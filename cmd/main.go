@@ -5,13 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	_ "github.com/lib/pq" // Import PostgreSQL driver
+	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"flashEvent/pkg/db"
 	"flashEvent/pkg/handlers"
-
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // @title Article REST API
@@ -24,59 +23,78 @@ func main() {
 	db.CreateTable(DB)
 	defer db.CloseConnection(DB)
 
+	r := gin.Default()
+
+	r.GET("/", homePage)
+
 	h := handlers.New(DB)
 
-	myRouter := mux.NewRouter().StrictSlash(true)
-
-	// Home page route
-	// @Summary Home page
-	// @Description Welcome page of the Article REST API
-	// @Router / [get]
-	myRouter.HandleFunc("/", homePage)
-
-	// Get all articles route
+	// Articles endpoints
 	// @Summary Get all articles
-	// @Description Retrieves a list of all articles
+	// @Description Get all articles from the database
+	// @Tags articles
+	// @Produce json
+	// @Success 200 {array} models.Article
 	// @Router /articles [get]
-	myRouter.HandleFunc("/articles", h.GetAllArticles).Methods(http.MethodGet)
+	r.GET("/articles", h.GetAllArticles)
 
-	// Get an article by ID route
 	// @Summary Get an article by ID
-	// @Description Retrieves a specific article by its ID
-	// @Param id path int true "Article ID"
+	// @Description Get an article from the database by its ID
+	// @Tags articles
+	// @Produce json
+	// @Param id path string true "Article ID"
+	// @Success 200 {object} models.Article
+	// @Failure 404 {string} string "Article not found"
 	// @Router /articles/{id} [get]
-	myRouter.HandleFunc("/articles/{id}", h.GetArticle).Methods(http.MethodGet)
+	r.GET("/articles/{id}", h.GetArticle)
 
-	// Add an article route
-	// @Summary Add an article
-	// @Description Adds a new article to the database
+	// @Summary Add a new article
+	// @Description Add a new article to the database
+	// @Tags articles
+	// @Accept json
+	// @Produce json
+	// @Param request body models.Article true "Article data to be added"
+	// @Success 201 {string} string "Created"
+	// @Failure 400 {string} string "Bad Request"
 	// @Router /articles [post]
-	myRouter.HandleFunc("/articles", h.AddArticle).Methods(http.MethodPost)
+	r.POST("/articles", h.AddArticle)
 
-	// Update an article route
 	// @Summary Update an existing article
-	// @Description Updates an existing article by its ID
-	// @Param id path int true "Article ID"
+	// @Description Update an existing article in the database
+	// @Tags articles
+	// @Accept json
+	// @Produce json
+	// @Param id path string true "Article ID"
+	// @Param request body models.Article true "Updated article data"
+	// @Success 200 {string} string "OK"
+	// @Failure 400 {string} string "Bad Request"
+	// @Failure 404 {string} string "Article not found"
 	// @Router /articles/{id} [put]
-	myRouter.HandleFunc("/articles/{id}", h.UpdateArticle).Methods(http.MethodPut)
+	r.PUT("/articles/{id}", h.UpdateArticle)
 
-	// Delete an article route
 	// @Summary Delete an article
-	// @Description Deletes an existing article by its ID
-	// @Param id path int true "Article ID"
+	// @Description Delete an article from the database
+	// @Tags articles
+	// @Produce json
+	// @Param id path string true "Article ID"
+	// @Success 200 {string} string "OK"
+	// @Failure 404 {string} string "Article not found"
 	// @Router /articles/{id} [delete]
-	myRouter.HandleFunc("/articles/{id}", h.DeleteArticle).Methods(http.MethodDelete)
+	r.DELETE("/articles/{id}", h.DeleteArticle)
 
-	// Serve Swagger documentation
-	myRouter.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("/swagger/doc.json"), // Specify the path to the Swagger JSON file
-	))
+	// Swagger UI route
+	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
-	log.Fatal(http.ListenAndServe(":8080", myRouter))
+	log.Fatal(r.Run(":8080"))
 	fmt.Println("Listening on port 8080")
 }
 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the Article REST API!")
-	fmt.Println("Article REST API")
+// @Summary Home page
+// @Description Welcome message for the Article REST API
+// @Produce plain
+// @Success 200 {string} string "Welcome to the Article REST API!"
+// @Router / [get]
+func homePage(c *gin.Context) {
+	c.String(http.StatusOK, "Welcome to the Article REST API!")
 }

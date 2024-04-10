@@ -14,7 +14,25 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Welcome message for the Article REST API",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Home page",
+                "responses": {
+                    "200": {
+                        "description": "Welcome to the Article REST API!",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
@@ -24,7 +42,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Article REST API",
-	Description:      "API de gestion des articles",
+	Description:      "API for managing articles",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
