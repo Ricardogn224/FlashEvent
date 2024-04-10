@@ -1,4 +1,9 @@
+basePath: /v1
+host: localhost:8080
 info:
   contact: {}
+  description: API de gestion des articles
+  title: Article REST API
+  version: "1.0"
 paths: {}
 swagger: "2.0"
