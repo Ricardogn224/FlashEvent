@@ -11,14 +11,14 @@ import (
 	"flashEvent/pkg/db"
 	"flashEvent/pkg/handlers"
 
-	"github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // @title Article REST API
 // @version 1.0
 // @description API de gestion des articles
 // @host localhost:8080
-// @BasePath /v1
+// @BasePath /
 func main() {
 	DB := db.Connect()
 	db.CreateTable(DB)
