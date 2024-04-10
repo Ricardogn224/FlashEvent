@@ -1,12 +1,70 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API de gestion des articles",
-        "title": "Article REST API",
-        "contact": {},
-        "version": "1.0"
+      "version": "1.0",
+      "title": "Article REST API",
+      "description": "API de gestion des articles"
     },
     "host": "localhost:8080",
     "basePath": "/",
-    "paths": {}
-}
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/": {
+        "get": {
+          "summary": "Page d'accueil",
+          "description": "Page d'accueil de l'API"
+        }
+      },
+      "/articles": {
+        "get": {
+          "summary": "Récupérer tous les articles",
+          "description": "Récupère la liste de tous les articles"
+        },
+        "post": {
+          "summary": "Ajouter un nouvel article",
+          "description": "Ajoute un nouvel article à la base de données"
+        }
+      },
+      "/articles/{id}": {
+        "get": {
+          "summary": "Récupérer un article par ID",
+          "description": "Récupère un article spécifique en fonction de son ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "integer"
+            }
+          ]
+        },
+        "put": {
+          "summary": "Mettre à jour un article existant",
+          "description": "Met à jour un article existant en fonction de son ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "integer"
+            }
+          ]
+        },
+        "delete": {
+          "summary": "Supprimer un article",
+          "description": "Supprime un article existant en fonction de son ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "integer"
+            }
+          ]
+        }
+      }
+    }
+  }
+  
