@@ -18,6 +18,14 @@ class RegisterScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                'Inscription',
+                style: TextStyle(
+                  fontSize: 24, // Font size resembling an H1 heading
+                  fontWeight: FontWeight.bold, // Bold font weight
+                ),
+              ),
+              SizedBox(height: 30),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
