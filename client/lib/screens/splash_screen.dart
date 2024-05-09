@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'base_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -11,15 +12,18 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BaseScreen()));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('Chargement...'),
+      body: Container(
+        color: Color(0xFF57A441), // Définit la couleur de fond en hexadécimal
+        child: Center(
+          child: Text('FLASH EVENT'),
+        ),
       ),
     );
   }
