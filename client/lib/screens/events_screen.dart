@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/widgets/event_row.dart';
 import 'event_details_screen.dart';
 
 
@@ -10,11 +11,11 @@ class EventsScreen extends StatelessWidget {
         title: Text('Événements'),
         centerTitle: true,
       ),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
+      body: SafeArea(child: Padding(padding: const EdgeInsets.all(8.0),
+        child: Scrollbar(child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
               decoration: InputDecoration(
                 hintText: 'Rechercher un événement',
                 prefixIcon: Icon(Icons.search),
@@ -26,33 +27,11 @@ class EventsScreen extends StatelessWidget {
                 fillColor: Colors.white,
               ),
             ),
+            EventRow(icon: Icon(Icons.arrow_right), text: "Evenement 1", onPressed: () {Navigator.of(context).pushNamed('/event_details');}, border: Colors.black),
+            ],
           ),
-          Expanded(
-            child: ListView.separated(
-              itemCount: 4,  // Supposons que vous avez 4 événements pour l'exemple
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Container(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Événement ${index + 1}'),
-                        Icon(Icons.arrow_forward_ios, size: 16),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pushNamed('/event_details');
-                  },
-
-                );
-              },
-              separatorBuilder: (context, index) => Divider(),
-            ),
-          ),
-        ],
-      ),
+        )),
+      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Action pour ajouter un nouvel événement
