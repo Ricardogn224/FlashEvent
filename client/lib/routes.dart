@@ -3,6 +3,7 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/events_screen.dart';
 import 'screens/event_details_screen.dart';
+import 'screens/event_new_screen.dart';
 import 'screens/splash_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -15,6 +16,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => EventsScreen());
     case '/event_details':
       return MaterialPageRoute(builder: (_) => EventDetailsScreen());
+    case '/event_new':
+      return MaterialPageRoute(builder: (_) => EventNewScreen());
     default:
       return MaterialPageRoute(builder: (_) => SplashScreen());
   }
