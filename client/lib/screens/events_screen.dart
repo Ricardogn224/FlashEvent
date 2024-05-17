@@ -16,6 +16,23 @@ class EventsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0), // Add bottom padding
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to the add event screen
+                    Navigator.pushNamed(context, '/invitations');
+                  },
+                  child: Text(
+                    "Voir mes invitations",
+                    style: TextStyle(
+                      color: Colors.blue, // Set text color to blue for link
+                      decoration: TextDecoration.underline, // Add underline for link
+                      fontSize: 18, // Set the font size
+                    ),
+                  ),
+                ),
+              ),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Rechercher un événement',
@@ -61,7 +78,7 @@ class EventsScreen extends StatelessWidget {
                               text: event.title,
                               onPressed: () {
                                 // Navigate to the add event screen
-                                Navigator.pushNamed(context, '/event_new');
+                                Navigator.pushNamed(context, '/event_details');
                               },
                               border: Colors.black,
                             ),
