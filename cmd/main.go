@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"flashEvent/db"
+	"github.com/janirefdez/ArticleRestApi/pkg/db"
+	"github.com/janirefdez/ArticleRestApi/pkg/handlers"
 
-	"flashEvent/pkg/db"
-	"flashEvent/pkg/handlers"
+
 )
 
 // @title Article REST API
