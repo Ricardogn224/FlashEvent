@@ -7,12 +7,19 @@ import (
 
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username" required:""`
 	Password string `json:"password" required:""`
+}
+
+// creation de la table user
+
+func MigrateUser(db *gorm.DB) {
+	db.AutoMigrate(&User{})
 }
 
 var (

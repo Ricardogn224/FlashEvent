@@ -16,8 +16,11 @@ func main() {
 	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
+
 	} else {
 		log.Println("Connected to database")
+		// Création des tables depuis les fichier modele
+
 	}
 
 	// Initialisation de l'API Swagger

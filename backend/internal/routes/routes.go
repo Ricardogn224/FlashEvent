@@ -22,7 +22,7 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 		endpoint.New(
 			http.MethodGet, "/event/{eventId}",
-			endpoint.Handler(controllers.FindEventByID),
+			endpoint.Handler(http.HandlerFunc(controllers.FindEventByID(db))), // Correction ici
 			endpoint.Summary("Find event by ID"),
 			endpoint.Path("eventId", "integer", "ID of event to return", true),
 			endpoint.Response(http.StatusOK, "successful operation", endpoint.SchemaResponseOption(controllers.Event{})),
@@ -36,7 +36,7 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 		endpoint.New(
 			http.MethodPost, "/register",
-			endpoint.Handler(controllers.RegisterUser),
+			endpoint.Handler(http.HandlerFunc(controllers.RegisterUser)), // Correction ici
 			endpoint.Summary("Register a new user"),
 			endpoint.Description("Register a new user with a username and password"),
 			endpoint.Body(controllers.User{}, "User object that needs to be registered", true),
@@ -44,7 +44,7 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 		endpoint.New(
 			http.MethodPost, "/login",
-			endpoint.Handler(controllers.LoginUser),
+			endpoint.Handler(http.HandlerFunc(controllers.LoginUser)), // Correction ici
 			endpoint.Summary("Login a user"),
 			endpoint.Description("Login a user and get a token"),
 			endpoint.Body(controllers.User{}, "User credentials", true),

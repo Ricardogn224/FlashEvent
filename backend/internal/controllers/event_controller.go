@@ -18,9 +18,17 @@ type Event struct {
 	Description string    `json:"description"`
 }
 
+// création de la table event
+func MigrateEvent(db *gorm.DB) {
+	db.AutoMigrate(&Event{})
+}
+
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		MigrateEvent(db)
+
 		var event Event
 		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -41,6 +49,9 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 // FindEventByID récupère un événement par son ID
 func FindEventByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		MigrateEvent(db)
+
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -63,6 +74,9 @@ func FindEventByID(db *gorm.DB) http.HandlerFunc {
 // UpdateEventByID met à jour un événement par son ID
 func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		MigrateEvent(db)
+
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -75,8 +89,6 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
-		// Vous pouvez implémenter la logique de validation et de mise à jour ici
 
 		// Mise à jour de l'événement dans la base de données
 		result := db.Model(&Event{}).Where("id = ?", id).Updates(&updatedEvent)
