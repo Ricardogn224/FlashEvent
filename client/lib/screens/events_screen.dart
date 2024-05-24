@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/widgets/event_row.dart';
 import 'package:flutter_flash_event/core/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'event_details_screen.dart';
 
-class EventsScreen extends StatelessWidget {
+
+class EventsScreen extends StatefulWidget {
+  @override
+  _EventsScreenState createState() => _EventsScreenState();
+}
+
+class _EventsScreenState extends State<EventsScreen> {
+  String? _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,6 +38,32 @@ class EventsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    _username ?? '',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0), // Add bottom padding
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to the add event screen
+                    Navigator.pushNamed(context, '/invitations');
+                  },
+                  child: Text(
+                    "Voir mes invitations",
+                    style: TextStyle(
+                      color: Colors.blue, // Set text color to blue for link
+                      decoration: TextDecoration.underline, // Add underline for link
+                      fontSize: 18, // Set the font size
+                    ),
+                  ),
+                ),
+              ),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Rechercher un événement',
@@ -61,7 +109,7 @@ class EventsScreen extends StatelessWidget {
                               text: event.title,
                               onPressed: () {
                                 // Navigate to the add event screen
-                                Navigator.pushNamed(context, '/event_new');
+                                Navigator.pushNamed(context, '/event_details');
                               },
                               border: Colors.black,
                             ),

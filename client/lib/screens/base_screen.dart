@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/screens/admin_home_desktop_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 import 'events_screen.dart';
@@ -21,12 +22,12 @@ class _BaseScreenState extends State<BaseScreen> {
   void _checkLoginStatus() async {
     // Simulation de la vérification de l'état de connexion
     // Vous devez remplacer cette logique par votre mécanisme de vérification d'authentification
-    bool isLoggedIn = true;
+    bool isLoggedIn = false;
 
     if (isLoggedIn) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EventsScreen()));
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeDesktop()));
     }
   }
 
