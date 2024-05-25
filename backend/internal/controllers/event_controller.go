@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -12,15 +11,31 @@ import (
 
 // Event représente la structure d'un événement
 type Event struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
-	Name        string    `json:"name" validate:"required"`
-	Date        time.Time `json:"date" validate:"required"`
-	Description string    `json:"description"`
+	ID          uint   `gorm:"primaryKey" json:"id"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
 }
 
 // création de la table event
 func MigrateEvent(db *gorm.DB) {
 	db.AutoMigrate(&Event{})
+}
+
+func GetAllEvents(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		MigrateEvent(db)
+
+		var events []Event
+		result := db.Find(&events)
+		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(events)
+	}
 }
 
 // AddEvent gère l'ajout d'un nouvel événement

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internal/controllers"
+	"backend/internal/models"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,6 +13,13 @@ import (
 
 func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 	api.AddEndpoint(
+		endpoint.New(
+			http.MethodGet, "/events",
+			endpoint.Handler(http.HandlerFunc(controllers.GetAllEvents(db))),
+			endpoint.Summary("Get all events"),
+			endpoint.Description("Retrieve all events from the store"),
+			endpoint.Response(http.StatusOK, "Successfully retrieved events", endpoint.SchemaResponseOption([]controllers.Event{})),
+		),
 		endpoint.New(
 			http.MethodPost, "/event",
 			endpoint.Handler(controllers.AuthMiddleware(http.HandlerFunc(controllers.AddEvent(db)))),
@@ -49,6 +57,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Login a user and get a token"),
 			endpoint.Body(controllers.User{}, "User credentials", true),
 			endpoint.Response(http.StatusOK, "Successfully logged in", endpoint.SchemaResponseOption(map[string]string{"message": ""})),
+		),
+		endpoint.New(
+			http.MethodPost, "/participant",
+			endpoint.Handler(http.HandlerFunc(controllers.AddParticipant(db))),
+			endpoint.Summary("Add a new participant"),
+			endpoint.Description("Add a new participant to an event"),
+			endpoint.Body(models.Participant_add{}, "Participant object that needs to be added", true),
+			endpoint.Response(http.StatusCreated, "Successfully added participant", endpoint.SchemaResponseOption(models.Participant{})),
 		),
 	)
 
