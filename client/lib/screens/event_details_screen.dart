@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/screens/items_event_screen.dart';
 
 class EventDetailsScreen extends StatelessWidget {
 
@@ -36,7 +37,8 @@ class EventDetailsScreen extends StatelessWidget {
             title: Text('Liste des choses à ramener'),
             trailing: Icon(Icons.add),
             onTap: () {
-              // Naviguer vers la liste des choses à ramener
+              // Navigate to EventItemsScreen when tapped
+              Navigator.pushNamed(context, '/item-event');
             },
           ),
           ListTile(
