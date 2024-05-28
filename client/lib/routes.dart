@@ -6,6 +6,7 @@ import 'screens/register_screen.dart';
 import 'screens/events_screen.dart';
 import 'screens/event_details_screen.dart';
 import 'screens/event_new_screen.dart';
+import 'screens/event_participants_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/admin_home_desktop_screen.dart';
 
@@ -19,6 +20,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => EventsScreen());
     case '/event_details':
       return MaterialPageRoute(builder: (_) => EventDetailsScreen());
+    case '/event_participants':
+      return MaterialPageRoute(builder: (_) => EventParticipantsScreen());
     case '/event_new':
       return MaterialPageRoute(builder: (_) => EventNewScreen());
     case '/invitations':
