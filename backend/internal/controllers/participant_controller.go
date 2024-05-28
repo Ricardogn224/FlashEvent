@@ -15,8 +15,30 @@ func MigrateParticipant(db *gorm.DB) {
 	db.AutoMigrate(&models.Participant{})
 }
 
+func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
+	// Initialiser la table Event si elle n'existe pas
+	MigrateParticipant(db)
+	// Valider que l'utilisateur et l'événement existent
+	var user models.User
+	if err := db.First(&user, participant.UserID).Error; err != nil {
+		return err
+	}
+	var event models.Event
+	if err := db.First(&event, participant.EventID).Error; err != nil {
+		return err
+	}
+
+	// Créer le participant
+	if err := db.Create(&participant).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AddParticipant handles the addition of a new participant to an event
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
+	MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
 		var participant models.Participant
 		if err := json.NewDecoder(r.Body).Decode(&participant); err != nil {

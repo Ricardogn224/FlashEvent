@@ -10,14 +10,25 @@ class MyAccountScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 60), // Add some space from the top
-            Center(
-              child: Text(
-                'My Account',
-                style: TextStyle(
-                  fontSize: 32, // H1 equivalent size
-                  fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate back to the previous screen
+                    Navigator.pop(context);
+                  },
+                  child: Text('Back'),
                 ),
-              ),
+                SizedBox(width: 38),
+                Text(
+                  'My Account',
+                  style: TextStyle(
+                    fontSize: 32, // H1 equivalent size
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 30), // Space between the title and the content
             Text(

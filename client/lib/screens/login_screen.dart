@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/services/auth_services.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 import 'events_screen.dart';
 import 'register_screen.dart';
+import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -36,9 +38,21 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         final response = await AuthServices.loginUser(email, password);
         if (response.statusCode == 200) {
-          // Store username in session
+          // Extract token from response body
+          Map<String, dynamic> data = jsonDecode(response.body);
+          String token = data['token'];
+          print(token);
+
+          // Decode the token
+          Map<String, dynamic>? decodedToken = Jwt.parseJwt(token);
+          print(decodedToken);
+// Access information from the decoded token
+          String email = decodedToken['email'];
+
+          // Store token in session
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('username', email);
+          await prefs.setString('token', token);
+          await prefs.setString('email', email);
 
           // Navigate to events screen
           Navigator.pushReplacement(

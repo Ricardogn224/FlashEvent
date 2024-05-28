@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,6 +16,7 @@ func MigrateEvent(db *gorm.DB) {
 	db.AutoMigrate(&models.Event{})
 }
 
+// GetAllEvents retourne tous les événements
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table Event si elle n'existe pas
@@ -35,6 +37,7 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("AddEvent function called")
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
 
@@ -55,14 +58,15 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Event created:", event)
 		// Create the participant
 		participant := models.Participant{
 			UserID:  eventAdd.UserID,
 			EventID: event.ID,
 			Active:  true, // Set the participant as active by default
 		}
-		if err := db.Create(&participant).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		if err := addParticipantEvent(db, participant); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -125,4 +129,17 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(updatedEvent)
 	}
+}
+
+// Secure handler functions with AuthMiddleware
+func AuthenticatedAddEvent(db *gorm.DB) http.HandlerFunc {
+	return AuthMiddleware(AddEvent(db)).(http.HandlerFunc)
+}
+
+func AuthenticatedFindEventByID(db *gorm.DB) http.HandlerFunc {
+	return AuthMiddleware(FindEventByID(db)).(http.HandlerFunc)
+}
+
+func AuthenticatedUpdateEventByID(db *gorm.DB) http.HandlerFunc {
+	return AuthMiddleware(UpdateEventByID(db)).(http.HandlerFunc)
 }

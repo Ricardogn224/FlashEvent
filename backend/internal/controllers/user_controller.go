@@ -4,11 +4,19 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
+	"time"
 
-	"github.com/gorilla/sessions"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
+
+var jwtKey = []byte("your_secret_key")
+
+type Claims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
 
 // MigrateUser crée la table User si elle n'existe pas
 func MigrateUser(db *gorm.DB) {
@@ -16,7 +24,7 @@ func MigrateUser(db *gorm.DB) {
 }
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
-func RegisterUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
+func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
@@ -46,7 +54,7 @@ func RegisterUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 }
 
 // LoginUser gère la connexion d'un utilisateur
-func LoginUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
+func LoginUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
@@ -69,20 +77,24 @@ func LoginUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 			return
 		}
 
-		session, err := store.Get(r, "session")
+		expirationTime := time.Now().Add(5 * time.Minute)
+		claims := &Claims{
+			Email: user.Email,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString(jwtKey)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		session.Values["authenticated"] = true
-		if err := session.Save(r, w); err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
+		// Au lieu de définir le cookie, on renvoie le token dans la réponse JSON
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Successfully logged in"})
+		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 	}
 }
 
@@ -101,16 +113,30 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// AuthMiddleware vérifie si l'utilisateur est authentifié
-func AuthMiddleware(store *sessions.CookieStore, next http.Handler) http.Handler {
+// AuthMiddleware vérifie le token JWT
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, err := store.Get(r, "session")
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		tokenStr := authHeader[len("Bearer "):]
+		claims := &Claims{}
+
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+		if !token.Valid {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

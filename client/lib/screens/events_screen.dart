@@ -11,7 +11,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  String? _username;
+  String? _email;
 
   @override
   void initState() {
@@ -22,7 +22,7 @@ class _EventsScreenState extends State<EventsScreen> {
   Future<void> _loadUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _username = prefs.getString('username');
+      _email = prefs.getString('email');
     });
   }
 
@@ -51,7 +51,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                   child: Text(
-                    _username ?? '',
+                    _email ?? '',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
