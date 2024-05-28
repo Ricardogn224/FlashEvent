@@ -13,13 +13,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -30,15 +30,15 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      String username = _usernameController.text;
+      String email = _emailController.text;
       String password = _passwordController.text;
 
       try {
-        final response = await AuthServices.loginUser(username, password);
+        final response = await AuthServices.loginUser(email, password);
         if (response.statusCode == 200) {
           // Store username in session
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('username', username);
+          await prefs.setString('username', email);
 
           // Navigate to events screen
           Navigator.pushReplacement(
@@ -84,17 +84,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 30),
                 TextFormField(
-                  controller: _usernameController,
+                  controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: 'Enter your username',
-                    labelText: 'Username',
+                    hintText: 'Enter your email',
+                    labelText: 'Email',
                     fillColor: Colors.white, // Text field background color
                     filled: true,
                     border: OutlineInputBorder(), // Text field border
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
+                      return 'Please enter your email';
                     }
                     return null;
                   },

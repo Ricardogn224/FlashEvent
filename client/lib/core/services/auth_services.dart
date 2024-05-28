@@ -30,14 +30,14 @@ class AuthServices {
     }
   }
 
-  static Future<http.Response> loginUser(String username, String password) async {
+  static Future<http.Response> loginUser(String email, String password) async {
     final response = await http.post(
       Uri.parse('http://10.0.2.2:8080/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'username': username,
+        'email': email,
         'password': password,
       }),
     );
