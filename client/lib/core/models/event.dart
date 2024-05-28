@@ -1,16 +1,16 @@
 class Event {
-  final String title;
+  final String name;
   final String description;
 
 
   Event({
-    required this.title,
+    required this.name,
     required this.description,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
-      title: json['title'],
+      name: json['name'],
       description: json['description'],
     );
   }

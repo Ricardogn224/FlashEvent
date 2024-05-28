@@ -22,12 +22,12 @@ class _BaseScreenState extends State<BaseScreen> {
   void _checkLoginStatus() async {
     // Simulation de la vérification de l'état de connexion
     // Vous devez remplacer cette logique par votre mécanisme de vérification d'authentification
-    bool isLoggedIn = false;
+    bool isLoggedIn = true;
 
     if (isLoggedIn) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EventsScreen()));
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeDesktop()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
   }
 

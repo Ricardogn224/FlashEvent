@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+
+class MyAccountScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 60), // Add some space from the top
+            Center(
+              child: Text(
+                'My Account',
+                style: TextStyle(
+                  fontSize: 32, // H1 equivalent size
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 30), // Space between the title and the content
+            Text(
+              'First Name: User',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Last Name: User',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Email: user@gmail.com',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/screens/invitation_screen.dart';
+import 'package:flutter_flash_event/screens/my_account_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/events_screen.dart';
@@ -28,6 +29,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => ManageUsersScreen());
     case '/manage-events':
       return MaterialPageRoute(builder: (_) => ManageEventsScreen());
+    case '/my-account':
+      return MaterialPageRoute(builder: (_) => MyAccountScreen());
     default:
       return MaterialPageRoute(builder: (_) => SplashScreen());
   }

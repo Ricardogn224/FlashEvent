@@ -32,6 +32,15 @@ class _EventsScreenState extends State<EventsScreen> {
       appBar: AppBar(
         title: Text('Événements'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () {
+              // Navigate to the account screen
+              Navigator.pushNamed(context, '/my-account');
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -106,7 +115,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           children: [
                             EventRow(
                               icon: Icon(Icons.chevron_right),
-                              text: event.title,
+                              text: event.name,
                               onPressed: () {
                                 // Navigate to the add event screen
                                 Navigator.pushNamed(context, '/event_details');

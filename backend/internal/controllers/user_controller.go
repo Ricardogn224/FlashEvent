@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/models"
 	"encoding/json"
 	"net/http"
 
@@ -9,16 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// User représente la structure d'un utilisateur
-type User struct {
-	ID       int64  `gorm:"primaryKey" json:"id"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
-
 // MigrateUser crée la table User si elle n'existe pas
 func MigrateUser(db *gorm.DB) {
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&models.User{})
 }
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
@@ -27,7 +21,7 @@ func RegisterUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
 
-		var user User
+		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -57,14 +51,14 @@ func LoginUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
 
-		var credentials User
+		var credentials models.User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		var user User
-		result := db.Where("username = ?", credentials.Username).First(&user)
+		var user models.User
+		result := db.Where("email = ?", credentials.Email).First(&user)
 		if result.Error != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
@@ -89,6 +83,21 @@ func LoginUser(db *gorm.DB, store *sessions.CookieStore) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Successfully logged in"})
+	}
+}
+
+// GetAllUsers returns all users
+func GetAllUsers(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var users []models.User
+		result := db.Find(&users)
+		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(users)
 	}
 }
 

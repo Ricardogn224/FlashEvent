@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/models"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -9,16 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// Event représente la structure d'un événement
-type Event struct {
-	ID          uint   `gorm:"primaryKey" json:"id"`
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description"`
-}
-
 // création de la table event
 func MigrateEvent(db *gorm.DB) {
-	db.AutoMigrate(&Event{})
+	db.AutoMigrate(&models.Event{})
 }
 
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
@@ -26,7 +20,7 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
 
-		var events []Event
+		var events []models.Event
 		result := db.Find(&events)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -44,14 +38,30 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
 
-		var event Event
-		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+		var eventAdd models.EventAdd
+		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
+		// Create the event
+		event := models.Event{
+			Name:        eventAdd.Name,
+			Description: eventAdd.Description,
+		}
 		result := db.Create(&event)
 		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// Create the participant
+		participant := models.Participant{
+			UserID:  eventAdd.UserID,
+			EventID: event.ID,
+			Active:  true, // Set the participant as active by default
+		}
+		if err := db.Create(&participant).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -74,7 +84,7 @@ func FindEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var event Event
+		var event models.Event
 		result := db.First(&event, id)
 		if result.Error != nil {
 			http.Error(w, "Event not found", http.StatusNotFound)
@@ -99,14 +109,14 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var updatedEvent Event
+		var updatedEvent models.Event
 		if err := json.NewDecoder(r.Body).Decode(&updatedEvent); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		// Mise à jour de l'événement dans la base de données
-		result := db.Model(&Event{}).Where("id = ?", id).Updates(&updatedEvent)
+		result := db.Model(&models.Event{}).Where("id = ?", id).Updates(&updatedEvent)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return

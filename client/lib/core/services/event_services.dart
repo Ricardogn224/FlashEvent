@@ -15,7 +15,7 @@ class EventServices {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'name': event.title,
+        'name': event.name,
         'description': event.description,
       }),
     );

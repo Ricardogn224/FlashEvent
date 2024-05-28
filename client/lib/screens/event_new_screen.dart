@@ -30,7 +30,7 @@ class _EventNewScreenState extends State<EventNewScreen> {
       });
 
       Event newEvent = Event(
-        title: _titleController.text,
+        name  : _titleController.text,
         description: _descriptionController.text,
       );
 

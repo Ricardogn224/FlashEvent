@@ -30,7 +30,7 @@ class ApiServices {
 
   static Future<List<Event>> getEvents() async {
     try {
-      final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+      final response = await http.get(Uri.parse('http://10.0.2.2:8080/events'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 

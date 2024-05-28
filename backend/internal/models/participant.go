@@ -9,7 +9,7 @@ type Participant struct {
 	Active  bool  `json:"active" gorm:"default:true"` // New active field
 }
 
-type Participant_add struct {
+type ParticipantAdd struct {
 	UserID  uint `json:"user_id" gorm:"not null"`
 	EventID uint `json:"event_id" gorm:"not null"`
 	Active  bool `json:"active" gorm:"default:true"` // New active field
