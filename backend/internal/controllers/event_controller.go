@@ -3,7 +3,6 @@ package controllers
 import (
 	"backend/internal/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -37,13 +36,19 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("AddEvent function called")
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
 
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Find the user by email
+		var user models.User
+		if err := db.Where("email = ?", eventAdd.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
@@ -58,10 +63,9 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Event created:", event)
-		// Create the participant
+		// Create the participant using the retrieved user ID
 		participant := models.Participant{
-			UserID:  eventAdd.UserID,
+			UserID:  user.ID,
 			EventID: event.ID,
 			Active:  true, // Set the participant as active by default
 		}

@@ -11,5 +11,5 @@ type Event struct {
 type EventAdd struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
-	UserID      uint   `json:"user_id" validate:"required"`
+	Email       string `json:"email"`
 }
