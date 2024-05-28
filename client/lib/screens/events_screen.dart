@@ -61,7 +61,7 @@ class EventsScreen extends StatelessWidget {
                               text: event.title,
                               onPressed: () {
                                 // Navigate to the add event screen
-                                Navigator.pushNamed(context, '/event_new');
+                                Navigator.pushNamed(context, '/event_details');
                               },
                               border: Colors.black,
                             ),
