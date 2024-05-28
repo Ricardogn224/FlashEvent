@@ -30,7 +30,7 @@ class EventDetailsScreen extends StatelessWidget {
             title: Text('Liste des participants'),
             trailing: Icon(Icons.people),
             onTap: () {
-              // Naviguer vers la liste des participants
+              Navigator.pushNamed(context, '/event_participants');
             },
           ),
           ListTile(
