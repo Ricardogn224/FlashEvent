@@ -118,7 +118,7 @@ class _EventsScreenState extends State<EventsScreen> {
                               text: event.name,
                               onPressed: () {
                                 // Navigate to the add event screen
-                                Navigator.pushNamed(context, '/event_details');
+                                Navigator.pushNamed(context, '/event_details', arguments: event.id);
                               },
                               border: Colors.black,
                             ),

@@ -86,7 +86,7 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Handler(http.HandlerFunc(controllers.AddItem(db))),
 			endpoint.Summary("Add a new item"),
 			endpoint.Description("Add a new item to an event"),
-			endpoint.Body(models.ItemEvent{}, "Item object that needs to be added", true),
+			endpoint.Body(models.ItemEventAdd{}, "Item object that needs to be added", true),
 			endpoint.Response(http.StatusCreated, "Successfully added item", endpoint.SchemaResponseOption(models.ItemEvent{})),
 		),
 		endpoint.New(

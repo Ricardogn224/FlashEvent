@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/core/models/itemEvent.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:flutter_flash_event/core/services/item_services.dart';
 import 'events_screen.dart';
 
-class EventNewScreen extends StatefulWidget {
-  const EventNewScreen({Key? key}) : super(key: key);
+class ItemNewScreen extends StatefulWidget {
+  const ItemNewScreen({Key? key}) : super(key: key);
 
   @override
-  _EventNewScreenState createState() => _EventNewScreenState();
+  _ItemNewScreenState createState() => _ItemNewScreenState();
 }
 
-class _EventNewScreenState extends State<EventNewScreen> {
+class _ItemNewScreenState extends State<ItemNewScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _nameController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -29,14 +29,15 @@ class _EventNewScreenState extends State<EventNewScreen> {
         _isLoading = true;
       });
 
-      Event newEvent = Event(
+      ItemEvent newItem = ItemEvent(
         id: 0,
-        name  : _titleController.text,
-        description: _descriptionController.text,
+        name  : _nameController.text,
+        eventId: 0,
+        userId: 0
       );
 
       try {
-        final response = await EventServices.addEvent(newEvent);
+        final response = await ItemServices.addItem(newItem);
         if (response.statusCode == 201) {
           // Event creation successful, navigate to events screen
           Navigator.pushReplacement(
@@ -81,7 +82,7 @@ class _EventNewScreenState extends State<EventNewScreen> {
                 ),
                 SizedBox(width: 38),
                 Text(
-                  'New Event',
+                  'New Item',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -95,7 +96,7 @@ class _EventNewScreenState extends State<EventNewScreen> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: TextFormField(
-                      controller: _titleController,
+                      controller: _nameController,
                       decoration: InputDecoration(
                         hintText: 'Title',
                         border: OutlineInputBorder(),
@@ -103,22 +104,6 @@ class _EventNewScreenState extends State<EventNewScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a title';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: TextFormField(
-                      controller: _descriptionController,
-                      decoration: InputDecoration(
-                        hintText: 'Description',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a description';
                         }
                         return null;
                       },

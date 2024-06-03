@@ -22,7 +22,7 @@ class MyAccountScreen extends StatelessWidget {
                 ),
                 SizedBox(width: 38),
                 Text(
-                  'My Account',
+                  'Mon compte',
                   style: TextStyle(
                     fontSize: 32, // H1 equivalent size
                     fontWeight: FontWeight.bold,
@@ -32,12 +32,12 @@ class MyAccountScreen extends StatelessWidget {
             ),
             SizedBox(height: 30), // Space between the title and the content
             Text(
-              'First Name: User',
+              'First Name: Hernandez',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
             Text(
-              'Last Name: User',
+              'Last Name: Ricardo',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
