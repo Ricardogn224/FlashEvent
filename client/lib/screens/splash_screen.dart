@@ -11,7 +11,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BaseScreen()));
     });
   }
@@ -20,9 +20,17 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(0xFF57A441), // Définit la couleur de fond en hexadécimal
-        child: Center(
-          child: Text('FLASH EVENT'),
+        color: Color.fromARGB(255, 0, 0, 0), // Définit la couleur de fond en hexadécimal
+        child: const Center(
+          child: Text(
+            'Flash Event',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic 
+            ),
+            ),
         ),
       ),
     );
