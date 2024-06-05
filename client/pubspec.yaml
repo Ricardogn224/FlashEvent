@@ -39,6 +39,8 @@ dependencies:
   dio: ^5.4.1
   http: ^1.2.1
   flutter_bloc: ^8.1.5
+  bloc: ^8.0.0
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_test:
