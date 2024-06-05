@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5iw2/home/blocs/home_bloc.dart';
-import 'package:flutter_5iw2/product/product_screen.dart';
-import 'package:flutter_5iw2/shared/widgets/cart_floating_button.dart';
+import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,26 +28,24 @@ class HomeScreen extends StatelessWidget {
             if (state is HomeDataLoadSuccess) {
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  final product = state.products[index];
+                  final event = state.events[index];
                   return ListTile(
-                    leading: Image.network(product.thumbnail),
-                    title: Text(product.title),
+                    title: Text(event.name),
                     subtitle: Text(
-                      product.description,
+                      event.description,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: () => ProductScreen.navigateTo(context, id: product.id),
+
                   );
                 },
-                itemCount: state.products.length,
+                itemCount: state.events.length,
               );
             }
 
             return const SizedBox();
           },
         ),
-        floatingActionButton: const CartFloatingButton(),
       ),
     );
   }
