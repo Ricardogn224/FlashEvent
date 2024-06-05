@@ -198,6 +198,7 @@ func main() {
             endpoint.Description("Add a new event to the store"),
             endpoint.Body(Event{}, "Event object that needs to be added", true),
             endpoint.Response(http.StatusCreated, "Successfully added event", endpoint.SchemaResponseOption(Event{})),
+            endpoint.Tags("Events"),
         ),
         endpoint.New(
             http.MethodGet, "/event/{eventId}",
@@ -205,6 +206,7 @@ func main() {
             endpoint.Summary("Find event by ID"),
             endpoint.Path("eventId", "integer", "ID of event to return", true),
             endpoint.Response(http.StatusOK, "successful operation", endpoint.SchemaResponseOption(Event{})),
+            endpoint.Tags("Events"),
         ),
         endpoint.New(
             http.MethodPut, "/event/{eventId}",
@@ -212,6 +214,7 @@ func main() {
             endpoint.Path("eventId", "integer", "ID of event to update", true),
             endpoint.Body(Event{}, "Event object with updated details", true),
             endpoint.Response(http.StatusOK, "Successfully updated event", endpoint.SchemaResponseOption(Event{})),
+            endpoint.Tags("Events"),
         ),
         endpoint.New(
             http.MethodPost, "/register",
@@ -220,6 +223,7 @@ func main() {
             endpoint.Description("Register a new user with a username and password"),
             endpoint.Body(User{}, "User object that needs to be registered", true),
             endpoint.Response(http.StatusCreated, "Successfully registered user", endpoint.SchemaResponseOption(User{})),
+            endpoint.Tags("Users"),
         ),
         endpoint.New(
             http.MethodPost,"/login",
@@ -228,6 +232,7 @@ func main() {
             endpoint.Description("Login a user and get a token"),
             endpoint.Body(User{}, "User credentials", true),
             endpoint.Response(http.StatusOK, "Successfully logged in", endpoint.SchemaResponseOption(map[string]string{"message": ""})),
+            endpoint.Tags("Users"),
         ),
     )
 
