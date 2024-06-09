@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/widgets/event_row.dart';
 import 'package:flutter_flash_event/core/services/api_services.dart';
-import 'event_details_screen.dart';
+import '../eventParty/event_details_screen.dart';
 
 class Invitation {
   final String title;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-
+                    onTap: () => EventScreen.navigateTo(context, id: event.id),
                   );
                 },
                 itemCount: state.events.length,
@@ -45,6 +46,14 @@ class HomeScreen extends StatelessWidget {
 
             return const SizedBox();
           },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navigate to the add event screen
+            Navigator.pushNamed(context, '/event_new');
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.blue,
         ),
       ),
     );

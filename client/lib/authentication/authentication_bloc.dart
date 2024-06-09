@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'authentication_event.dart';
 import 'authentication_state.dart';
 
@@ -18,7 +19,12 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     final token = prefs.getString('token');
 
     if (token != null) {
-      emit(AuthenticationAuthenticated());
+      bool isTokenExpired = JwtDecoder.isExpired(token);
+      if (isTokenExpired) {
+        emit(AuthenticationUnauthenticated());
+      } else {
+        emit(AuthenticationAuthenticated());
+      }
     } else {
       emit(AuthenticationUnauthenticated());
     }

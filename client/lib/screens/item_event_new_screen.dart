@@ -3,7 +3,8 @@ import 'package:flutter_flash_event/core/models/itemEvent.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/core/services/item_services.dart';
-import 'events_screen.dart';
+import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
+import 'package:flutter_flash_event/home/home_screen.dart';
 
 class ItemNewScreen extends StatefulWidget {
   const ItemNewScreen({Key? key}) : super(key: key);
@@ -42,7 +43,7 @@ class _ItemNewScreenState extends State<ItemNewScreen> {
           // Event creation successful, navigate to events screen
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => EventsScreen()),
+            MaterialPageRoute(builder: (context) => HomeScreen()),
           );
         } else {
           // Handle error
