@@ -11,8 +11,38 @@ services:
       - POSTGRES_DB=articlesDB
       - POSTGRES_USER=janire
       - POSTGRES_PASSWORD=password
+    networks:
+      - go_app_network
+
   adminer:
     image: adminer
     restart: unless-stopped
     ports:
       - 8088:8080
+    networks:
+      - go_app_network
+
+  go_app:
+    container_name: go_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgres://janire:password@database:5432/articlesDB
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_USER=janire
+      - DB_PASSWORD=password
+      - DB_NAME=articlesDB
+    networks:
+        - go_app_network
+
+networks:
+  go_app_network:
+    driver: bridge
+
+
