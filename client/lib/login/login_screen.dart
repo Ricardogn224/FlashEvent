@@ -18,26 +18,27 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9F9F9),  // Couleur de fond de l'écran
       body: BlocProvider(
         create: (context) => LoginBloc(),
         child: BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginLoading) {
-              // Show loading indicator
+              // Afficher un indicateur de chargement
               showDialog(
                 context: context,
                 barrierDismissible: false,
                 builder: (context) => const Center(child: CircularProgressIndicator()),
               );
             } else if (state is LoginSuccess) {
-              Navigator.of(context).pop(); // Dismiss the loading indicator
+              Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               context.read<AuthenticationBloc>().add(LoggedIn());
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => HomeScreen()),
               );
             } else if (state is LoginFailure) {
-              Navigator.of(context).pop(); // Dismiss the loading indicator
+              Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.error)),
               );
@@ -50,26 +51,34 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Image(
+                    image: AssetImage('assets/flash-event-logo.png'),
+                    height: 150,
+                  ),
+                  const SizedBox(height: 30),
                   const Text(
                     'Connexion',
                     style: TextStyle(
-                      fontSize: 24, // Font size resembling an H1 heading
-                      fontWeight: FontWeight.bold, // Bold font weight
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your email',
+                    decoration: InputDecoration(
+                      hintText: 'Entrez votre email',
                       labelText: 'Email',
-                      fillColor: Colors.white, // Text field background color
+                      fillColor: Colors.white,
                       filled: true,
-                      border: OutlineInputBorder(), // Text field border
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
+                        return 'Veuillez entrer votre email';
                       }
                       return null;
                     },
@@ -78,53 +87,64 @@ class LoginScreen extends StatelessWidget {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your password',
-                      labelText: 'Password',
-                      fillColor: Colors.white, // Text field background color
+                    decoration: InputDecoration(
+                      hintText: 'Entrez votre mot de passe',
+                      labelText: 'Mot de passe',
+                      fillColor: Colors.white,
                       filled: true,
-                      border: OutlineInputBorder(), // Text field border
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Veuillez entrer votre mot de passe';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 20),
-                  BlocBuilder<LoginBloc, LoginState>(
-                    builder: (context, state) {
-                      return ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            BlocProvider.of<LoginBloc>(context).add(
-                              LoginButtonPressed(
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                              ),
-                            );
-                          }
-                        },
-                        child: state is LoginLoading
-                            ? const CircularProgressIndicator()
-                            : const Text('Login'),
-                      );
-                    },
+                  SizedBox(
+                    width: double.infinity, // Assurer que le bouton ait la même largeur que les input
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF6058E9), // Couleur personnalisée du bouton
+                        foregroundColor: Colors.white, // Couleur du texte sur le bouton
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          BlocProvider.of<LoginBloc>(context).add(
+                            LoginButtonPressed(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Connexion'),
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigate to the registration page when the text is clicked
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const RegisterScreen()),
                       );
                     },
-                    child: const Text(
-                      'Not registered yet? Click here',
-                      style: TextStyle(
-                        color: Colors.blue, // Text color of the clickable text
-                        decoration: TextDecoration.underline, // Underline the text
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'Pas encore inscrit ? Cliquez ici',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor, // Utilise la couleur principale du thème
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
