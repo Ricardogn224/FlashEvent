@@ -19,17 +19,12 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color.fromARGB(255, 0, 0, 0), // Définit la couleur de fond en hexadécimal
+        color: Color(0xFFF9F9F9), // Définit la couleur de fond en hexadécimal
         child: const Center(
-          child: Text(
-            'Flash Event',
-            style: TextStyle(
-              fontSize: 24,
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic 
-            ),
-            ),
+          child: Image(
+            image: AssetImage('assets/flash-event-logo.png'), // Chemin vers votre logo
+            height: 300, // Ajustez la hauteur du logo si nécessaire
+          ),
         ),
       ),
     );
