@@ -140,10 +140,31 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			}{}, "Utilitaires à ajouter à l'événement", true),
 			endpoint.Response(http.StatusCreated, "Utilitaires ajoutés avec succès à l'événement", endpoint.SchemaResponseOption(models.Event{})),
 		),
+
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/message",
+			endpoint.Handler(http.HandlerFunc(controllers.SendMessage(db))),
+			endpoint.Summary("Send a message"),
+			endpoint.Description("Send a message in the event chat room"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Body(models.Message{}, "Message object", true),
+			endpoint.Response(http.StatusCreated, "Message sent", endpoint.SchemaResponseOption(models.Message{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/event/{eventId}/messages",
+			endpoint.Handler(http.HandlerFunc(controllers.GetMessages(db))),
+			endpoint.Summary("Get messages"),
+			endpoint.Description("Retrieve messages from the event chat room"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.Message{})),
+		),
 	)
 
 	router.Path("/swagger/json").Methods("GET").Handler(api.Handler())
 	router.PathPrefix("/swagger/ui").Handler(swag.UIHandler("/swagger/ui", "/swagger/json", true))
+
+	// Route pour WebSocket
+	router.HandleFunc("/ws", controllers.WebSocketEndpoint(db)).Methods("GET")
 
 	api.Walk(func(path string, e *swag.Endpoint) {
 		h := e.Handler.(http.HandlerFunc)
