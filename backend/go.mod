@@ -1,8 +1,9 @@
 module backend
 
-go 1.18
+go 1.22.1
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/sessions v1.2.2
 	github.com/zc2638/swag v1.6.0
