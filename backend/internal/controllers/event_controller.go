@@ -15,11 +15,19 @@ func MigrateEvent(db *gorm.DB) {
 	db.AutoMigrate(&models.Event{})
 }
 
+// création de la table food
+func MigrateFood(db *gorm.DB) {
+	db.AutoMigrate(&models.FoodItem{})
+}
+
 // GetAllEvents retourne tous les événements
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
+
+		// migrate food
+		MigrateFood(db)
 
 		var events []models.Event
 		result := db.Find(&events)
@@ -38,6 +46,9 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
+
+		//migrate food
+		MigrateFood(db)
 
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
