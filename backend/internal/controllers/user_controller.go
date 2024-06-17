@@ -22,12 +22,18 @@ type Claims struct {
 func MigrateUser(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 }
+func MigrateChat(db *gorm.DB) {
+	db.AutoMigrate(&models.Message{}, &models.ChatRoom{})
+}
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
 func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
+
+		// migrer chat
+		MigrateChat(db)
 
 		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {

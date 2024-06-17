@@ -11,8 +11,15 @@ services:
       - POSTGRES_DB=articlesDB
       - POSTGRES_USER=janire
       - POSTGRES_PASSWORD=password
+    
+
   adminer:
     image: adminer
     restart: unless-stopped
     ports:
       - 8088:8080
+ 
+
+
+
+
