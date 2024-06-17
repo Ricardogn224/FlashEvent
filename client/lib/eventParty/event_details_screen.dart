@@ -31,49 +31,86 @@ class EventScreen extends StatelessWidget {
       child: BlocBuilder<EventPartyBloc, EventPartyState>(
         builder: (context, state) {
           final eventParty = state.eventParty;
-          print(eventParty);
           return SafeArea(
             child: Scaffold(
+              backgroundColor: const Color(0xFFF9F9F9),
               appBar: AppBar(
-                title: Text(state.eventParty?.name ?? ''),
+                title: const Text('Évènement Detail'),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                elevation: 0,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none),
+                    onPressed: () {},
+                  ),
+                ],
               ),
-              backgroundColor: Colors.white,
-              body: Column(
-                children: [
-                  if (state.status == EventPartyStatus.loading)
-                    const Expanded(
-                      child: Center(
-                        child: CircularProgressIndicator(),
+              body: state.status == EventPartyStatus.loading
+                  ? const Center(
+                child: CircularProgressIndicator(),
+              )
+                  : eventParty != null
+                  ? Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      eventParty.name,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  if (state.status == EventPartyStatus.success && eventParty != null)
-                    Expanded(
+                    const SizedBox(height: 8),
+                    Text(
+                      eventParty.description,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${eventParty.description} €',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(eventParty.description),
-                                const SizedBox(height: 10),
-                                Text(eventParty.description),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
-                          )
+                          Row(
+                            children: const [
+                              Icon(Icons.location_on, color: Color(0xFF6058E9)),
+                              SizedBox(width: 8),
+                              Text('New York - USA'),
+                            ],
+                          ),
+                          const Divider(), // Ligne de séparation
+                          Row(
+                            children: const [
+                              Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
+                              SizedBox(width: 8),
+                              Text('28 Sun 2021'),
+                            ],
+                          ),
+                          const Divider(), // Ligne de séparation
+                          Row(
+                            children: const [
+                              Icon(Icons.people, color: Color(0xFF6058E9)),
+                              SizedBox(width: 8),
+                              Text('128 Attendees'),
+                            ],
+                          ),
                         ],
                       ),
-                    )
-                ],
+                    ),
+                  ],
+                ),
+              )
+                  : const Center(
+                child: Text('Event not found'),
               ),
             ),
           );

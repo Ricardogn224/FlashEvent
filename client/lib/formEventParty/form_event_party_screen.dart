@@ -12,10 +12,10 @@ class BlocFormEventScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FormEventPartyBloc()..add(InitEvent()),
+      create: (context) => FormEventPartyBloc(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Form Validation'),
+          title: const Text('Création évènement'),
         ),
         body: BlocBuilder<FormEventPartyBloc, FormEventPartyState>(
           builder: (context, state) {
