@@ -18,7 +18,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9F9F9),  // Couleur de fond de l'écran
+      backgroundColor: const Color(0xFFF9F9F9), // Couleur de fond de l'écran
       body: BlocProvider(
         create: (context) => LoginBloc(),
         child: BlocListener<LoginBloc, LoginState>(
@@ -105,28 +105,30 @@ class LoginScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity, // Assurer que le bouton ait la même largeur que les input
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF6058E9), // Couleur personnalisée du bouton
-                        foregroundColor: Colors.white, // Couleur du texte sur le bouton
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                  Builder( // Utilisation de Builder pour obtenir le bon contexte
+                    builder: (context) => SizedBox(
+                      width: double.infinity, // Assurer que le bouton ait la même largeur que les input
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6058E9), // Couleur personnalisée du bouton
+                          foregroundColor: Colors.white, // Couleur du texte sur le bouton
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            BlocProvider.of<LoginBloc>(context).add(
+                              LoginButtonPressed(
+                                email: _emailController.text,
+                                password: _passwordController.text,
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('Connexion'),
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          BlocProvider.of<LoginBloc>(context).add(
-                            LoginButtonPressed(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text('Connexion'),
                     ),
                   ),
                   GestureDetector(
