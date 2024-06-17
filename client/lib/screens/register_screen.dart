@@ -46,21 +46,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         final response = await AuthServices.registerUser(newUser);
         if (response.statusCode == 201) {
-          // Registration successful, navigate to login screen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginScreen()),
           );
         } else {
-          // Handle error
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registration failed')),
+            SnackBar(content: Text('Échec de l\'inscription')),
           );
         }
       } catch (e) {
-        print('Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('Erreur: $e')),
         );
       } finally {
         setState(() {
@@ -73,133 +70,92 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9F9F9),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        color: Colors.grey[200], // Background color of the page
         child: Center(
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Inscription',
-                  style: TextStyle(
-                    fontSize: 24, // Font size resembling an H1 heading
-                    fontWeight: FontWeight.bold, // Bold font weight
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Image(
+                    image: AssetImage('assets/flash-event-logo.png'),
+                    height: 120,
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your email',
-                    labelText: 'Email',
-                    fillColor: Colors.white, // Text field background color
-                    filled: true,
-                    border: OutlineInputBorder(), // Text field border
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Inscription',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _firstNameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your first name',
-                    labelText: 'First Name',
-                    fillColor: Colors.white, // Text field background color
-                    filled: true,
-                    border: OutlineInputBorder(), // Text field border
+                  const SizedBox(height: 30),
+                  _buildTextField(_emailController, 'Entrez votre email', 'Email'),
+                  _buildTextField(_firstNameController, 'Entrez votre prénom', 'Prénom'),
+                  _buildTextField(_lastNameController, 'Entrez votre nom', 'Nom'),
+                  _buildTextField(_usernameController, 'Entrez votre nom d’utilisateur', 'Nom d’utilisateur'),
+                  _buildTextField(_passwordController, 'Entrez votre mot de passe', 'Mot de passe', isPassword: true),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF6058E9),
+                      foregroundColor: Colors.white, // Corrected property
+                      minimumSize: Size(double.infinity, 50),
+                    ),
+                    onPressed: _register,
+                    child: const Text('S\'inscrire'),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _lastNameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your last name',
-                    labelText: 'Last Name',
-                    fillColor: Colors.white, // Text field background color
-                    filled: true,
-                    border: OutlineInputBorder(), // Text field border
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your last name';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your username',
-                    labelText: 'Username',
-                    fillColor: Colors.white, // Text field background color
-                    filled: true,
-                    border: OutlineInputBorder(), // Text field border
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your password',
-                    labelText: 'Password',
-                    fillColor: Colors.white, // Text field background color
-                    filled: true,
-                    border: OutlineInputBorder(), // Text field border
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _register,
-                  child: Text('Register'),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    // Navigate to the registration page when the text is clicked
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  },
-                  child: Text(
-                    'Already registered? Click here',
-                    style: TextStyle(
-                      color: Colors.blue, // Text color of the clickable text
-                      decoration: TextDecoration.underline, // Underline the text
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'Déjà inscrit ? Cliquez ici',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor, // Utilise la couleur principale du thème
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String hintText, String labelText, {bool isPassword = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          hintText: hintText,
+          labelText: labelText,
+          fillColor: Colors.white,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.0),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Veuillez entrer votre $labelText';
+          }
+          return null;
+        },
       ),
     );
   }

@@ -18,7 +18,3 @@ services:
     restart: unless-stopped
     ports:
       - 8088:8080
-
-
-
-
