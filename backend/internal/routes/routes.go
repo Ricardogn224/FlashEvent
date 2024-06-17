@@ -67,6 +67,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Successfully retrieved users", endpoint.SchemaResponseOption([]models.User{})),
 		),
 		endpoint.New(
+			http.MethodGet, "/user/{userId}",
+			endpoint.Handler(http.HandlerFunc(controllers.GetUserByID(db))),
+			endpoint.Summary("Get user by ID"),
+			endpoint.Description("Retrieve a user by their ID"),
+			endpoint.Path("userId", "integer", "ID of the user to retrieve", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(models.User{})),
+		),
+		endpoint.New(
 			http.MethodPost, "/participant",
 			endpoint.Handler(http.HandlerFunc(controllers.AddParticipant(db))),
 			endpoint.Summary("Add a new participant"),
@@ -140,7 +148,23 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			}{}, "Utilitaires à ajouter à l'événement", true),
 			endpoint.Response(http.StatusCreated, "Utilitaires ajoutés avec succès à l'événement", endpoint.SchemaResponseOption(models.Event{})),
 		),
-
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/chat-room",
+			endpoint.Handler(http.HandlerFunc(controllers.AddChatRoom(db))),
+			endpoint.Summary("Add a new chat room"),
+			endpoint.Description("Add a new chat room for a specific event"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Body(models.ChatRoom{}, "ChatRoom object to add", true),
+			endpoint.Response(http.StatusCreated, "Chat room created", endpoint.SchemaResponseOption(models.ChatRoom{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/event/{eventId}/chat-rooms",
+			endpoint.Handler(http.HandlerFunc(controllers.GetChatRooms(db))),
+			endpoint.Summary("Get chat rooms"),
+			endpoint.Description("Retrieve all chat rooms for a specific event"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Response(http.StatusOK, "Chat rooms retrieved", endpoint.SchemaResponseOption([]models.ChatRoom{})),
+		),
 		endpoint.New(
 			http.MethodPost, "/event/{eventId}/message",
 			endpoint.Handler(http.HandlerFunc(controllers.SendMessage(db))),
@@ -151,12 +175,12 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusCreated, "Message sent", endpoint.SchemaResponseOption(models.Message{})),
 		),
 		endpoint.New(
-			http.MethodGet, "/event/{eventId}/messages",
-			endpoint.Handler(http.HandlerFunc(controllers.GetMessages(db))),
+			http.MethodGet, "/chat-rooms/{chatRoomId}/messages",
+			endpoint.Handler(http.HandlerFunc(controllers.GetMessagesByChatRoom(db))),
 			endpoint.Summary("Get messages"),
 			endpoint.Description("Retrieve messages from the event chat room"),
-			endpoint.Path("eventId", "integer", "ID of the event", true),
-			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.Message{})),
+			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
+			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.MessageResponse{})),
 		),
 	)
 

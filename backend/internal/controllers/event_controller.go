@@ -84,9 +84,10 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 
 		// Create the participant using the retrieved user ID
 		participant := models.Participant{
-			UserID:  user.ID,
-			EventID: event.ID,
-			Active:  true, // Set the participant as active by default
+			UserID:   user.ID,
+			EventID:  event.ID,
+			Active:   true, // Set the participant as active by default
+			Response: true,
 		}
 		if err := addParticipantEvent(db, participant); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
