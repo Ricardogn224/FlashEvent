@@ -1,27 +1,27 @@
 part of 'participant_bloc.dart';
 
 
-enum EventPartyStatus { initial, loading, success, error }
+enum ParticipantStatus { initial, loading, success, error }
 
-class EventPartyState {
-  final EventPartyStatus status;
-  final Event? eventParty;
+class ParticipantState {
+  final ParticipantStatus status;
+  final List<User>? participants;
   final String? errorMessage;
 
-  EventPartyState({
-    this.status = EventPartyStatus.initial,
-    this.eventParty,
+  ParticipantState({
+    this.status = ParticipantStatus.initial,
+    this.participants,
     this.errorMessage,
   });
 
-  EventPartyState copyWith({
-    EventPartyStatus? status,
-    Event? eventParty,
+  ParticipantState copyWith({
+    ParticipantStatus? status,
+    List<User>? participants,
     String? errorMessage,
   }) {
-    return EventPartyState(
+    return ParticipantState(
       status: status ?? this.status,
-      eventParty: eventParty ?? this.eventParty,
+      participants: participants ?? this.participants,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

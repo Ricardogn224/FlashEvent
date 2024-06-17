@@ -17,7 +17,7 @@ func GetAllItems(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var items []models.ItemEvent
 		if err := db.Find(&items).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
 
@@ -28,34 +28,23 @@ func GetAllItems(db *gorm.DB) http.HandlerFunc {
 
 func AddItem(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Migrate the Item table
+		// Migration de la table Item
 		MigrateItem(db)
 
-		var itemRequest models.ItemEventAdd
+		var itemRequest models.ItemEvent
 		if err := json.NewDecoder(r.Body).Decode(&itemRequest); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		var user models.User
-		if err := db.Where("email = ?", itemRequest.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
-			return
-		}
-
-		// Create the item
-		item := models.ItemEvent{
-			Name:    itemRequest.Name,
-			UserID:  user.ID,
-			EventID: itemRequest.EventID,
-		}
-		if err := db.Create(&item).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		// Création de l'élément
+		if err := db.Create(&itemRequest).Error; err != nil {
+			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(item)
+		json.NewEncoder(w).Encode(itemRequest)
 	}
 }
 
@@ -66,7 +55,7 @@ func GetItemsByEventID(db *gorm.DB) http.HandlerFunc {
 
 		var items []models.ItemEvent
 		if err := db.Where("event_id = ?", eventID).Find(&items).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
 

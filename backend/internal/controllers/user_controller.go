@@ -4,9 +4,11 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -22,12 +24,18 @@ type Claims struct {
 func MigrateUser(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 }
+func MigrateChat(db *gorm.DB) {
+	db.AutoMigrate(&models.Message{}, &models.ChatRoom{})
+}
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
 func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table User si elle n'existe pas
 		MigrateUser(db)
+
+		// migrer chat
+		MigrateChat(db)
 
 		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -110,6 +118,32 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(users)
+	}
+}
+
+// GetUserByID returns a user by their ID
+func GetUserByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["userId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		var user models.User
+		result := db.First(&user, id)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				http.Error(w, "User not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(user)
 	}
 }
 
