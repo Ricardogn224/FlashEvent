@@ -12,10 +12,11 @@ import (
 )
 
 func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
+
 	api.AddEndpoint(
 		endpoint.New(
 			http.MethodGet, "/events",
-			endpoint.Handler(http.HandlerFunc(controllers.GetAllEvents(db))),
+			endpoint.Handler(controllers.GetAllEvents(db)),
 			endpoint.Summary("Get all events"),
 			endpoint.Description("Retrieve all events from the store"),
 			endpoint.Response(http.StatusOK, "Successfully retrieved events", endpoint.SchemaResponseOption([]models.Event{})),
@@ -66,6 +67,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Successfully retrieved users", endpoint.SchemaResponseOption([]models.User{})),
 		),
 		endpoint.New(
+			http.MethodGet, "/user/{userId}",
+			endpoint.Handler(http.HandlerFunc(controllers.GetUserByID(db))),
+			endpoint.Summary("Get user by ID"),
+			endpoint.Description("Retrieve a user by their ID"),
+			endpoint.Path("userId", "integer", "ID of the user to retrieve", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(models.User{})),
+		),
+		endpoint.New(
 			http.MethodPost, "/participant",
 			endpoint.Handler(http.HandlerFunc(controllers.AddParticipant(db))),
 			endpoint.Summary("Add a new participant"),
@@ -104,10 +113,82 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Path("eventId", "integer", "ID of the event", true),
 			endpoint.Response(http.StatusOK, "Successfully retrieved items", endpoint.SchemaResponseOption([]models.ItemEvent{})),
 		),
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/add-food",
+			endpoint.Handler(http.HandlerFunc(controllers.AddFoodToEvent(db))),
+			endpoint.Summary("Ajouter de la nourriture à un événement"),
+			endpoint.Description("Permettre à un participant d'ajouter de la nourriture à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(struct {
+				Food string `json:"food"`
+			}{}, "Nourriture à ajouter à l'événement", true),
+			endpoint.Response(http.StatusCreated, "Nourriture ajoutée avec succès à l'événement", endpoint.SchemaResponseOption(models.Event{})),
+		),
+
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/add-transportation",
+			endpoint.Handler(http.HandlerFunc(controllers.AddTransportationToEvent(db))),
+			endpoint.Summary("Ajouter un moyen de transport à un événement"),
+			endpoint.Description("Permettre à un participant d'ajouter un moyen de transport à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(struct {
+				Transportation string `json:"transportation"`
+			}{}, "Moyen de transport à ajouter à l'événement", true),
+			endpoint.Response(http.StatusCreated, "Transport ajouté avec succès à l'événement", endpoint.SchemaResponseOption(models.Event{})),
+		),
+
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/add-utilities",
+			endpoint.Handler(http.HandlerFunc(controllers.AddUtilitiesToEvent(db))),
+			endpoint.Summary("Ajouter des utilitaires à un événement"),
+			endpoint.Description("Permettre à un participant d'ajouter des utilitaires à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(struct {
+				Utilities string `json:"utilities"`
+			}{}, "Utilitaires à ajouter à l'événement", true),
+			endpoint.Response(http.StatusCreated, "Utilitaires ajoutés avec succès à l'événement", endpoint.SchemaResponseOption(models.Event{})),
+		),
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/chat-room",
+			endpoint.Handler(http.HandlerFunc(controllers.AddChatRoom(db))),
+			endpoint.Summary("Add a new chat room"),
+			endpoint.Description("Add a new chat room for a specific event"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Body(models.ChatRoom{}, "ChatRoom object to add", true),
+			endpoint.Response(http.StatusCreated, "Chat room created", endpoint.SchemaResponseOption(models.ChatRoom{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/event/{eventId}/chat-rooms",
+			endpoint.Handler(http.HandlerFunc(controllers.GetChatRooms(db))),
+			endpoint.Summary("Get chat rooms"),
+			endpoint.Description("Retrieve all chat rooms for a specific event"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Response(http.StatusOK, "Chat rooms retrieved", endpoint.SchemaResponseOption([]models.ChatRoom{})),
+		),
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/message",
+			endpoint.Handler(http.HandlerFunc(controllers.SendMessage(db))),
+			endpoint.Summary("Send a message"),
+			endpoint.Description("Send a message in the event chat room"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Body(models.Message{}, "Message object", true),
+			endpoint.Response(http.StatusCreated, "Message sent", endpoint.SchemaResponseOption(models.Message{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/chat-rooms/{chatRoomId}/messages",
+			endpoint.Handler(http.HandlerFunc(controllers.GetMessagesByChatRoom(db))),
+			endpoint.Summary("Get messages"),
+			endpoint.Description("Retrieve messages from the event chat room"),
+			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
+			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.MessageResponse{})),
+		),
 	)
 
 	router.Path("/swagger/json").Methods("GET").Handler(api.Handler())
 	router.PathPrefix("/swagger/ui").Handler(swag.UIHandler("/swagger/ui", "/swagger/json", true))
+
+	// Route pour WebSocket
+	router.HandleFunc("/ws", controllers.WebSocketEndpoint(db)).Methods("GET")
 
 	api.Walk(func(path string, e *swag.Endpoint) {
 		h := e.Handler.(http.HandlerFunc)

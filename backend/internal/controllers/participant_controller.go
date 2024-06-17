@@ -40,7 +40,7 @@ func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
-		var participant models.Participant
+		var participant models.ParticipantAdd
 		if err := json.NewDecoder(r.Body).Decode(&participant); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -48,7 +48,7 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 
 		// Validate that the user and event exist
 		var user models.User
-		if err := db.First(&user, participant.UserID).Error; err != nil {
+		if err := db.Where("email = ?", participant.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
