@@ -37,11 +37,6 @@ class FormParticipantScreen extends StatelessWidget {
                   children: [
                     CustomFormField(
                       hintText: 'Email',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r"[a-zA-Z]+|\s"),
-                        )
-                      ],
                       onChange: (val) {
                         BlocProvider.of<FormParticipantBloc>(context)
                             .add(EmailChanged(email: BlocFormItem(value: val!)));

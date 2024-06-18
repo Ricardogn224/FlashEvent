@@ -36,30 +36,37 @@ func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 	return nil
 }
 
-// AddParticipant handles the addition of a new participant to an event
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
-		var participant models.ParticipantAdd
-		if err := json.NewDecoder(r.Body).Decode(&participant); err != nil {
+		var participantAdd models.ParticipantAdd
+		if err := json.NewDecoder(r.Body).Decode(&participantAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		// Validate that the user and event exist
+		// Validate that the user exists
 		var user models.User
-		if err := db.Where("email = ?", participant.Email).First(&user).Error; err != nil {
+		if err := db.Where("email = ?", participantAdd.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
+
+		// Validate that the event exists
 		var event models.Event
-		if err := db.First(&event, participant.EventID).Error; err != nil {
+		if err := db.First(&event, participantAdd.EventID).Error; err != nil {
 			http.Error(w, "Event not found", http.StatusNotFound)
 			return
 		}
 
-		result := db.Create(&participant)
-		if result.Error != nil {
+		// Create a new Participant instance
+		participant := models.Participant{
+			UserID:  user.ID,
+			EventID: event.ID,
+		}
+
+		// Save the new Participant to the database
+		if err := db.Create(&participant).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -77,7 +84,7 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 
 		// Fetch all participants with the given event ID
 		var participants []models.Participant
-		if err := db.Where("event_id = ?", eventID).Find(&participants).Error; err != nil {
+		if err := db.Where("event_id = ? AND active = ? AND response = ?", eventID, true, true).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}

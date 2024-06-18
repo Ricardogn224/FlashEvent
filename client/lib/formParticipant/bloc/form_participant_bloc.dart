@@ -53,6 +53,7 @@ class FormParticipantBloc extends Bloc<FormParticipantEvent, FormParticipantStat
 
   Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<FormParticipantState> emit) async {
     if (state.formKey!.currentState!.validate()) {
+      print(eventId);
       ParticipantAdd newParticipant = ParticipantAdd(
         id: 0,
         email: state.email.value,

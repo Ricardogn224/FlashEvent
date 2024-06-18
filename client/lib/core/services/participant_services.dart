@@ -15,6 +15,8 @@ class ParticipantServices {
       throw Exception('Token not found');
     }
 
+    print('id event: ${participant.eventId}');
+
     final response = await http.post(
       Uri.parse('http://10.0.2.2:8080/participant'),
       headers: <String, String>{
@@ -23,7 +25,7 @@ class ParticipantServices {
       },
       body: jsonEncode(<String, dynamic>{
         'email': participant.email,
-        'eventId': participant.eventId,
+        'event_id': participant.eventId,
       }),
     );
 

@@ -67,19 +67,11 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		event := models.Event{
 			Name:        eventAdd.Name,
 			Description: eventAdd.Description,
-			IsPrivate:   eventAdd.IsPrivate,
 		}
 		result := db.Create(&event)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
-		}
-
-		// Generate invitation link if the event is private
-		if event.IsPrivate {
-			invitationLink := GenerateInvitationLink(event)
-			event.InvitationLink = invitationLink
-			db.Save(&event) // Save the updated event with the invitation link
 		}
 
 		// Create the participant using the retrieved user ID
@@ -141,13 +133,6 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&updatedEvent); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
-		}
-
-		// Générer ou supprimer le lien d'invitation en fonction de la confidentialité
-		if updatedEvent.IsPrivate && updatedEvent.InvitationLink == "" {
-			updatedEvent.InvitationLink = GenerateInvitationLink(updatedEvent)
-		} else if !updatedEvent.IsPrivate {
-			updatedEvent.InvitationLink = ""
 		}
 
 		// Mise à jour de l'événement dans la base de données
@@ -252,15 +237,6 @@ func AddItemToEvent(db *gorm.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(item)
 	}
-}
-
-// GenerateInvitationLink génère un lien d'invitation pour un événement privé
-func GenerateInvitationLink(event models.Event) string {
-	if event.IsPrivate {
-		// Logique de génération de lien d'invitation (par exemple, un UUID ou un token unique)
-		return "/invite/" + strconv.Itoa(int(event.ID)) + "/" + generateUniqueToken()
-	}
-	return ""
 }
 
 // generateUniqueToken génère un token unique
