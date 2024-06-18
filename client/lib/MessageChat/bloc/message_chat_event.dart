@@ -6,5 +6,5 @@ sealed class MessageChatEvent {}
 class MessageChatDataLoaded extends MessageChatEvent {
   final int id;
 
-  MessageChatataLoaded({required this.id});
+  MessageChatDataLoaded({required this.id});
 }

@@ -56,7 +56,7 @@ class ParticipantScreen extends StatelessWidget {
                     onPressed: () async {
                       final newParticipant = await Navigator.of(context).push<Map<String, String>>(
                         MaterialPageRoute(
-                          builder: (context) => FormParticipantScreen(id),
+                          builder: (context) => FormParticipantScreen.navigateTo(context, id: id)
                         ),
                       );
 

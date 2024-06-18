@@ -17,7 +17,7 @@ class FormParticipantScreen extends StatelessWidget {
 
   final int eventId;
 
-  const FormParticipantScreen(this.eventId, {super.key});
+  const FormParticipantScreen({super.key, required this.eventId});
 
   @override
   Widget build(BuildContext context) {

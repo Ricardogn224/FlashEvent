@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/formEventParty/form_event_party_screen.dart';
 import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
-import 'package:flutter_flash_event/participant/bloc/participant_bloc.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/screens/invitation_screen.dart';
 import 'package:flutter_flash_event/screens/item_event_new_screen.dart';
@@ -29,9 +30,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => ParticipantScreen(id: args as int));
     case FormParticipantScreen.routeName:
-      return MaterialPageRoute(builder: (context) => ParticipantScreen(id: args as int));
+      return MaterialPageRoute(builder: (context) => FormParticipantScreen(eventId: args as int));
+    case ChatRoomScreen.routeName:
+      return MaterialPageRoute(builder: (context) => ChatRoomScreen(id: args as int));
+    case MessageChatScreen.routeName:
+      return MaterialPageRoute(builder: (context) => MessageChatScreen(id: args as int));
     case '/event_new':
-      return MaterialPageRoute(builder: (_) => FormEventScreen());
+      return MaterialPageRoute(builder: (_) => BlocFormEventScreen());
     case '/invitations':
       return MaterialPageRoute(builder: (_) => InvitationScreen());
     case '/admin':
