@@ -14,3 +14,15 @@ type ParticipantAdd struct {
 	EventID uint   `json:"event_id" gorm:"not null"`
 	Email   string `json:"email"`
 }
+
+type Invitation struct {
+	ParticipantID uint   `json:"participant_id"`
+	EventID       uint   `json:"event_id"`
+	EventName     string `json:"event_name"`
+	UserID        uint   `json:"user_id"`
+}
+
+type InvitationAnswer struct {
+	ParticipantID uint `json:"participant_id"`
+	Active        bool `json:"answer"`
+}

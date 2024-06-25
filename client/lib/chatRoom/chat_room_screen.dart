@@ -4,7 +4,6 @@ import 'package:flutter_flash_event/ChatRoom/bloc/chat_room_bloc.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
 import 'package:flutter_flash_event/participant/bloc/participant_bloc.dart';
-import 'package:flutter_flash_event/screens/messages_screen.dart';
 
 class ChatRoomScreen extends StatelessWidget {
   static const String routeName = '/chat-room';

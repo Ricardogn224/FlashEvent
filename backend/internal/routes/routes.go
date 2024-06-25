@@ -166,12 +166,12 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Chat rooms retrieved", endpoint.SchemaResponseOption([]models.ChatRoom{})),
 		),
 		endpoint.New(
-			http.MethodPost, "/event/{eventId}/message",
+			http.MethodPost, "/event/{chatRoomId}/message",
 			endpoint.Handler(http.HandlerFunc(controllers.SendMessage(db))),
 			endpoint.Summary("Send a message"),
 			endpoint.Description("Send a message in the event chat room"),
-			endpoint.Path("eventId", "integer", "ID of the event", true),
-			endpoint.Body(models.Message{}, "Message object", true),
+			endpoint.Path("chatRoomId", "integer", "ID of the chat-room", true),
+			endpoint.Body(models.MessageAdd{}, "Message object", true),
 			endpoint.Response(http.StatusCreated, "Message sent", endpoint.SchemaResponseOption(models.Message{})),
 		),
 		endpoint.New(
@@ -181,6 +181,31 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Retrieve messages from the event chat room"),
 			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
 			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.MessageResponse{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/invitations/{email}",
+			endpoint.Handler(http.HandlerFunc(controllers.GetInvitationsByUser(db))),
+			endpoint.Summary("Get invitations by user"),
+			endpoint.Description("Retrieve participant items where the user ID matches the provided parameter and response is true"),
+			endpoint.Path("email", "string", "Email of the user", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved participants", endpoint.SchemaResponseOption([]models.Invitation{})),
+		),
+		endpoint.New(
+			http.MethodPost, "/answer-invitation",
+			endpoint.Handler(http.HandlerFunc(controllers.AnswerInvitation(db))),
+			endpoint.Summary("Response to invitation"),
+			endpoint.Description("Response to an invitation"),
+			endpoint.Body(models.InvitationAnswer{}, "Message object", true),
+			endpoint.Response(http.StatusOK, "Successfully answered invitation", endpoint.SchemaResponseOption(models.Participant{})),
+		),
+		endpoint.New(
+			http.MethodPatch, "/events/{id}/activate-transport",
+			endpoint.Handler(http.HandlerFunc(controllers.ActivateTransport(db))),
+			endpoint.Summary("Activate transport for an event"),
+			endpoint.Description("Update the transport active status for a given event"),
+			endpoint.Path("id", "string", "ID of the event", true),
+			endpoint.Body(models.EventTransportUpdate{}, "Transport update object", true),
+			endpoint.Response(http.StatusOK, "Successfully updated event", endpoint.SchemaResponseOption(models.Event{})),
 		),
 	)
 

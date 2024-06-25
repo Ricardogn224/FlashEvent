@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
+import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 
 class EventScreen extends StatelessWidget {
@@ -117,6 +119,16 @@ class EventScreen extends StatelessWidget {
                       title: Text('Liste des messages'),
                       trailing: Icon(Icons.adb),
                       onTap: () => ChatRoomScreen.navigateTo(context, id: eventParty!.id),
+                    ),
+                    ListTile(
+                      title: Text('Liste des choses'),
+                      trailing: Icon(Icons.adb),
+                      onTap: () => ItemEventScreen.navigateTo(context, id: eventParty!.id),
+                    ),
+                    ListTile(
+                      title: Text('Liste des invitations'),
+                      trailing: Icon(Icons.adb),
+                      onTap: () => InvitationScreen.navigateTo(context),
                     ),
                   ],
                 ),

@@ -11,6 +11,11 @@ type Message struct {
 	Timestamp  time.Time `json:"timestamp"`
 }
 
+type MessageAdd struct {
+	Email   string `json:"email"`
+	Content string `json:"content"`
+}
+
 type MessageResponse struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
 	ChatRoomID uint      `json:"chat_room_id"`

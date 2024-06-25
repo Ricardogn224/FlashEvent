@@ -65,8 +65,9 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 
 		// Create the event
 		event := models.Event{
-			Name:        eventAdd.Name,
-			Description: eventAdd.Description,
+			Name:            eventAdd.Name,
+			Description:     eventAdd.Description,
+			TransportActive: eventAdd.TransportActive,
 		}
 		result := db.Create(&event)
 		if result.Error != nil {
@@ -193,58 +194,6 @@ func AddUserToEvent(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// AddItemToEvent ajoute un élément à un événement
-func AddItemToEvent(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		eventID, err := strconv.Atoi(vars["eventId"])
-		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
-			return
-		}
-
-		var request struct {
-			Name           string `json:"name"`
-			Description    string `json:"description"`
-			Food           string `json:"food,omitempty"`
-			Logistics      string `json:"logistics,omitempty"`
-			OtherUtilities string `json:"other_utilities,omitempty"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		var event models.Event
-		if err := db.First(&event, eventID).Error; err != nil {
-			http.Error(w, "Event not found", http.StatusNotFound)
-			return
-		}
-
-		item := models.ItemEvent{
-			Name:           request.Name,
-			Description:    request.Description,
-			Food:           request.Food,
-			Logistics:      request.Logistics,
-			OtherUtilities: request.OtherUtilities,
-		}
-
-		if err := db.Create(&item).Error; err != nil {
-			http.Error(w, "Failed to add item to event", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(item)
-	}
-}
-
-// generateUniqueToken génère un token unique
-func generateUniqueToken() string {
-	// Implémentation de génération d'un token unique (par exemple, UUID)
-	return "unique-token" // Remplacer par la logique réelle
-}
-
 // Fonctions handlers sécurisées avec AuthMiddleware
 func AuthenticatedAddEvent(db *gorm.DB) http.HandlerFunc {
 	return AuthMiddleware(AddEvent(db)).(http.HandlerFunc)
@@ -295,6 +244,36 @@ func AddFoodToEvent(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(foodItem)
+	}
+}
+
+// AddTransportationToEvent ajoute un véhicule et un nombre de places à un événement
+func ActivateTransport(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		eventID := vars["id"]
+
+		var transportUpdate models.EventTransportUpdate
+		if err := json.NewDecoder(r.Body).Decode(&transportUpdate); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		event.TransportActive = transportUpdate.TransportActive
+
+		if err := db.Save(&event).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(event)
 	}
 }
 

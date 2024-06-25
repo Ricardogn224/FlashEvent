@@ -29,22 +29,33 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 		}
 		chatRoomID := uint(chatRoomId)
 
-		var msg models.Message
+		var msg models.MessageAdd
 		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		msg.ChatRoomID = chatRoomID
-		msg.Timestamp = time.Now()
+		// Validate that the user exists
+		var user models.User
+		if err := db.Where("email = ?", msg.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
 
-		if err := db.Create(&msg).Error; err != nil {
+		message := models.Message{
+			UserID:     uint(user.ID),
+			ChatRoomID: uint(chatRoomID),
+			Content:    msg.Content,
+			Timestamp:  time.Now(),
+		}
+
+		if err := db.Create(&message).Error; err != nil {
 			http.Error(w, "Failed to send message", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(msg)
+		json.NewEncoder(w).Encode(message)
 	}
 }
 
