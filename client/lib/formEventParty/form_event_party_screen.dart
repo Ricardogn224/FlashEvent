@@ -19,6 +19,22 @@ class BlocFormEventScreen extends StatelessWidget {
         ),
         body: BlocBuilder<FormEventPartyBloc, FormEventPartyState>(
           builder: (context, state) {
+            TextEditingController dateController = TextEditingController(text: state.date.value);
+
+            Future<void> _selectDate(BuildContext context) async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
+              );
+              if (picked != null && picked != DateTime.now()) {
+                String formattedDate = "${picked.day}/${picked.month}/${picked.year}";
+                BlocProvider.of<FormEventPartyBloc>(context).add(DateChanged(date: BlocFormItem(value: formattedDate)));
+                dateController.text = formattedDate;
+              }
+            }
+
             return Container(
               padding: const EdgeInsets.all(30),
               child: Form(
@@ -49,6 +65,28 @@ class BlocFormEventScreen extends StatelessWidget {
                       validator: (val) {
                         return state.description.error;
                       },
+                    ),
+                    CustomFormField(
+                      hintText: 'Place',
+                      onChange: (val) {
+                        BlocProvider.of<FormEventPartyBloc>(context)
+                            .add(PlaceChanged(place: BlocFormItem(value: val!)));
+                      },
+                      validator: (val) {
+                        return state.place.error;
+                      },
+                    ),
+                    GestureDetector(
+                      onTap: () => _selectDate(context),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: dateController,
+                          decoration: const InputDecoration(hintText: 'Date'),
+                          validator: (val) {
+                            return state.date.error;
+                          },
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 30),
                     Row(

@@ -8,7 +8,6 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class EventServices {
   static Future<http.Response> addEvent(Event event) async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
@@ -21,11 +20,13 @@ class EventServices {
       Uri.parse('http://10.0.2.2:8080/event'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token', // Include token in headers
+        'Authorization': 'Bearer $token', // Inclure le token dans les en-têtes
       },
       body: jsonEncode(<String, String>{
         'name': event.name,
         'description': event.description,
+        'place': event.place,
+        'date': event.date,
         'email': email ?? '',
       }),
     );
@@ -47,7 +48,7 @@ class EventServices {
       final response = await http.get(Uri.parse('http://10.0.2.2:8080/event/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $token', // Include token in headers
+          'Authorization': 'Bearer $token', // Inclure le token dans les en-têtes
         },);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw ApiException(message: 'Error while requesting event with id $id', statusCode: response.statusCode);
@@ -59,5 +60,4 @@ class EventServices {
       throw ApiException(message: 'Unknown error while requesting product with id $id');
     }
   }
-
 }

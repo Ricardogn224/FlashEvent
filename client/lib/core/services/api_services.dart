@@ -35,7 +35,7 @@ class ApiServices {
       await Future.delayed(const Duration(seconds: 1));
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw Error();
+        throw ApiException(message: 'Error while requesting events', statusCode: response.statusCode);
       }
 
       final data = json.decode(response.body);
@@ -43,8 +43,9 @@ class ApiServices {
         return Event.fromJson(e);
       }).toList() ?? [];
     } catch (error) {
-      log('Error occurred while retrieving users.', error: error);
+      log('Error occurred while retrieving events.', error: error);
       rethrow;
     }
   }
+
 }

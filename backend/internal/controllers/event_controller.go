@@ -47,7 +47,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		// Initialiser la table Event si elle n'existe pas
 		MigrateEvent(db)
 
-		//migrate food
+		// Migrate food
 		MigrateFood(db)
 
 		var eventAdd models.EventAdd
@@ -56,17 +56,19 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Find the user by email
+		// Trouver l'utilisateur par email
 		var user models.User
 		if err := db.Where("email = ?", eventAdd.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
-		// Create the event
+		// Créer l'événement
 		event := models.Event{
 			Name:        eventAdd.Name,
 			Description: eventAdd.Description,
+			Place:       eventAdd.Place,
+			Date:        eventAdd.Date,
 			IsPrivate:   eventAdd.IsPrivate,
 		}
 		result := db.Create(&event)
@@ -75,18 +77,18 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Generate invitation link if the event is private
+		// Générer un lien d'invitation si l'événement est privé
 		if event.IsPrivate {
 			invitationLink := GenerateInvitationLink(event)
 			event.InvitationLink = invitationLink
-			db.Save(&event) // Save the updated event with the invitation link
+			db.Save(&event) // Sauvegarder l'événement mis à jour avec le lien d'invitation
 		}
 
-		// Create the participant using the retrieved user ID
+		// Créer le participant en utilisant l'ID de l'utilisateur récupéré
 		participant := models.Participant{
 			UserID:  user.ID,
 			EventID: event.ID,
-			Active:  true, // Set the participant as active by default
+			Active:  true, // Définir le participant comme actif par défaut
 		}
 		if err := addParticipantEvent(db, participant); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -97,6 +99,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(event)
 	}
 }
+
 
 // FindEventByID récupère un événement par son ID
 func FindEventByID(db *gorm.DB) http.HandlerFunc {

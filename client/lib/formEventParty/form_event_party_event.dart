@@ -38,3 +38,17 @@ class DescriptionChanged extends FormEventPartyEvent {
   @override
   List<Object> get props => [description];
 }
+
+class PlaceChanged extends FormEventPartyEvent {
+  const PlaceChanged({required this.place});
+  final BlocFormItem place;
+  @override
+  List<Object> get props => [place];
+}
+
+class DateChanged extends FormEventPartyEvent {
+  const DateChanged({required this.date});
+  final BlocFormItem date;
+  @override
+  List<Object> get props => [date];
+}

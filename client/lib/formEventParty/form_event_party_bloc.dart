@@ -18,6 +18,8 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
     on<InitEvent>(_initState);
     on<NameChanged>(_onNameChanged);
     on<DescriptionChanged>(_onDescriptionChanged);
+    on<PlaceChanged>(_onPlaceChanged);
+    on<DateChanged>(_onDateChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
@@ -28,8 +30,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
     emit(state.copyWith(formKey: formKey));
   }
 
-  Future<void> _onNameChanged(
-      NameChanged event, Emitter<FormEventPartyState> emit) async {
+  Future<void> _onNameChanged(NameChanged event, Emitter<FormEventPartyState> emit) async {
     emit(
       state.copyWith(
         name: BlocFormItem(
@@ -41,8 +42,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
     );
   }
 
-  Future<void> _onDescriptionChanged(
-      DescriptionChanged event, Emitter<FormEventPartyState> emit) async {
+  Future<void> _onDescriptionChanged(DescriptionChanged event, Emitter<FormEventPartyState> emit) async {
     emit(
       state.copyWith(
         description: BlocFormItem(
@@ -54,10 +54,31 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
     );
   }
 
-  Future<void> _onFormReset(
-      FormResetEvent event,
-      Emitter<FormEventPartyState> emit,
-      ) async {
+  Future<void> _onPlaceChanged(PlaceChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        place: BlocFormItem(
+          value: event.place.value,
+          error: event.place.value.isValidName ? null : 'Enter place',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
+  Future<void> _onDateChanged(DateChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        date: BlocFormItem(
+          value: event.date.value,
+          error: event.date.value.isValidName ? null : 'Enter date',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
+  Future<void> _onFormReset(FormResetEvent event, Emitter<FormEventPartyState> emit) async {
     state.formKey?.currentState?.reset();
   }
 
@@ -67,6 +88,8 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
         id: 0,
         name: state.name.value,
         description: state.description.value,
+        place: state.place.value,
+        date: state.date.value,
       );
 
       try {
