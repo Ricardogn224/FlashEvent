@@ -5,12 +5,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
-import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
-part 'form_event_party_state.dart';
 part 'form_event_party_event.dart';
+part 'form_event_party_state.dart';
 
 
 class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> {

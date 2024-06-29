@@ -22,53 +22,81 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 		MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
 
 		vars := mux.Vars(r)
-		eventIDInt, err := strconv.Atoi(vars["eventId"])
+		chatRoomId, err := strconv.Atoi(vars["chatRoomId"])
 		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			http.Error(w, "Invalid chat room ID", http.StatusBadRequest)
 			return
 		}
-		eventID := uint(eventIDInt)
+		chatRoomID := uint(chatRoomId)
 
-		var msg models.Message
+		var msg models.MessageAdd
 		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		msg.EventID = eventID
-		msg.Timestamp = time.Now()
+		// Validate that the user exists
+		var user models.User
+		if err := db.Where("email = ?", msg.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
 
-		if err := db.Create(&msg).Error; err != nil {
+		message := models.Message{
+			UserID:     uint(user.ID),
+			ChatRoomID: uint(chatRoomID),
+			Content:    msg.Content,
+			Timestamp:  time.Now(),
+		}
+
+		if err := db.Create(&message).Error; err != nil {
 			http.Error(w, "Failed to send message", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(msg)
+		json.NewEncoder(w).Encode(message)
 	}
 }
 
 // GetMessages récupère les messages d'une salle de chat
-func GetMessages(db *gorm.DB) http.HandlerFunc {
+func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
 
 		vars := mux.Vars(r)
-		eventIDInt, err := strconv.Atoi(vars["eventId"])
+		chatRoomId, err := strconv.Atoi(vars["chatRoomId"])
 		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			http.Error(w, "Invalid chat room ID", http.StatusBadRequest)
 			return
 		}
-
-		eventID := uint(eventIDInt)
+		chatRoomID := uint(chatRoomId)
 
 		var messages []models.Message
-		if err := db.Where("event_id = ?", eventID).Find(&messages).Error; err != nil {
+		if err := db.Where("chat_room_id = ?", chatRoomID).Find(&messages).Error; err != nil {
 			http.Error(w, "Failed to retrieve messages", http.StatusInternalServerError)
 			return
 		}
 
+		var responseMessages []models.MessageResponse
+		for _, message := range messages {
+			var user models.User
+			if err := db.First(&user, message.UserID).Error; err != nil {
+				http.Error(w, "Failed to retrieve user info", http.StatusInternalServerError)
+				return
+			}
+			responseMessages = append(responseMessages, models.MessageResponse{
+				ID:         message.ID,
+				ChatRoomID: message.ChatRoomID,
+				UserID:     user.ID,
+				Email:      user.Email,
+				Username:   user.Username,
+				Content:    message.Content,
+				Timestamp:  message.Timestamp,
+			})
+		}
+
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(messages)
+		json.NewEncoder(w).Encode(responseMessages)
 	}
 }

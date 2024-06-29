@@ -31,10 +31,24 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 		// Migration de la table Item
 		MigrateItem(db)
 
-		var itemRequest models.ItemEvent
-		if err := json.NewDecoder(r.Body).Decode(&itemRequest); err != nil {
+		var itemRequestAdd models.ItemEventAdd
+		if err := json.NewDecoder(r.Body).Decode(&itemRequestAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		}
+
+		// Validate that the user exists
+		var user models.User
+		if err := db.Where("email = ?", itemRequestAdd.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		// Create a new Participant instance
+		itemRequest := models.ItemEvent{
+			UserID:  user.ID,
+			EventID: itemRequestAdd.EventID,
+			Name:    itemRequestAdd.Name,
 		}
 
 		// Création de l'élément

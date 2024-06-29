@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ItemServices {
-  static Future<List<ItemEvent>> getItems() async {
+  static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/items'));
+      final response = await http.get(Uri.parse('http://10.0.2.2:8080/items-event//$id'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -33,8 +33,6 @@ class ItemServices {
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
 
-    print('email body: ${email}');
-
     if (token == null) {
       throw Exception('Token not found');
     }
@@ -45,9 +43,10 @@ class ItemServices {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
       },
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, dynamic>{
         'name': itemEvent.name,
         'email': email ?? '',
+        'event_id': itemEvent.eventId,
       }),
     );
 
@@ -56,7 +55,7 @@ class ItemServices {
     } else {
       print('Error: ${response.statusCode}');
       print('Response body: ${response.body}');
-      throw Exception('Failed to create event');
+      throw Exception('Failed to create item');
     }
   }
 }
