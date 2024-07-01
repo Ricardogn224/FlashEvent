@@ -7,7 +7,8 @@ import (
 
 // ConnectDB crée une connexion à la base de données PostgreSQL avec GORM
 func ConnectDB() (*gorm.DB, error) {
-	dsn := "user=janire password=password dbname=articlesDB port=5432 sslmode=disable host=localhost"
+	//dsn := "user=janire password=password dbname=articlesDB port=5432 sslmode=disable host=localhost"
+	dsn := "user=janire password=password dbname=articlesDB port=5432 sslmode=disable host=database"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err

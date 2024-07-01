@@ -11,10 +11,21 @@ services:
       - POSTGRES_DB=articlesDB
       - POSTGRES_USER=janire
       - POSTGRES_PASSWORD=password
-    
 
   adminer:
     image: adminer
     restart: unless-stopped
     ports:
-      - 8088:8080
+      - "8088:8080"
+
+  backend:
+    container_name: backend
+    build: .
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://janire:password@database:5432/articlesDB
