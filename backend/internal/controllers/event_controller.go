@@ -20,6 +20,10 @@ func MigrateFood(db *gorm.DB) {
 	db.AutoMigrate(&models.FoodItem{})
 }
 
+func MigrateTransportation(db *gorm.DB) {
+	db.AutoMigrate(&models.Transportation{})
+}
+
 // GetAllEvents retourne tous les événements
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +32,10 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 
 		// migrate food
 		MigrateFood(db)
+
+		MigrateTransportation(db)
+
+		MigrateParticipant(db)
 
 		var events []models.Event
 		result := db.Find(&events)
@@ -49,6 +57,8 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 
 		//migrate food
 		MigrateFood(db)
+
+		MigrateTransportation(db)
 
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
@@ -277,10 +287,9 @@ func ActivateTransport(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// AddTransportationToEvent ajoute un véhicule et un nombre de places à un événement
 func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var eventID uint
+
 		// Extraire l'ID de l'événement à partir des paramètres de la requête
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
@@ -288,20 +297,25 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "Invalid event ID", http.StatusBadRequest)
 			return
 		}
-		eventID = uint(eventIDInt)
+		eventID := uint(eventIDInt)
 
-		var request struct {
-			Vehicle    string `json:"vehicle"`
-			SeatNumber int    `json:"seat_number"`
-		}
+		var request models.TransportationAdd
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Trouver l'utilisateur par email
+		var user models.User
+		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
 		// Enregistrer les informations sur le transport dans la base de données
 		transportation := models.Transportation{
 			EventID:    eventID,
+			UserID:     user.ID,
 			Vehicle:    request.Vehicle,
 			SeatNumber: request.SeatNumber,
 		}
@@ -311,6 +325,34 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(transportation)
+	}
+}
+
+// GetTransportationByEvent retourne tous les détails de transport pour un événement spécifique
+func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		eventIDInt, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+		eventID := uint(eventIDInt)
+
+		var transportation []models.Transportation
+		result := db.Where("event_id = ?", eventID).Find(&transportation)
+		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if len(transportation) == 0 {
+			http.Error(w, "No transportation found for this event", http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(transportation)
 	}
 }

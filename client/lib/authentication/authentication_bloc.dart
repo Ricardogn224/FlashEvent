@@ -21,6 +21,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     if (token != null) {
       bool isTokenExpired = JwtDecoder.isExpired(token);
       if (isTokenExpired) {
+        print(isTokenExpired);
         emit(AuthenticationUnauthenticated());
       } else {
         emit(AuthenticationAuthenticated());

@@ -33,7 +33,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
       state.copyWith(
         name: BlocFormItem(
           value: event.name.value,
-          error: event.name.value.isValidName ? null : 'Enter name',
+          error: event.name.value.isValidName ? null : 'Entrer un nom valide',
         ),
         formKey: formKey,
       ),
@@ -46,7 +46,6 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
       state.copyWith(
         description: BlocFormItem(
           value: event.description.value,
-          error: event.description.value.isValidName ? null : 'Enter description',
         ),
         formKey: formKey,
       ),

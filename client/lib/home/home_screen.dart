@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 
@@ -73,6 +74,11 @@ class HomeScreen extends StatelessWidget {
                           fontSize: 16,
                           color: Colors.grey,
                         ),
+                      ),
+                      ListTile(
+                        title: Text('Liste des invitations'),
+                        trailing: Icon(Icons.adb),
+                        onTap: () => InvitationScreen.navigateTo(context),
                       ),
                       const SizedBox(height: 16),
                       TextField(

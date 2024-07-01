@@ -13,4 +13,9 @@ extension StringExtension on String {
     final phoneRegExp = RegExp(r"^(?:[+0]9)?[0-9]{10}$");
     return phoneRegExp.hasMatch(this);
   }
+
+  bool get isValidInteger {
+    final integerRegExp = RegExp(r"^-?[0-9]+$");
+    return integerRegExp.hasMatch(this);
+  }
 }

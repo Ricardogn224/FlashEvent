@@ -1,9 +1,36 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_flash_event/core/models/transportation.dart';
 import 'package:flutter_flash_event/core/models/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class UserServices {
+
+  static Future<User> getCurrentUserByEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
+
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:8080/users-email/$email'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
+      print(response.statusCode);
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(message: 'Error while requesting event with email $email', statusCode: response.statusCode);
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      return User.fromJson(data);
+    } catch (error) {
+      throw ApiException(message: 'Unknown error while requesting product with email $email');
+    }
+  }
+
   static Future<List<User>> getUsersParticipants({required int id}) async {
     try {
       // Fetch participants for the given event ID
@@ -39,4 +66,21 @@ class UserServices {
       rethrow;
     }
   }
+
+  static Future<List<UserTransport>> getParticipantsByTransportation({required int id}) async {
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:8080/transportation/$id/participants'));
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw Exception('Failed to load participants');
+      }
+
+      final List<dynamic> participantsData = json.decode(response.body);
+      return participantsData.map((data) => UserTransport.fromJson(data)).toList();
+    } catch (error) {
+      log('Error occurred while retrieving participants.', error: error);
+      rethrow;
+    }
+  }
+
 }

@@ -147,6 +147,23 @@ func GetUserByID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// GetUserByID returns a user by their ID
+func GetUserByEmail(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		email := params["email"]
+
+		var user models.User
+		if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
 // AuthMiddleware vérifie le token JWT
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
