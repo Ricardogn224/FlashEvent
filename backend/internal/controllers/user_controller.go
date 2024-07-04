@@ -13,6 +13,15 @@ import (
 	"gorm.io/gorm"
 )
 
+func contains(slice []uint, item uint) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
+
 var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
@@ -118,6 +127,49 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(users)
+	}
+}
+
+// GetAllUserEmails returns all user emails
+func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		eventIDInt, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+		eventID := uint(eventIDInt)
+
+		// Fetch all users
+		var users []models.User
+		result := db.Select("id, email").Find(&users)
+		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		var participants []models.Participant
+		if eventID != 0 {
+			db.Where("event_id = ? AND (active = ? AND response = ? OR response = ?)", eventID, true, true, false).Find(&participants)
+		}
+		// Extract participant user IDs
+		participantIDs := make([]uint, len(participants))
+		for i, participant := range participants {
+			participantIDs[i] = participant.UserID
+		}
+
+		// Filter out participants from the user list
+		emails := make([]string, 0)
+		for _, user := range users {
+			if !contains(participantIDs, user.ID) {
+				emails = append(emails, user.Email)
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(emails)
 	}
 }
 

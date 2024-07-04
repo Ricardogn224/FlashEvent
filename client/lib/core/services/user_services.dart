@@ -49,7 +49,7 @@ class UserServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse = await http.get(Uri.parse('http://10.0.2.2:8080/user/$userId'));
+        final userResponse = await http.get(Uri.parse('http://10.0.2.2:8080/users/$userId'));
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }
@@ -80,6 +80,31 @@ class UserServices {
     } catch (error) {
       log('Error occurred while retrieving participants.', error: error);
       rethrow;
+    }
+  }
+
+  static Future<List<String>> getAllUserEmails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8080/users-emails'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(message: 'Error while requesting user emails', statusCode: response.statusCode);
+      }
+
+      final List<dynamic> emailsData = json.decode(response.body);
+      return List<String>.from(emailsData);
+    } catch (error) {
+      log('Error occurred while retrieving user emails.', error: error);
+      throw ApiException(message: 'Unknown error while requesting user emails');
     }
   }
 

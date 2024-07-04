@@ -31,3 +31,12 @@ class EmailChanged extends FormParticipantEvent {
   @override
   List<Object> get props => [email];
 }
+
+class FetchEmailSuggestions extends FormParticipantEvent {
+  final String query;
+
+  const FetchEmailSuggestions({required this.query});
+
+  @override
+  List<Object> get props => [query];
+}

@@ -30,6 +30,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusCreated, "Successfully added event", endpoint.SchemaResponseOption(models.Event{})),
 		),
 		endpoint.New(
+			http.MethodGet, "/users-emails/{eventId}",
+			endpoint.Handler(controllers.GetAllUserEmails(db)),
+			endpoint.Summary("Get all user emails"),
+			endpoint.Path("eventId", "integer", "ID of event", true),
+			endpoint.Description("Retrieve all user emails from the store"),
+			endpoint.Response(http.StatusOK, "Successfully retrieved user emails", endpoint.SchemaResponseOption([]string{})),
+		),
+		endpoint.New(
 			http.MethodGet, "/event/{eventId}",
 			endpoint.Handler(http.HandlerFunc(controllers.AuthenticatedFindEventByID(db))),
 			endpoint.Summary("Find event by ID"),

@@ -6,6 +6,7 @@ import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
 import 'package:flutter_flash_event/core/services/participant_services.dart';
+import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/utils/extensions.dart';
@@ -21,6 +22,7 @@ class FormParticipantBloc extends Bloc<FormParticipantEvent, FormParticipantStat
   FormParticipantBloc({required this.eventId}) : super(const FormParticipantState()) {
     on<InitEvent>(_initState);
     on<EmailChanged>(_onEmailChanged);
+    on<FetchEmailSuggestions>(_onFetchEmailSuggestions);
     on<FormSubmitEvent>(_onFormSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
@@ -42,6 +44,21 @@ class FormParticipantBloc extends Bloc<FormParticipantEvent, FormParticipantStat
         formKey: formKey,
       ),
     );
+  }
+
+  Future<void> _onFetchEmailSuggestions(FetchEmailSuggestions event, Emitter<FormParticipantState> emit) async {
+    try {
+      // Assuming you have a service method to fetch email suggestions
+      final suggestions = await UserServices.getAllUserEmails();
+
+      // Filter the suggestions based on the query
+      final filteredSuggestions = suggestions.where((email) => email.contains(event.query)).toList();
+
+      // Emit the new state with filtered suggestions
+      emit(state.copyWith(emailSuggestions: filteredSuggestions));
+    } catch (e) {
+      emit(state.copyWith(emailSuggestions: []));
+    }
   }
 
   Future<void> _onFormReset(

@@ -8,11 +8,16 @@ class CustomFormField extends StatelessWidget {
     this.inputFormatters,
     this.validator,
     this.onChange,
+    this.controller,
+    this.focusNode,
   }) : super(key: key);
+
   final String hintText;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
   final void Function(String?)? onChange;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +26,8 @@ class CustomFormField extends StatelessWidget {
       child: TextFormField(
         inputFormatters: inputFormatters,
         validator: validator,
+        controller: controller,
+        focusNode: focusNode,
         decoration: InputDecoration(hintText: hintText),
         onChanged: onChange,
       ),
