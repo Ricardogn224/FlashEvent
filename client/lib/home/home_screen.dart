@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
+import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -52,9 +53,7 @@ class HomeScreen extends StatelessWidget {
                             backgroundColor: Colors.grey.shade300,
                             child: IconButton(
                               icon: const Icon(Icons.person),
-                              onPressed: () {
-                                // Action pour le profil
-                              },
+                              onPressed: () => MyAccountScreen.navigateTo(context),
                             ),
                           ),
                         ],

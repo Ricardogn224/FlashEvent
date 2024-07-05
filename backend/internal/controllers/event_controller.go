@@ -299,6 +299,17 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 		}
 		eventID := uint(eventIDInt)
 
+		// Check if transport is active for the event
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+		if !event.TransportActive {
+			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
+			return
+		}
+
 		var request models.TransportationAdd
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -309,6 +320,13 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 		var user models.User
 		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		// Vérifier si l'utilisateur a déjà une réservation de transport pour cet événement
+		var existingTransportation models.Transportation
+		if err := db.Where("event_id = ? AND user_id = ?", eventID, user.ID).First(&existingTransportation).Error; err == nil {
+			http.Error(w, "You already have a transportation reservation for this event", http.StatusConflict)
 			return
 		}
 
@@ -339,6 +357,17 @@ func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 		eventID := uint(eventIDInt)
+
+		// Check if transport is active for the event
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+		if !event.TransportActive {
+			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
+			return
+		}
 
 		var transportation []models.Transportation
 		result := db.Where("event_id = ?", eventID).Find(&transportation)

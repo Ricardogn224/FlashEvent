@@ -9,6 +9,7 @@ import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart
 import 'package:flutter_flash_event/formTransportation/form_transportation_screen.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
+import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/screens/my_account_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';

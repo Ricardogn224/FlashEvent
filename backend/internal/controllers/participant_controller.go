@@ -169,6 +169,22 @@ func GetParticipantsWithUserByTransportationID(db *gorm.DB) http.HandlerFunc {
 		params := mux.Vars(r)
 		transportationId := params["transportationId"]
 
+		var transportation models.Transportation
+		if err := db.First(&transportation, "id = ?", transportationId).Error; err != nil {
+			http.Error(w, "Transportation not found", http.StatusNotFound)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, "id = ?", transportation.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+		if !event.TransportActive {
+			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
+			return
+		}
+
 		// Define a structure to hold the response data
 
 		var results []models.ParticipantWithUser

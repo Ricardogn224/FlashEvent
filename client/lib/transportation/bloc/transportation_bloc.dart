@@ -22,7 +22,6 @@ class TransportationBloc extends Bloc<TransportationEvent, TransportationState> 
       try {
         print(state);
         final currentUser = await UserServices.getCurrentUserByEmail();
-        print(currentUser);
 
         final transportations = await TransportationServices.getTransportationsByEvent(id: event.id);
         final participantsFutures = transportations.map((transportation) =>
