@@ -34,8 +34,9 @@ class EmailChanged extends FormParticipantEvent {
 
 class FetchEmailSuggestions extends FormParticipantEvent {
   final String query;
+  final int eventId;
 
-  const FetchEmailSuggestions({required this.query});
+  const FetchEmailSuggestions({required this.query, required this.eventId});
 
   @override
   List<Object> get props => [query];

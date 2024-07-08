@@ -49,7 +49,7 @@ class FormParticipantBloc extends Bloc<FormParticipantEvent, FormParticipantStat
   Future<void> _onFetchEmailSuggestions(FetchEmailSuggestions event, Emitter<FormParticipantState> emit) async {
     try {
       // Assuming you have a service method to fetch email suggestions
-      final suggestions = await UserServices.getAllUserEmails();
+      final suggestions = await UserServices.getAllUserEmails(id: event.eventId);
 
       // Filter the suggestions based on the query
       final filteredSuggestions = suggestions.where((email) => email.contains(event.query)).toList();

@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/admin/admin_event_screen.dart';
+import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
-/*class AdminHomeDesktop extends StatelessWidget {
+class AdminHomeDesktop extends StatelessWidget {
+
+  static const String routeName = '/admin';
+
+  static navigateTo(BuildContext context) {
+    Navigator.of(context).pushNamed(routeName);
+  }
+
   const AdminHomeDesktop({Key? key}) : super(key: key);
 
   @override
@@ -24,7 +33,7 @@ import 'package:flutter_flash_event/widgets/admin_button.dart';
                 title: 'Gestion des utlisateurs',
                 onPressed: () {
                   // Navigate to Manage Users screen
-                  Navigator.pushNamed(context, '/manage-users');
+                  AdminUserScreen.navigateTo(context);
                 },
               ),
               SizedBox(height: 20),
@@ -32,7 +41,7 @@ import 'package:flutter_flash_event/widgets/admin_button.dart';
                 title: 'Gestion des évènements',
                 onPressed: () {
                   // Navigate to Manage Events screen
-                  Navigator.pushNamed(context, '/manage-events');
+                  AdminEventScreen.navigateTo(context);
                 },
               ),
             ],
@@ -42,31 +51,3 @@ import 'package:flutter_flash_event/widgets/admin_button.dart';
     );
   }
 }
-
-class ManageUsersScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Manage Users'),
-      ),
-      body: Center(
-        child: Text('User Management Screen'),
-      ),
-    );
-  }
-}
-
-class ManageEventsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Manage Events'),
-      ),
-      body: Center(
-        child: Text('Event Management Screen'),
-      ),
-    );
-  }
-}*/
