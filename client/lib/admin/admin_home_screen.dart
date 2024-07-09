@@ -44,6 +44,14 @@ class AdminHomeDesktop extends StatelessWidget {
                   AdminEventScreen.navigateTo(context);
                 },
               ),
+              SizedBox(height: 20),
+              AdminButton(
+                title: 'Fonctionnalités',
+                onPressed: () {
+                  // Navigate to Manage Events screen
+                  AdminEventScreen.navigateTo(context);
+                },
+              ),
             ],
           ),
         ),

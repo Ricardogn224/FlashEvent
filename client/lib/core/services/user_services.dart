@@ -129,4 +129,25 @@ class UserServices {
     }
   }
 
+  static Future<User> getUser({required int id}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(message: 'Error while requesting user with id $id', statusCode: response.statusCode);
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      return User.fromJson(data);
+    } catch (error) {
+      throw ApiException(message: 'Unknown error while requesting user with id $id');
+    }
+  }
+
 }

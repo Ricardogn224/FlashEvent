@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
 import 'package:flutter_flash_event/admin/bloc/admin_bloc.dart';
 
 class AdminUserScreen extends StatelessWidget {
@@ -57,7 +58,7 @@ class AdminUserScreen extends StatelessWidget {
                                     IconButton(
                                       icon: Icon(Icons.edit),
                                       onPressed: () {
-                                        // Handle edit action
+                                        AdminUserEditScreen.navigateTo(context, id: user.id);
                                       },
                                     ),
                                     IconButton(

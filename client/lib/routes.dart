@@ -6,6 +6,7 @@ import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
 import 'package:flutter_flash_event/admin/admin_event_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_add_oarticipant.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
+import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/formEventParty/form_event_party_screen.dart';
@@ -45,6 +46,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => EventScreen(id: args as int));
     case ParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => ParticipantScreen(id: args as int));
+    case AdminUserEditScreen.routeName:
+      return MaterialPageRoute(builder: (context) => AdminUserEditScreen(id: args as int));
     case AdminEventEditScreen.routeName:
       return MaterialPageRoute(builder: (context) => AdminEventEditScreen(eventId: args as int));
     case FormParticipantScreen.routeName:
