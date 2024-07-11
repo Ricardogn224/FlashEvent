@@ -3,8 +3,10 @@ package controllers
 import (
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -113,6 +115,31 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 	}
+}
+
+func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return nil, fmt.Errorf("authorization header missing")
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	var user models.User
+	if err := db.Where("email = ?", claims.Email).First(&user).Error; err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return &user, nil
 }
 
 // GetAllUsers returns all users

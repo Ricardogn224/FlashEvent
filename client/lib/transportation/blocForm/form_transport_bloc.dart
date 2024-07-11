@@ -8,12 +8,12 @@ import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
-part 'form_event_party_event.dart';
-part 'form_event_party_state.dart';
+part 'form_transport_event.dart';
+part 'form_transport_state.dart';
 
 
-class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> {
-  FormEventPartyBloc() : super(const FormEventPartyState()) {
+class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
+  FormTransportBloc() : super(const FormTransportState()) {
     on<InitEvent>(_initState);
     on<NameChanged>(_onNameChanged);
     on<DescriptionChanged>(_onDescriptionChanged);
@@ -24,12 +24,15 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
 
   final formKey = GlobalKey<FormState>();
 
-  Future<void> _initState(InitEvent event, Emitter<FormEventPartyState> emit) async {
-    emit(state.copyWith(formKey: formKey));
+  Future<void> _initState(InitEvent event, Emitter<FormTransportState> emit) async {
+    emit(state.copyWith(
+      formKey: formKey,
+      transportStart: BlocFormItem(value: event.event.transportStart ?? '', error: 'Enter transport start'),
+    ));
   }
 
   Future<void> _onNameChanged(
-      NameChanged event, Emitter<FormEventPartyState> emit) async {
+      NameChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         name: BlocFormItem(
@@ -42,7 +45,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
   }
 
   Future<void> _onDescriptionChanged(
-      DescriptionChanged event, Emitter<FormEventPartyState> emit) async {
+      DescriptionChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         description: BlocFormItem(
@@ -54,7 +57,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
   }
 
   Future<void> _onTransportStartChanged(
-      TransportStartChanged event, Emitter<FormEventPartyState> emit) async {
+      TransportStartChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         transportStart: BlocFormItem(
@@ -67,12 +70,12 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
 
   Future<void> _onFormReset(
       FormResetEvent event,
-      Emitter<FormEventPartyState> emit,
+      Emitter<FormTransportState> emit,
       ) async {
     state.formKey?.currentState?.reset();
   }
 
-  Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<FormEventPartyState> emit) async {
+  Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<FormTransportState> emit) async {
     if (state.formKey!.currentState!.validate()) {
       Event newEvent = Event(
         id: 0,

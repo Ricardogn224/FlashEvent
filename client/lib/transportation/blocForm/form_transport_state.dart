@@ -1,7 +1,7 @@
-part of 'form_event_party_bloc.dart';
+part of 'form_transport_bloc.dart';
 
-class FormEventPartyState extends Equatable {
-  const FormEventPartyState({
+class FormTransportState extends Equatable {
+  const FormTransportState({
     this.name = const BlocFormItem(error: 'Enter name'),
     this.description = const BlocFormItem(error: 'Enter description'),
     this.transportStart = const BlocFormItem(error: 'Enter transport start'),
@@ -13,13 +13,13 @@ class FormEventPartyState extends Equatable {
   final BlocFormItem transportStart;
   final GlobalKey<FormState>? formKey;
 
-  FormEventPartyState copyWith({
+  FormTransportState copyWith({
     BlocFormItem? name,
     BlocFormItem? description,
     BlocFormItem? transportStart,
     GlobalKey<FormState>? formKey,
   }) {
-    return FormEventPartyState(
+    return FormTransportState(
       description: description ?? this.description,
       name: name ?? this.name,
       transportStart: transportStart ?? this.transportStart,

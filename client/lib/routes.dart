@@ -8,6 +8,7 @@ import 'package:flutter_flash_event/admin/admin_user_add_oarticipant.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
+import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/formEventParty/form_event_party_screen.dart';
 import 'package:flutter_flash_event/formItemEvent/form_item_event_screen.dart';
@@ -18,6 +19,7 @@ import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/screens/my_account_screen.dart';
+import 'package:flutter_flash_event/transportation/transport_start_edit_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'login/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -66,6 +68,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => FormItemEventScreen(eventId: args as int));
     case FormTransportationScreen.routeName:
       return MaterialPageRoute(builder: (context) => FormTransportationScreen(eventId: args as int));
+    case TransportStartEditScreen.routeName:
+      return MaterialPageRoute(builder: (context) => TransportStartEditScreen(event: args as Event));
     case '/event_new':
       return MaterialPageRoute(builder: (_) => BlocFormEventScreen());
     case '/my-account':

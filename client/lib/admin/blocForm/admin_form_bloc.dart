@@ -97,6 +97,8 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         id: 0, // Replace with actual id
         name: state.name.value,
         description: state.description.value,
+        transportActive: false,
+        transportStart: '',
       );
 
       // Handle the submission logic here

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/formTransportation/form_transportation_screen.dart';
 import 'package:flutter_flash_event/transportation/bloc/transportation_bloc.dart';
+import 'package:flutter_flash_event/transportation/transport_start_edit_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_list_item.dart';
 
 class TransportationScreen extends StatelessWidget {
@@ -24,6 +25,7 @@ class TransportationScreen extends StatelessWidget {
           final transportations = state.transportations;
           final participants = state.participants;
           final currentUser = state.currentUser;
+          final eventParty = state.eventParty;
 
           return SafeArea(
             child: Scaffold(
@@ -33,6 +35,27 @@ class TransportationScreen extends StatelessWidget {
               backgroundColor: Colors.white,
               body: Column(
                 children: [
+                  if (eventParty != null) // Check if eventParty is not null
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Lieu de départ : ' + (eventParty.transportStart.isNotEmpty
+                                ? eventParty.transportStart
+                                : 'Indéfini'),
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              TransportStartEditScreen.navigateTo(context, event: eventParty);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   if (state.status == TransportationStatus.loading)
                     const Expanded(
                       child: Center(
@@ -48,7 +71,7 @@ class TransportationScreen extends StatelessWidget {
                           return TransportationListItem(
                             transportation: transportation,
                             participants: transportParticipants,
-                            currentUser : currentUser,
+                            currentUser: currentUser,
                           );
                         },
                         itemCount: transportations.length,

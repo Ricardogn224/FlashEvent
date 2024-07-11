@@ -5,7 +5,8 @@ type Event struct {
 	ID              uint   `gorm:"primaryKey" json:"id"`
 	Name            string `json:"name" required:""`
 	Description     string `json:"description" required:""`
-	TransportActive bool   `json:"trnsport_active" gorm:"default:false"`
+	TransportActive bool   `json:"transport_active" gorm:"default:false"`
+	TransportStart  string `json:"transport_start"`
 }
 
 // EventRequest represents the request body for adding an event

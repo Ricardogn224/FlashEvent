@@ -3,10 +3,12 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 import 'package:flutter_flash_event/core/models/transportation.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flash_event/core/services/event_services.dart';
 import 'package:flutter_flash_event/core/services/message_services.dart';
 import 'package:flutter_flash_event/core/services/transportation_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/models/user.dart'; // Import your Participant model
+import 'package:flutter_flash_event/core/models/event.dart'; // Import your Participant model
 import 'package:flutter_flash_event/core/services/participant_services.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart'; // Import participant services
 
@@ -22,6 +24,7 @@ class TransportationBloc extends Bloc<TransportationEvent, TransportationState> 
       try {
         print(state);
         final currentUser = await UserServices.getCurrentUserByEmail();
+        final eventParty = await EventServices.getEvent(id: event.id);
 
         final transportations = await TransportationServices.getTransportationsByEvent(id: event.id);
         final participantsFutures = transportations.map((transportation) =>
@@ -35,6 +38,7 @@ class TransportationBloc extends Bloc<TransportationEvent, TransportationState> 
           transportations: transportations,
           participants: participants,
           currentUser: currentUser,
+          eventParty: eventParty,
         ));
       } catch (error) {
         emit(state.copyWith(status: TransportationStatus.error, errorMessage: 'An error occurred'));

@@ -107,19 +107,23 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-func GetParticipantByUserId(db *gorm.DB) http.HandlerFunc {
+func GetParticipantByEventId(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
-		userID := params["userId"]
-
-		// Fetch all participants with the given event ID
-		var participant models.Participant
-		if err := db.Where("user_id = ?", userID).First(&participant).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 
-		// Respond with the retrieved participants
+		params := mux.Vars(r)
+		eventID := params["eventId"]
+
+		var participant models.Participant
+		if err := db.Where("user_id = ? AND event_id = ?", user.ID, eventID).First(&participant).Error; err != nil {
+			http.Error(w, "Participant not found", http.StatusNotFound)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(participant)
 	}

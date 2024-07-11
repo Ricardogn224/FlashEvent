@@ -106,7 +106,7 @@ class ParticipantServices {
 
     if (participant.id == 0) {
       try {
-        final responseParticipant= await http.get(Uri.parse('http://10.0.2.2:8080/get-participant/${participant.userId}'),
+        final responseParticipant= await http.get(Uri.parse('http://10.0.2.2:8080//${participant.eventId}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers

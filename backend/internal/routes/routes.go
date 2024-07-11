@@ -152,10 +152,10 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 
 		endpoint.New(
-			http.MethodGet, "/get-participant/{userId}",
-			endpoint.Handler(controllers.GetParticipantByUserId(db)),
-			endpoint.Summary("Get transportation by event ID"),
-			endpoint.Path("id", "string", "Id of the user", true),
+			http.MethodGet, "/get-participant/{eventId}",
+			endpoint.Handler(controllers.GetParticipantByEventId(db)),
+			endpoint.Summary("Get participant by user ID and event ID"),
+			endpoint.Path("eventId", "string", "ID of the event", true),
 			endpoint.Response(http.StatusOK, "Successfully retrieved participant", endpoint.SchemaResponseOption(models.Participant{})),
 		),
 		endpoint.New(

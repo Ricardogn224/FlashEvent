@@ -1,13 +1,13 @@
-part of 'form_event_party_bloc.dart';
+part of 'form_transport_bloc.dart';
 
-abstract class FormEventPartyEvent extends Equatable {
-  const FormEventPartyEvent();
+abstract class FormTransportEvent extends Equatable {
+  const FormTransportEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class FormSubmitEvent extends FormEventPartyEvent {
+class FormSubmitEvent extends FormTransportEvent {
   final VoidCallback onSuccess;
   final Function(String) onError;
 
@@ -17,29 +17,31 @@ class FormSubmitEvent extends FormEventPartyEvent {
   List<Object> get props => [onSuccess, onError];
 }
 
-class FormResetEvent extends FormEventPartyEvent {
+class FormResetEvent extends FormTransportEvent {
   const FormResetEvent();
 }
 
-class InitEvent extends FormEventPartyEvent {
-  const InitEvent();
+class InitEvent extends FormTransportEvent {
+  final Event event;
+
+  InitEvent({required this.event});
 }
 
-class NameChanged extends FormEventPartyEvent {
+class NameChanged extends FormTransportEvent {
   const NameChanged({required this.name});
   final BlocFormItem name;
   @override
   List<Object> get props => [name];
 }
 
-class DescriptionChanged extends FormEventPartyEvent {
+class DescriptionChanged extends FormTransportEvent {
   const DescriptionChanged({required this.description});
   final BlocFormItem description;
   @override
   List<Object> get props => [description];
 }
 
-class TransportStartChanged extends FormEventPartyEvent {
+class TransportStartChanged extends FormTransportEvent {
   const TransportStartChanged({required this.transportStart});
   final BlocFormItem transportStart;
   @override
