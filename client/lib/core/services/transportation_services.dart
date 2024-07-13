@@ -7,9 +7,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TransportationServices {
   static Future<List<Transportation>> getTransportationsByEvent(
       {required int id}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
     try {
       final response = await http
-          .get(Uri.parse('http://10.0.2.2:8000/event/$id/transportations'));
+          .get(Uri.parse('http://10.0.2.2:8000/event/$id/transportations'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 

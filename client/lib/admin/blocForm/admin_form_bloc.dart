@@ -30,6 +30,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     on<RemoveParticipant>(_onRemoveParticipant);
     on<FormParticipantSubmitEvent>(_onFormParticipantSubmitted);
     on<FormSubmitEvent>(_onFormSubmitted);
+    on<FormNewSubmitEvent>(_onFormNewSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
 
@@ -112,6 +113,32 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
 
       // If successful, call event.onSuccess()
       event.onSuccess();
+    } else {
+      // If validation fails, you can call event.onError() with a message
+      event.onError('Validation failed');
+    }
+  }
+
+  Future<void> _onFormNewSubmitted(FormNewSubmitEvent event, Emitter<AdminFormState> emit) async {
+    if (state.formKey!.currentState!.validate()) {
+      Event newEvent = Event(
+        id: 0,
+        name: state.name.value,
+        description: state.description.value,
+        transportActive: false,
+        transportStart: '',
+      );
+
+      try {
+        final response = await EventServices.addEvent(newEvent);
+        if (response.statusCode == 201) {
+          event.onSuccess();
+        } else {
+          event.onError('Event creation failed');
+        }
+      } catch (e) {
+        event.onError('Error: $e');
+      }
     } else {
       // If validation fails, you can call event.onError() with a message
       event.onError('Validation failed');

@@ -74,12 +74,7 @@ class AdminEventNewScreen extends StatelessWidget {
                             BlocProvider.of<AdminFormBloc>(context).add(
                               FormSubmitEvent(
                                 onSuccess: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(),
-                                    ),
-                                  );
+                                  Navigator.pop(context);
                                 },
                                 onError: (errorMessage) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -102,12 +97,6 @@ class AdminEventNewScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    TextButton(
-                      onPressed: () {
-                        // Add logic to navigate to add participant screen
-                      },
-                      child: const Text('Add a participant'),
-                    ),
                   ],
                 ),
               ),

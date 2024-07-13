@@ -8,8 +8,14 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class EventServices {
   static Future<List<Event>> getEvents() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8000/events'));
+      final response = await http.get(Uri.parse('http://10.0.2.2:8000/events'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 

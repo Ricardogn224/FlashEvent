@@ -17,6 +17,16 @@ class FormSubmitEvent extends AdminFormUserEvent {
   List<Object> get props => [onSuccess, onError];
 }
 
+class FormNewSubmitEvent extends AdminFormUserEvent {
+  final VoidCallback onSuccess;
+  final Function(String) onError;
+
+  const FormNewSubmitEvent({required this.onSuccess, required this.onError});
+
+  @override
+  List<Object> get props => [onSuccess, onError];
+}
+
 class FormResetEvent extends AdminFormUserEvent {
   const FormResetEvent();
 }
@@ -25,6 +35,10 @@ class InitEvent extends AdminFormUserEvent {
   final int id;
 
   InitEvent({required this.id});
+}
+
+class InitNewEvent extends AdminFormUserEvent {
+  const InitNewEvent();
 }
 
 class FirstnameChanged extends AdminFormUserEvent {
@@ -53,6 +67,13 @@ class UsernameChanged extends AdminFormUserEvent {
   final BlocFormItem username;
   @override
   List<Object> get props => [username];
+}
+
+class PasswordChanged extends AdminFormUserEvent {
+  const PasswordChanged({required this.password});
+  final BlocFormItem password;
+  @override
+  List<Object> get props => [password];
 }
 
 class ToggleAdminRoleEvent extends AdminFormUserEvent {
