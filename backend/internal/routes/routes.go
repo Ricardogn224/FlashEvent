@@ -19,7 +19,6 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Summary("Get all events"),
 			endpoint.Description("Retrieve all events from the store"),
 			endpoint.Response(http.StatusOK, "Successfully retrieved events", endpoint.SchemaResponseOption([]models.Event{})),
-			endpoint.Security("BearerAuth"),
 		),
 		endpoint.New(
 			http.MethodPost, "/event",

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"fmt"
@@ -31,22 +32,11 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-// MigrateUser crée la table User si elle n'existe pas
-func MigrateUser(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
-}
-func MigrateChat(db *gorm.DB) {
-	db.AutoMigrate(&models.Message{}, &models.ChatRoom{})
-}
-
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
 func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table User si elle n'existe pas
-		MigrateUser(db)
-
-		// migrer chat
-		MigrateChat(db)
+		// Initialiser les tables nécessaires si elles n'existent pas
+		database.MigrateAll(db)
 
 		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -75,8 +65,8 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 // LoginUser gère la connexion d'un utilisateur
 func LoginUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table User si elle n'existe pas
-		MigrateUser(db)
+		// Initialiser les tables nécessaires si elles n'existent pas
+		database.MigrateAll(db)
 
 		var credentials models.User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
@@ -160,7 +150,6 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 // GetAllUserEmails returns all user emails
 func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -226,7 +215,7 @@ func GetUserByID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetUserByID returns a user by their ID
+// GetUserByEmail returns a user by their email
 func GetUserByEmail(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"net/http"
 	"sync"
@@ -52,6 +53,8 @@ func (manager *WebSocketManager) broadcastMessage(msg models.Message) {
 
 func WebSocketEndpoint(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateMessage(db) // Assurez-vous que la table Message existe
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			http.Error(w, "Failed to upgrade connection", http.StatusInternalServerError)
@@ -73,8 +76,8 @@ func WebSocketEndpoint(db *gorm.DB) http.HandlerFunc {
 			}
 
 			if err := db.Create(&msg).Error; err != nil {
-				http.Error(w, "Failed to save message", http.StatusInternalServerError)
-				return
+				conn.WriteJSON(map[string]string{"error": "Failed to save message"})
+				continue
 			}
 
 			wsManager.broadcastMessage(msg)

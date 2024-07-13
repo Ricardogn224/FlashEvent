@@ -10,12 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// création de la table event
+// Migrate les différentes tables
 func MigrateEvent(db *gorm.DB) {
 	db.AutoMigrate(&models.Event{})
 }
 
-// création de la table food
 func MigrateFood(db *gorm.DB) {
 	db.AutoMigrate(&models.FoodItem{})
 }
@@ -24,17 +23,16 @@ func MigrateTransportation(db *gorm.DB) {
 	db.AutoMigrate(&models.Transportation{})
 }
 
-// GetAllEvents retourne tous les événements
+func MigrateParticipant(db *gorm.DB) {
+	db.AutoMigrate(&models.Participant{})
+}
+
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table Event si elle n'existe pas
+		// Initialiser les tables si elles n'existent pas
 		MigrateEvent(db)
-
-		// migrate food
 		MigrateFood(db)
-
 		MigrateTransportation(db)
-
 		MigrateParticipant(db)
 
 		var events []models.Event
@@ -52,12 +50,9 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table Event si elle n'existe pas
+		// Initialiser les tables si elles n'existent pas
 		MigrateEvent(db)
-
-		//migrate food
 		MigrateFood(db)
-
 		MigrateTransportation(db)
 
 		var eventAdd models.EventAdd
@@ -92,7 +87,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			Active:   true, // Set the participant as active by default
 			Response: true,
 		}
-		if err := addParticipantEvent(db, participant); err != nil {
+		if err := db.Create(&participant).Error; err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -446,8 +441,22 @@ func AddActivityToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Ajoutez l'activité à l'événement (logique à adapter selon vos besoins)
-		event.Activities = append(event.Activities, activity.Activity)
+		// Ajoutez l'activité à l'événement
+		var activities []string
+		if err := json.Unmarshal(event.Activities, &activities); err != nil {
+			http.Error(w, "Failed to parse activities", http.StatusInternalServerError)
+			return
+		}
+		activities = append(activities, activity.Activity)
+
+		activitiesJSON, err := json.Marshal(activities)
+		if err != nil {
+			http.Error(w, "Failed to serialize activities", http.StatusInternalServerError)
+			return
+		}
+
+		event.Activities = activitiesJSON
+
 		if err := db.Save(&event).Error; err != nil {
 			http.Error(w, "Failed to add activity", http.StatusInternalServerError)
 			return

@@ -28,7 +28,7 @@ func main() {
 		option.Schemes("http", "https"),
 		option.Security("BearerAuth", "read:events"),
 		option.SecurityScheme("BearerAuth",
-			option.APIKeySecurity("Authorization", "header"),
+			option.APIKeySecurity("token", "header"),
 		),
 	)
 
