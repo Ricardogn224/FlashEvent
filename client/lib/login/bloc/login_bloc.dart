@@ -9,16 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-
   LoginBloc() : super(LoginInitial()) {
     on<LoginButtonPressed>(_onLoginButtonPressed);
   }
 
-  Future<void> _onLoginButtonPressed(LoginButtonPressed event, Emitter<LoginState> emit) async {
+  Future<void> _onLoginButtonPressed(
+      LoginButtonPressed event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
 
     try {
-      final response = await AuthServices.loginUser(event.email, event.password);
+      final response =
+          await AuthServices.loginUser(event.email, event.password);
       if (response.statusCode == 200) {
         // Extract token from response body
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -37,7 +38,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         emit(LoginSuccess());
 
-        await FirebaseApi().initNotifications();
+        //await FirebaseApi().initNotifications();
       } else {
         emit(LoginFailure(error: 'Login failed: ${response.body}'));
       }
