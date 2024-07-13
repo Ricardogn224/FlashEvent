@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
-import 'package:flutter_flash_event/Transportation/transportation_screen.dart';
+import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
 import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
@@ -53,90 +53,99 @@ class EventScreen extends StatelessWidget {
               ),
               body: state.status == EventPartyStatus.loading
                   ? const Center(
-                child: CircularProgressIndicator(),
-              )
+                      child: CircularProgressIndicator(),
+                    )
                   : eventParty != null
-                  ? Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      eventParty.name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      eventParty.description,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: const [
-                              Icon(Icons.location_on, color: Color(0xFF6058E9)),
-                              SizedBox(width: 8),
-                              Text('New York - USA'),
+                      ? Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                eventParty.name,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                eventParty.description,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.location_on,
+                                            color: Color(0xFF6058E9)),
+                                        SizedBox(width: 8),
+                                        Text('New York - USA'),
+                                      ],
+                                    ),
+                                    const Divider(), // Ligne de séparation
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.calendar_today,
+                                            color: Color(0xFF6058E9)),
+                                        SizedBox(width: 8),
+                                        Text('28 Sun 2021'),
+                                      ],
+                                    ),
+                                    const Divider(), // Ligne de séparation
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.people,
+                                            color: Color(0xFF6058E9)),
+                                        SizedBox(width: 8),
+                                        Text('128 Attendees'),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ListTile(
+                                title: Text('Liste des participants'),
+                                trailing: Icon(Icons.people),
+                                onTap: () => ParticipantScreen.navigateTo(
+                                    context,
+                                    id: eventParty!.id),
+                              ),
+                              ListTile(
+                                title: Text('Liste des messages'),
+                                trailing: Icon(Icons.adb),
+                                onTap: () => ChatRoomScreen.navigateTo(context,
+                                    id: eventParty!.id),
+                              ),
+                              ListTile(
+                                title: Text('Liste des choses'),
+                                trailing: Icon(Icons.adb),
+                                onTap: () => ItemEventScreen.navigateTo(context,
+                                    id: eventParty!.id),
+                              ),
+                              ListTile(
+                                title: Text('Gestion du transport'),
+                                trailing: Icon(Icons.adb),
+                                onTap: () => TransportationScreen.navigateTo(
+                                    context,
+                                    id: eventParty!.id),
+                              ),
                             ],
                           ),
-                          const Divider(), // Ligne de séparation
-                          Row(
-                            children: const [
-                              Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
-                              SizedBox(width: 8),
-                              Text('28 Sun 2021'),
-                            ],
-                          ),
-                          const Divider(), // Ligne de séparation
-                          Row(
-                            children: const [
-                              Icon(Icons.people, color: Color(0xFF6058E9)),
-                              SizedBox(width: 8),
-                              Text('128 Attendees'),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      title: Text('Liste des participants'),
-                      trailing: Icon(Icons.people),
-                      onTap: () => ParticipantScreen.navigateTo(context, id: eventParty!.id),
-                    ),
-                    ListTile(
-                      title: Text('Liste des messages'),
-                      trailing: Icon(Icons.adb),
-                      onTap: () => ChatRoomScreen.navigateTo(context, id: eventParty!.id),
-                    ),
-                    ListTile(
-                      title: Text('Liste des choses'),
-                      trailing: Icon(Icons.adb),
-                      onTap: () => ItemEventScreen.navigateTo(context, id: eventParty!.id),
-                    ),
-                    ListTile(
-                      title: Text('Gestion du transport'),
-                      trailing: Icon(Icons.adb),
-                      onTap: () => TransportationScreen.navigateTo(context, id: eventParty!.id),
-                    ),
-                  ],
-                ),
-              )
-                  : const Center(
-                child: Text('Event not found'),
-              ),
+                        )
+                      : const Center(
+                          child: Text('Event not found'),
+                        ),
             ),
           );
         },

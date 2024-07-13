@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/blocFormUser/admin_form_user_bloc.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 
 class AdminUserEditScreen extends StatelessWidget {
@@ -39,133 +38,135 @@ class AdminUserEditScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              body: state.status ==  FormStatus.inProgress
+              body: state.status == FormStatus.inProgress
                   ? const Center(
-                child: CircularProgressIndicator(),
-              )
+                      child: CircularProgressIndicator(),
+                    )
                   : email != ''
-                  ? Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomFormField(
-                      initialValue: state.firstname.value,
-                      hintText: 'Nom',
-                      onChange: (val) {
-                        BlocProvider.of<AdminFormUserBloc>(context).add(
-                          FirstnameChanged(
-                            firstname: BlocFormItem(value: val!),
-                          ),
-                        );
-                      },
-                      validator: (val) {
-                        return state.firstname.error;
-                      },
-                    ),
-                    CustomFormField(
-                      initialValue: state.lastname.value,
-                      hintText: 'Prénom',
-                      onChange: (val) {
-                        BlocProvider.of<AdminFormUserBloc>(context).add(
-                          LastnameChanged(
-                            lastname: BlocFormItem(value: val!),
-                          ),
-                        );
-                      },
-                      validator: (val) {
-                        return state.lastname.error;
-                      },
-                    ),
-                    CustomFormField(
-                      initialValue: state.username.value,
-                      hintText: 'Username',
-                      onChange: (val) {
-                        BlocProvider.of<AdminFormUserBloc>(context).add(
-                          UsernameChanged(
-                            username: BlocFormItem(value: val!),
-                          ),
-                        );
-                      },
-                      validator: (val) {
-                        return state.username.error;
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<AdminFormUserBloc>(
-                                context)
-                                .add(
-                              FormSubmitEvent(
-                                onSuccess: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                      const HomeScreen(),
+                      ? Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomFormField(
+                                initialValue: state.firstname.value,
+                                hintText: 'Nom',
+                                onChange: (val) {
+                                  BlocProvider.of<AdminFormUserBloc>(context)
+                                      .add(
+                                    FirstnameChanged(
+                                      firstname: BlocFormItem(value: val!),
                                     ),
                                   );
                                 },
-                                onError: (errorMessage) {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                        content:
-                                        Text(errorMessage)),
-                                  );
+                                validator: (val) {
+                                  return state.firstname.error;
                                 },
                               ),
-                            );
-                          },
-                          child: const Text('SUBMIT'),
-                        ),
-                        const SizedBox(width: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<AdminFormUserBloc>(
-                                context)
-                                .add(const FormResetEvent());
-                          },
-                          child: const Text('RESET'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Role Admin',
-                          style:
-                          Theme.of(context).textTheme.headline6,
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<AdminFormUserBloc>(
-                                context)
-                                .add(
-                              ToggleAdminRoleEvent(
-                                id: id,
-                                isAdmin: !state.isAdmin,
+                              CustomFormField(
+                                initialValue: state.lastname.value,
+                                hintText: 'Prénom',
+                                onChange: (val) {
+                                  BlocProvider.of<AdminFormUserBloc>(context)
+                                      .add(
+                                    LastnameChanged(
+                                      lastname: BlocFormItem(value: val!),
+                                    ),
+                                  );
+                                },
+                                validator: (val) {
+                                  return state.lastname.error;
+                                },
                               ),
-                            );
-                          },
-                          child: Text(state.isAdmin
-                              ? 'Desactiver'
-                              : 'Activer'),
+                              CustomFormField(
+                                initialValue: state.username.value,
+                                hintText: 'Username',
+                                onChange: (val) {
+                                  BlocProvider.of<AdminFormUserBloc>(context)
+                                      .add(
+                                    UsernameChanged(
+                                      username: BlocFormItem(value: val!),
+                                    ),
+                                  );
+                                },
+                                validator: (val) {
+                                  return state.username.error;
+                                },
+                              ),
+                              const SizedBox(height: 30),
+                              Row(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      BlocProvider.of<AdminFormUserBloc>(
+                                              context)
+                                          .add(
+                                        FormSubmitEvent(
+                                          onSuccess: () {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const HomeScreen(),
+                                              ),
+                                            );
+                                          },
+                                          onError: (errorMessage) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(errorMessage)),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('SUBMIT'),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      BlocProvider.of<AdminFormUserBloc>(
+                                              context)
+                                          .add(const FormResetEvent());
+                                    },
+                                    child: const Text('RESET'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Role Admin',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      BlocProvider.of<AdminFormUserBloc>(
+                                              context)
+                                          .add(
+                                        ToggleAdminRoleEvent(
+                                          id: id,
+                                          isAdmin: !state.isAdmin,
+                                        ),
+                                      );
+                                    },
+                                    child: Text(state.isAdmin
+                                        ? 'Desactiver'
+                                        : 'Activer'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      : const Center(
+                          child: Text('User non trouvé'),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-                  : const Center(
-                child: Text('User non trouvé'),
-              ),
             ),
           );
         },

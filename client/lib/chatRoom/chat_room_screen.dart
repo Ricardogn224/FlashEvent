@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flash_event/ChatRoom/bloc/chat_room_bloc.dart';
+import 'package:flutter_flash_event/chatRoom/bloc/chat_room_bloc.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
 import 'package:flutter_flash_event/participant/bloc/participant_bloc.dart';
@@ -37,8 +37,10 @@ class ChatRoomScreen extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  if (state.status == ChatRoomStatus.success && chatRooms != null)
-                    Expanded( // Add Expanded here
+                  if (state.status == ChatRoomStatus.success &&
+                      chatRooms != null)
+                    Expanded(
+                      // Add Expanded here
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final chatRoom = state.chatRooms?[index];
@@ -46,7 +48,8 @@ class ChatRoomScreen extends StatelessWidget {
                             leading: Icon(Icons.person),
                             title: Text(chatRoom!.name),
                             subtitle: Text('Nom: ${chatRoom.name}'),
-                            onTap: () => MessageChatScreen.navigateTo(context, id: chatRoom.id),
+                            onTap: () => MessageChatScreen.navigateTo(context,
+                                id: chatRoom.id),
                           );
                         },
                         itemCount: state.chatRooms?.length,
