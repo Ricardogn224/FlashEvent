@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
-class AdminHomeDesktop extends StatelessWidget {
+/*class AdminHomeDesktop extends StatelessWidget {
   const AdminHomeDesktop({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Interface Admin',
+      title: 'Interface admin',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Admin Interface'),
+          title: Text('admin Interface'),
           centerTitle: true,
         ),
         body: Center(
@@ -69,4 +69,4 @@ class ManageEventsScreen extends StatelessWidget {
       ),
     );
   }
-}
+}*/

@@ -3,8 +3,10 @@ package controllers
 import (
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -12,6 +14,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
+
+func contains(slice []uint, item uint) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
 
 var jwtKey = []byte("your_secret_key")
 
@@ -106,6 +117,31 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return nil, fmt.Errorf("authorization header missing")
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	var user models.User
+	if err := db.Where("email = ?", claims.Email).First(&user).Error; err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return &user, nil
+}
+
 // GetAllUsers returns all users
 func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -118,6 +154,49 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(users)
+	}
+}
+
+// GetAllUserEmails returns all user emails
+func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		eventIDInt, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+		eventID := uint(eventIDInt)
+
+		// Fetch all users
+		var users []models.User
+		result := db.Select("id, email").Find(&users)
+		if result.Error != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		var participants []models.Participant
+		if eventID != 0 {
+			db.Where("event_id = ? AND (active = ? AND response = ? OR response = ?)", eventID, true, true, false).Find(&participants)
+		}
+		// Extract participant user IDs
+		participantIDs := make([]uint, len(participants))
+		for i, participant := range participants {
+			participantIDs[i] = participant.UserID
+		}
+
+		// Filter out participants from the user list
+		emails := make([]string, 0)
+		for _, user := range users {
+			if !contains(participantIDs, user.ID) {
+				emails = append(emails, user.Email)
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(emails)
 	}
 }
 
@@ -139,6 +218,23 @@ func GetUserByID(db *gorm.DB) http.HandlerFunc {
 			} else {
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
+// GetUserByID returns a user by their ID
+func GetUserByEmail(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		email := params["email"]
+
+		var user models.User
+		if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 

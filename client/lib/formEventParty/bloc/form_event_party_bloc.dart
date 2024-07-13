@@ -17,6 +17,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
     on<InitEvent>(_initState);
     on<NameChanged>(_onNameChanged);
     on<DescriptionChanged>(_onDescriptionChanged);
+    on<TransportStartChanged>(_onTransportStartChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
@@ -33,7 +34,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
       state.copyWith(
         name: BlocFormItem(
           value: event.name.value,
-          error: event.name.value.isValidName ? null : 'Enter name',
+          error: event.name.value.isValidName ? null : 'Entrer un nom valide',
         ),
         formKey: formKey,
       ),
@@ -46,7 +47,18 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
       state.copyWith(
         description: BlocFormItem(
           value: event.description.value,
-          error: event.description.value.isValidName ? null : 'Enter description',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
+  Future<void> _onTransportStartChanged(
+      TransportStartChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        transportStart: BlocFormItem(
+          value: event.transportStart.value
         ),
         formKey: formKey,
       ),
@@ -66,6 +78,8 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
         id: 0,
         name: state.name.value,
         description: state.description.value,
+        transportActive: false,
+        transportStart: '',
       );
 
       try {

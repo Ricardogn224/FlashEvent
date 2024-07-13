@@ -25,6 +25,8 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
     on<InvitationAnsw>((event, emit) async {
 
+      print(event.active);
+
       InvitationAnswer invitationAnswer = InvitationAnswer(
           participantId: event.participantId,
           active: event.active

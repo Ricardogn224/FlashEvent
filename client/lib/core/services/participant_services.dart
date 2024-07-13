@@ -93,4 +93,62 @@ class ParticipantServices {
     }
   }
 
+  static Future<http.Response> updateParticipant(Participant participant) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    int newIdParticipant = 0;
+
+    if (participant.id == 0) {
+      try {
+        final responseParticipant= await http.get(Uri.parse('http://10.0.2.2:8080//${participant.eventId}'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $token', // Include token in headers
+          },);
+        if (responseParticipant.statusCode < 200 || responseParticipant.statusCode >= 400) {
+          throw ApiException(message: 'Error while requesting event with user id', statusCode: responseParticipant.statusCode);
+        }
+
+        final data = json.decode(responseParticipant.body) as Map<String, dynamic>;
+        final participantReq = Participant.fromJson(data);
+        newIdParticipant = participantReq.id;
+      } catch (error) {
+        throw ApiException(message: 'Unknown error while requesting product with user id');
+      }
+    }
+
+    String url = '';
+
+    if (newIdParticipant != 0) {
+      url = 'http://10.0.2.2:8080/participants/${newIdParticipant}';
+    } else {
+      url = 'http://10.0.2.2:8080/participants/${participant.id}';
+    }
+
+    final response = await http.patch(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token', // Include token in headers
+      },
+      body: jsonEncode(<String, dynamic>{
+        'transportation_id': participant.transportationId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      print('Error: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception('Failed to create event');
+    }
+  }
+
 }

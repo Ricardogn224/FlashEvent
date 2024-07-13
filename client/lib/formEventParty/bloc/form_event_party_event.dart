@@ -38,3 +38,10 @@ class DescriptionChanged extends FormEventPartyEvent {
   @override
   List<Object> get props => [description];
 }
+
+class TransportStartChanged extends FormEventPartyEvent {
+  const TransportStartChanged({required this.transportStart});
+  final BlocFormItem transportStart;
+  @override
+  List<Object> get props => [transportStart];
+}

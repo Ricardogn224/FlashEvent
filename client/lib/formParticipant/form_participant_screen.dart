@@ -8,8 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 
 class FormParticipantScreen extends StatelessWidget {
-
-  static const String routeName = '/new-particpant';
+  static const String routeName = '/new-participant';
 
   static navigateTo(BuildContext context, {required int id}) {
     Navigator.of(context).pushNamed(routeName, arguments: id);
@@ -35,14 +34,39 @@ class FormParticipantScreen extends StatelessWidget {
                 key: state.formKey,
                 child: Column(
                   children: [
-                    CustomFormField(
-                      hintText: 'Email',
-                      onChange: (val) {
+                    Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return const Iterable<String>.empty();
+                        }
                         BlocProvider.of<FormParticipantBloc>(context)
-                            .add(EmailChanged(email: BlocFormItem(value: val!)));
+                            .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: eventId));
+                        return state.emailSuggestions.where((String option) {
+                          return option.contains(textEditingValue.text.toLowerCase());
+                        });
                       },
-                      validator: (val) {
-                        return state.email.error;
+                      onSelected: (String selection) {
+                        BlocProvider.of<FormParticipantBloc>(context)
+                            .add(EmailChanged(email: BlocFormItem(value: selection)));
+                      },
+                      fieldViewBuilder: (
+                          BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted,
+                          ) {
+                        return CustomFormField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          hintText: 'Email',
+                          onChange: (val) {
+                            BlocProvider.of<FormParticipantBloc>(context)
+                                .add(EmailChanged(email: BlocFormItem(value: val!)));
+                          },
+                          validator: (val) {
+                            return state.email.error;
+                          },
+                        );
                       },
                     ),
                     const SizedBox(height: 30),

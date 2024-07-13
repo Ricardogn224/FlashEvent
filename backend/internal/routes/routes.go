@@ -31,6 +31,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Security("BearerAuth"),
 		),
 		endpoint.New(
+			http.MethodGet, "/users-emails/{eventId}",
+			endpoint.Handler(controllers.GetAllUserEmails(db)),
+			endpoint.Summary("Get all user emails"),
+			endpoint.Path("eventId", "integer", "ID of event", true),
+			endpoint.Description("Retrieve all user emails from the store"),
+			endpoint.Response(http.StatusOK, "Successfully retrieved user emails", endpoint.SchemaResponseOption([]string{})),
+		),
+		endpoint.New(
 			http.MethodGet, "/event/{eventId}",
 			endpoint.Handler(http.HandlerFunc(controllers.AuthenticatedFindEventByID(db))),
 			endpoint.Summary("Find event by ID"),
@@ -71,13 +79,21 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Security("BearerAuth"),
 		),
 		endpoint.New(
-			http.MethodGet, "/user/{userId}",
+			http.MethodGet, "/users/{userId}",
 			endpoint.Handler(http.HandlerFunc(controllers.GetUserByID(db))),
 			endpoint.Summary("Get user by ID"),
 			endpoint.Description("Retrieve a user by their ID"),
 			endpoint.Path("userId", "integer", "ID of the user to retrieve", true),
 			endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(models.User{})),
 			endpoint.Security("BearerAuth"),
+		),
+		endpoint.New(
+			http.MethodGet, "/users-email/{email}",
+			endpoint.Handler(http.HandlerFunc(controllers.GetUserByEmail(db))),
+			endpoint.Summary("Get user by email"),
+			endpoint.Description("Retrieve a user by the email"),
+			endpoint.Path("email", "string", "Email of the user to retrieve", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(models.User{})),
 		),
 		endpoint.New(
 			http.MethodPost, "/participant",
@@ -136,11 +152,44 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Security("BearerAuth"),
 		),
 		endpoint.New(
-			http.MethodPost, "/event/{eventId}/add-transportation",
+			http.MethodPost, "/event/{eventId}/transportations",
 			endpoint.Handler(http.HandlerFunc(controllers.AddTransportationToEvent(db))),
 			endpoint.Summary("Ajouter un moyen de transport à un événement"),
 			endpoint.Description("Permettre à un participant d'ajouter un moyen de transport à un événement"),
 			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(models.TransportationAdd{}, "transportation that needs to be added", true),
+			endpoint.Response(http.StatusCreated, "Transport ajouté avec succès à l'événement", endpoint.SchemaResponseOption(models.Transportation{})),
+		),
+
+		endpoint.New(
+			http.MethodGet, "/get-participant/{eventId}",
+			endpoint.Handler(controllers.GetParticipantByEventId(db)),
+			endpoint.Summary("Get participant by user ID and event ID"),
+			endpoint.Path("eventId", "string", "ID of the event", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved participant", endpoint.SchemaResponseOption(models.Participant{})),
+		),
+		endpoint.New(
+			http.MethodPatch, "/participants/{participantId}",
+			endpoint.Handler(http.HandlerFunc(controllers.UpdateParticipant(db))),
+			endpoint.Summary("Modifier un participant"),
+			endpoint.Description("Modifier participant d'un événement"),
+			endpoint.Path("participantId", "integer", "ID du particpant", true),
+			endpoint.Body(models.Participant{}, "Data Participant", true),
+			endpoint.Response(http.StatusCreated, "Participant modifié avec succès", endpoint.SchemaResponseOption(models.Participant{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/event/{eventId}/transportations",
+			endpoint.Handler(controllers.GetTransportationByEvent(db)),
+			endpoint.Summary("Get transportation by event ID"),
+			endpoint.Path("eventId", "integer", "ID of event to return transportation details for", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved transportation details", endpoint.SchemaResponseOption([]models.Transportation{})),
+		),
+		endpoint.New(
+			http.MethodGet, "/transportation/{transportationId}/participants",
+			endpoint.Handler(controllers.GetParticipantsWithUserByTransportationID(db)),
+			endpoint.Summary("Get transportation by transportation ID"),
+			endpoint.Path("transportationId", "integer", "ID of transportation to return participant details for", true),
+			endpoint.Response(http.StatusOK, "Successfully retrieved participants for transportation", endpoint.SchemaResponseOption([]models.ParticipantWithUser{})),
 			endpoint.Body(struct {
 				Transportation string `json:"transportation"`
 			}{}, "Moyen de transport à ajouter à l'événement", true),
