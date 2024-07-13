@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "412472990817",
+    "project_id": "flashevent-b7dfd",
+    "storage_bucket": "flashevent-b7dfd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412472990817:android:cc7c248b073267be065e20",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj_no05GGoQUwYgDg5T5XmzBl62LE1_90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
