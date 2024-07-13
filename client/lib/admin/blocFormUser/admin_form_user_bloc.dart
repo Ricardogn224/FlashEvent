@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
+import 'package:flutter_flash_event/core/models/user.dart';
+import 'package:flutter_flash_event/core/services/auth_services.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/utils/extensions.dart';
@@ -15,11 +17,14 @@ part 'admin_form_user_state.dart';
 class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
   AdminFormUserBloc() : super(const AdminFormUserState()) {
     on<InitEvent>(_initState);
+    on<InitNewEvent>(_initStateNew);
     on<FirstnameChanged>(_onFirstnameChanged);
     on<LastnameChanged>(_onLastnameChanged);
     on<EmailChanged>(_onEmailChanged);
     on<UsernameChanged>(_onUsernameChanged);
+    on<PasswordChanged>(_onPasswordChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
+    on<FormNewSubmitEvent>(_onFormNewSubmitted);
     on<FormResetEvent>(_onFormReset);
     on<ToggleAdminRoleEvent>(_onToggleAdminRole);
   }
@@ -49,6 +54,11 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
         status: FormStatus.error,
       ));
     }
+  }
+
+  Future<void> _initStateNew(InitNewEvent event, Emitter<AdminFormUserState> emit) async {
+    emit(state.copyWith(formKey: formKey));
+
   }
 
 
@@ -104,6 +114,19 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
     );
   }
 
+  Future<void> _onPasswordChanged(
+      PasswordChanged event, Emitter<AdminFormUserState> emit) async {
+    emit(
+      state.copyWith(
+        password: BlocFormItem(
+          value: event.password.value,
+          error: event.password.value.isValidName ? null : 'Enter a valid name',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
   Future<void> _onFormReset(
       FormResetEvent event,
       Emitter<AdminFormUserState> emit,
@@ -119,6 +142,34 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
 
       // If successful, call event.onSuccess()
       event.onSuccess();
+    } else {
+      // If validation fails, you can call event.onError() with a message
+      event.onError('Validation failed');
+    }
+  }
+
+  Future<void> _onFormNewSubmitted(FormNewSubmitEvent event, Emitter<AdminFormUserState> emit) async {
+    if (state.formKey!.currentState!.validate()) {
+
+      User newUser = User(
+          id: 0,
+          firstname: state.firstname.value,
+          lastname: state.lastname.value,
+          username: state.username.value,
+          email: state.email.value,
+          password: state.password.value
+      );
+
+      try {
+        final response = await AuthServices.registerUser(newUser);
+        if (response.statusCode == 201) {
+          event.onSuccess();
+        } else {
+          event.onError('Event creation failed');
+        }
+      } catch (e) {
+        event.onError('Error: $e');
+      }
     } else {
       // If validation fails, you can call event.onError() with a message
       event.onError('Validation failed');

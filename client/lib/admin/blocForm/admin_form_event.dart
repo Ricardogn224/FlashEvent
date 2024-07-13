@@ -17,6 +17,16 @@ class FormSubmitEvent extends AdminFormEvent {
   List<Object> get props => [onSuccess, onError];
 }
 
+class FormNewSubmitEvent extends AdminFormEvent {
+  final VoidCallback onSuccess;
+  final Function(String) onError;
+
+  const FormNewSubmitEvent({required this.onSuccess, required this.onError});
+
+  @override
+  List<Object> get props => [onSuccess, onError];
+}
+
 class FormResetEvent extends AdminFormEvent {
   const FormResetEvent();
 }

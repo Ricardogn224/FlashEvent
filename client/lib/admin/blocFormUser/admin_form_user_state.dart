@@ -6,6 +6,7 @@ class AdminFormUserState extends Equatable {
     this.lastname = const BlocFormItem(error: 'Enter lastname'),
     this.username = const BlocFormItem(error: 'Enter lastname'),
     this.email = const BlocFormItem(error: 'Enter email'),
+    this.password = const BlocFormItem(error: 'Enter password'),
     this.isAdmin = false,
     this.formKey,
     this.status = FormStatus.none,
@@ -15,6 +16,7 @@ class AdminFormUserState extends Equatable {
   final BlocFormItem lastname;
   final BlocFormItem username;
   final BlocFormItem email;
+  final BlocFormItem password;
   final bool isAdmin;
   final GlobalKey<FormState>? formKey;
   final FormStatus status;
@@ -24,6 +26,7 @@ class AdminFormUserState extends Equatable {
     BlocFormItem? lastname,
     BlocFormItem? email,
     BlocFormItem? username,
+    BlocFormItem? password,
     bool? isAdmin,
     GlobalKey<FormState>? formKey,
     FormStatus? status,
@@ -33,6 +36,7 @@ class AdminFormUserState extends Equatable {
       lastname: lastname ?? this.lastname,
       email: email ?? this.email,
       username: username ?? this.username,
+      password: password ?? this.password,
       isAdmin: isAdmin ?? this.isAdmin,
       formKey: formKey ?? this.formKey,
       status: status ?? this.status,
