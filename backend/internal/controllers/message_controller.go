@@ -59,7 +59,7 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetMessages récupère les messages d'une salle de chat
+// GetMessagesByChatRoom récupère les messages d'une salle de chat
 func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
@@ -98,5 +98,50 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(responseMessages)
+	}
+}
+
+// AddMessageToChat permet d'envoyer un message dans la salle de chat de l'événement
+func AddMessageToChat(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		eventID, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		var message models.MessageAdd
+		if err := json.NewDecoder(r.Body).Decode(&message); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Validate that the user exists
+		var user models.User
+		if err := db.Where("email = ?", message.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		chatMessage := models.Message{
+			ChatRoomID: event.ID, // Utilisez l'ID de l'événement comme ChatRoomID
+			UserID:     user.ID,
+			Content:    message.Content,
+			Timestamp:  time.Now(),
+		}
+		if err := db.Create(&chatMessage).Error; err != nil {
+			http.Error(w, "Failed to send message", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(chatMessage)
 	}
 }

@@ -2,10 +2,11 @@ package models
 
 // Event représente la structure d'un événement
 type Event struct {
-	ID              uint   `gorm:"primaryKey" json:"id"`
-	Name            string `json:"name" required:""`
-	Description     string `json:"description" required:""`
-	TransportActive bool   `json:"trnsport_active" gorm:"default:false"`
+	ID              uint     `gorm:"primaryKey" json:"id"`
+	Name            string   `json:"name" required:""`
+	Description     string   `json:"description" required:""`
+	TransportActive bool     `json:"trnsport_active" gorm:"default:false"`
+	Activities      []string `json:"activities"` // Liste des activités de l'événement
 }
 
 // EventRequest represents the request body for adding an event

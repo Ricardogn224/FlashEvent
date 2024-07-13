@@ -16,16 +16,20 @@ func main() {
 	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
-
 	} else {
 		log.Println("Connected to database")
-		// Création des tables depuis les fichier modele
-
 	}
 
 	// Initialisation de l'API Swagger
 	api := swag.New(
 		option.Title("Swagger Event API"),
+		option.Description("API documentation for the Event API"),
+		option.Version("1.0.0"),
+		option.Schemes("http", "https"),
+		option.Security("BearerAuth", "read:events"),
+		option.SecurityScheme("BearerAuth",
+			option.APIKeySecurity("Authorization", "header"),
+		),
 	)
 
 	// Création du routeur
@@ -33,6 +37,9 @@ func main() {
 
 	// Enregistrement des routes
 	routes.RegisterRoutes(router, api, db)
+
+	// Servir la documentation Swagger
+	router.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", api.Handler()))
 
 	// Démarrage du serveur HTTP
 	log.Fatal(http.ListenAndServe(":8080", router))

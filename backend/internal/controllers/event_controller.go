@@ -350,3 +350,39 @@ func AddUtilitiesToEvent(db *gorm.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(utilities)
 	}
 }
+
+// AddActivityToEvent permet à un participant d'ajouter une activité à un événement
+func AddActivityToEvent(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		eventID, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		var activity struct {
+			Activity string `json:"activity"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&activity); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Ajoutez l'activité à l'événement (logique à adapter selon vos besoins)
+		event.Activities = append(event.Activities, activity.Activity)
+		if err := db.Save(&event).Error; err != nil {
+			http.Error(w, "Failed to add activity", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(event)
+	}
+}
