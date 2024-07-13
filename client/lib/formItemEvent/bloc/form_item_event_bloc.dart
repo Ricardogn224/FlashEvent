@@ -1,36 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_flash_event/core/models/itemEvent.dart';
+import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
-import 'package:flutter_flash_event/core/services/item_services.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
-part 'form_event_item_event.dart';
-part 'form_item_event_state.dart';
+part 'form_event_party_event.dart';
+part 'form_event_party_state.dart';
 
-
-class FormItemEventBloc extends Bloc<FormEventItemEvent, FormItemEventState> {
-  final int eventId;
-
-  FormItemEventBloc({required this.eventId}) : super(const FormItemEventState()) {
+class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> {
+  FormEventPartyBloc() : super(const FormEventPartyState()) {
     on<InitEvent>(_initState);
     on<NameChanged>(_onNameChanged);
+    on<DescriptionChanged>(_onDescriptionChanged);
+    on<PlaceChanged>(_onPlaceChanged);
+    on<DateChanged>(_onDateChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
 
   final formKey = GlobalKey<FormState>();
 
-  Future<void> _initState(InitEvent event, Emitter<FormItemEventState> emit) async {
+  Future<void> _initState(InitEvent event, Emitter<FormEventPartyState> emit) async {
     emit(state.copyWith(formKey: formKey));
   }
 
-  Future<void> _onNameChanged(
-      NameChanged event, Emitter<FormItemEventState> emit) async {
+  Future<void> _onNameChanged(NameChanged event, Emitter<FormEventPartyState> emit) async {
     emit(
       state.copyWith(
         name: BlocFormItem(
@@ -42,28 +39,62 @@ class FormItemEventBloc extends Bloc<FormEventItemEvent, FormItemEventState> {
     );
   }
 
-  Future<void> _onFormReset(
-      FormResetEvent event,
-      Emitter<FormItemEventState> emit,
-      ) async {
-    state.formKey?.currentState?.reset();
+  Future<void> _onDescriptionChanged(DescriptionChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        description: BlocFormItem(
+          value: event.description.value,
+          error: event.description.value.isNotEmpty ? null : 'Enter description',
+        ),
+        formKey: formKey,
+      ),
+    );
   }
 
-  Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<FormItemEventState> emit) async {
+  Future<void> _onPlaceChanged(PlaceChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        place: BlocFormItem(
+          value: event.place.value,
+          error: event.place.value.isNotEmpty ? null : 'Enter place',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
+  Future<void> _onDateChanged(DateChanged event, Emitter<FormEventPartyState> emit) async {
+    emit(
+      state.copyWith(
+        date: BlocFormItem(
+          value: event.date.value,
+          error: event.date.value.isNotEmpty ? null : 'Enter date',
+        ),
+        formKey: formKey,
+      ),
+    );
+  }
+
+  Future<void> _onFormReset(FormResetEvent event, Emitter<FormEventPartyState> emit) async {
+    emit(const FormEventPartyState()); // Reset the state to initial values
+  }
+
+  Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<FormEventPartyState> emit) async {
     if (state.formKey!.currentState!.validate()) {
-      ItemEvent newItem = ItemEvent(
+      Event newEvent = Event(
         id: 0,
         name: state.name.value,
-        userId: 0,
-        eventId: eventId,
+        description: state.description.value,
+        place: state.place.value,
+        date: state.date.value,
       );
 
       try {
-        final response = await ItemServices.addItem(newItem);
+        final response = await EventServices.addEvent(newEvent);
         if (response.statusCode == 201) {
           event.onSuccess();
         } else {
-          event.onError('Item creation failed');
+          event.onError('Event creation failed');
         }
       } catch (e) {
         event.onError('Error: $e');

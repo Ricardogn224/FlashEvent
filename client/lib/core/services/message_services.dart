@@ -14,7 +14,7 @@ class MessageServices {
     String? token = prefs.getString('token');
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/chat-rooms/$id/messages'),
+      final response = await http.get(Uri.parse('http://localhost:8080/chat-rooms/$id/messages'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -43,7 +43,7 @@ class MessageServices {
     }
     
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/event/${message.chatRoomId}/message'),
+      Uri.parse('http://localhost:8080/event/${message.chatRoomId}/message'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

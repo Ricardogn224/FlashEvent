@@ -7,7 +7,7 @@ class UserServices {
   static Future<List<User>> getUsersParticipants({required int id}) async {
     try {
       // Fetch participants for the given event ID
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/participants-event/$id'));
+      final response = await http.get(Uri.parse('http://localhost:8080/participants-event/$id'));
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -22,7 +22,7 @@ class UserServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse = await http.get(Uri.parse('http://10.0.2.2:8080/user/$userId'));
+        final userResponse = await http.get(Uri.parse('http://localhost:8080/user/$userId'));
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }

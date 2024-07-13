@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ItemServices {
   static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/items-event//$id'));
+      final response = await http.get(Uri.parse('http://localhost:8080/items-event//$id'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -38,7 +38,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/item'),
+      Uri.parse('http://localhost:8080/item'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

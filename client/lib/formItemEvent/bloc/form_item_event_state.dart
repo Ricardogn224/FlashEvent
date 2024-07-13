@@ -1,26 +1,36 @@
-part of 'form_item_event_bloc.dart';
+part of 'form_event_party_bloc.dart';
 
-class FormItemEventState extends Equatable {
-  const FormItemEventState({
-    this.name = const BlocFormItem(error: 'Enter name'),
+class FormEventPartyState extends Equatable {
+  final BlocFormItem name;
+  final BlocFormItem description;
+  final BlocFormItem place;
+  final BlocFormItem date;
+  final GlobalKey<FormState>? formKey;
+
+  const FormEventPartyState({
+    this.name = const BlocFormItem(),
+    this.description = const BlocFormItem(),
+    this.place = const BlocFormItem(),
+    this.date = const BlocFormItem(),
     this.formKey,
   });
 
-  final BlocFormItem name;
-  final GlobalKey<FormState>? formKey;
-
-  FormItemEventState copyWith({
+  FormEventPartyState copyWith({
     BlocFormItem? name,
+    BlocFormItem? description,
+    BlocFormItem? place,
+    BlocFormItem? date,
     GlobalKey<FormState>? formKey,
   }) {
-    return FormItemEventState(
+    return FormEventPartyState(
       name: name ?? this.name,
-      formKey: formKey,
+      description: description ?? this.description,
+      place: place ?? this.place,
+      date: date ?? this.date,
+      formKey: formKey ?? this.formKey,
     );
   }
 
   @override
-  List<Object> get props => [name];
+  List<Object?> get props => [name, description, place, date, formKey];
 }
-
-enum FormStatus { none, inProgress, valid, invalid }

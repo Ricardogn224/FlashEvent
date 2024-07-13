@@ -17,7 +17,7 @@ class EventServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/event'),
+      Uri.parse('http://localhost:8080/event'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Inclure le token dans les en-têtes
@@ -45,7 +45,7 @@ class EventServices {
     String? token = prefs.getString('token');
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/event/$id'),
+      final response = await http.get(Uri.parse('http://localhost:8080/event/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Inclure le token dans les en-têtes

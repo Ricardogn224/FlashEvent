@@ -78,13 +78,6 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Générer un lien d'invitation si l'événement est privé
-		if event.IsPrivate {
-			invitationLink := GenerateInvitationLink(event)
-			event.InvitationLink = invitationLink
-			db.Save(&event) // Sauvegarder l'événement mis à jour avec le lien d'invitation
-		}
-
 		// Créer le participant en utilisant l'ID de l'utilisateur récupéré
 		participant := models.Participant{			
 			UserID:   user.ID,

@@ -3,7 +3,6 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 import 'package:flutter_flash_event/core/models/message.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/core/services/message_services.dart';
-
 part 'message_chat_event.dart';
 part 'message_chat_state.dart';
 

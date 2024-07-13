@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flash_event/ChatRoom/bloc/chat_room_bloc.dart';
+import 'package:flutter_flash_event/chatRoom/bloc/chat_room_bloc.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
 import 'package:flutter_flash_event/participant/bloc/participant_bloc.dart';

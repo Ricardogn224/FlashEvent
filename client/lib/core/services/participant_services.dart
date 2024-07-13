@@ -17,7 +17,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/participant'),
+      Uri.parse('http://localhost:8080/participant'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -49,7 +49,7 @@ class ParticipantServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/invitations/${email}'),
+        Uri.parse('http://localhost:8080/invitations/${email}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -77,7 +77,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/answer-invitation'),
+      Uri.parse('http://localhost:8080/answer-invitation'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
