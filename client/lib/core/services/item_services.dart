@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ItemServices {
   static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/items-event//$id'));
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:8000/items-event//$id'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -19,8 +20,9 @@ class ItemServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-        return ItemEvent.fromJson(e);
-      }).toList() ?? [];
+            return ItemEvent.fromJson(e);
+          }).toList() ??
+          [];
     } catch (error) {
       log('Error occurred while retrieving users.', error: error);
       rethrow;
@@ -28,7 +30,6 @@ class ItemServices {
   }
 
   static Future<http.Response> addItem(ItemEvent itemEvent) async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
@@ -38,7 +39,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/item'),
+      Uri.parse('http://10.0.2.2:8000/item'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

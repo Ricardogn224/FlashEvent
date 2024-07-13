@@ -7,10 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class EventServices {
-
   static Future<List<Event>> getEvents() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/events'));
+      final response = await http.get(Uri.parse('http://10.0.2.2:8000/events'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -20,17 +19,16 @@ class EventServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-        return Event.fromJson(e);
-      }).toList() ?? [];
+            return Event.fromJson(e);
+          }).toList() ??
+          [];
     } catch (error) {
       log('Error occurred while retrieving users.', error: error);
       rethrow;
     }
   }
 
-
   static Future<http.Response> addEvent(Event event) async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
@@ -40,7 +38,7 @@ class EventServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/event'),
+      Uri.parse('http://10.0.2.2:8000/event'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -66,20 +64,24 @@ class EventServices {
     String? token = prefs.getString('token');
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/event/$id'),
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/event/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw ApiException(message: 'Error while requesting event with id $id', statusCode: response.statusCode);
+        throw ApiException(
+            message: 'Error while requesting event with id $id',
+            statusCode: response.statusCode);
       }
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       return Event.fromJson(data);
     } catch (error) {
-      throw ApiException(message: 'Unknown error while requesting product with id $id');
+      throw ApiException(
+          message: 'Unknown error while requesting product with id $id');
     }
   }
-
 }

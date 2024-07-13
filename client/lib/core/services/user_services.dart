@@ -7,12 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class UserServices {
-
   static Future<List<User>> getUsers() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/users'));
+      final response = await http.get(Uri.parse('http://10.0.2.2:8000/users'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -22,8 +21,9 @@ class UserServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-        return User.fromJson(e);
-      }).toList() ?? [];
+            return User.fromJson(e);
+          }).toList() ??
+          [];
     } catch (error) {
       log('Error occurred while retrieving users.', error: error);
       rethrow;
@@ -36,26 +36,32 @@ class UserServices {
     String? email = prefs.getString('email');
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/users-email/$email'),
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/users-email/$email'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw ApiException(message: 'Error while requesting event with email $email', statusCode: response.statusCode);
+        throw ApiException(
+            message: 'Error while requesting event with email $email',
+            statusCode: response.statusCode);
       }
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       return User.fromJson(data);
     } catch (error) {
-      throw ApiException(message: 'Unknown error while requesting product with email $email');
+      throw ApiException(
+          message: 'Unknown error while requesting product with email $email');
     }
   }
 
   static Future<List<User>> getUsersParticipants({required int id}) async {
     try {
       // Fetch participants for the given event ID
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/participants-event/$id'));
+      final response = await http
+          .get(Uri.parse('http://10.0.2.2:8000/participants-event/$id'));
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -70,7 +76,8 @@ class UserServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse = await http.get(Uri.parse('http://10.0.2.2:8080/users/$userId'));
+        final userResponse =
+            await http.get(Uri.parse('http://10.0.2.2:8000/users/$userId'));
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }
@@ -88,16 +95,20 @@ class UserServices {
     }
   }
 
-  static Future<List<UserTransport>> getParticipantsByTransportation({required int id}) async {
+  static Future<List<UserTransport>> getParticipantsByTransportation(
+      {required int id}) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/transportation/$id/participants'));
+      final response = await http.get(
+          Uri.parse('http://10.0.2.2:8000/transportation/$id/participants'));
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
       }
 
       final List<dynamic> participantsData = json.decode(response.body);
-      return participantsData.map((data) => UserTransport.fromJson(data)).toList();
+      return participantsData
+          .map((data) => UserTransport.fromJson(data))
+          .toList();
     } catch (error) {
       log('Error occurred while retrieving participants.', error: error);
       rethrow;
@@ -110,7 +121,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/users-emails/$id'),
+        Uri.parse('http://10.0.2.2:8000/users-emails/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -118,7 +129,9 @@ class UserServices {
       );
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw ApiException(message: 'Error while requesting user emails', statusCode: response.statusCode);
+        throw ApiException(
+            message: 'Error while requesting user emails',
+            statusCode: response.statusCode);
       }
 
       final List<dynamic> emailsData = json.decode(response.body);
@@ -134,20 +147,24 @@ class UserServices {
     String? token = prefs.getString('token');
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/$id'),
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/users/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw ApiException(message: 'Error while requesting user with id $id', statusCode: response.statusCode);
+        throw ApiException(
+            message: 'Error while requesting user with id $id',
+            statusCode: response.statusCode);
       }
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       return User.fromJson(data);
     } catch (error) {
-      throw ApiException(message: 'Unknown error while requesting user with id $id');
+      throw ApiException(
+          message: 'Unknown error while requesting user with id $id');
     }
   }
-
 }

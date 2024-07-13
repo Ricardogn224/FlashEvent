@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 class AuthServices {
   static Future<http.Response> registerUser(User user) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/register'),
+      Uri.parse('http://10.0.2.2:8000/register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -32,7 +32,7 @@ class AuthServices {
 
   static Future<http.Response> loginUser(String email, String password) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/login'),
+      Uri.parse('http://10.0.2.2:8000/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
