@@ -27,6 +27,10 @@ class InitEvent extends AdminFormEvent {
   InitEvent({required this.id});
 }
 
+class InitNewEvent extends AdminFormEvent {
+  const InitNewEvent();
+}
+
 class NameChanged extends AdminFormEvent {
   const NameChanged({required this.name});
   final BlocFormItem name;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flash_event/Admin/admin_home_screen.dart';
+import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
@@ -18,13 +18,11 @@ import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
-import 'package:flutter_flash_event/screens/my_account_screen.dart';
 import 'package:flutter_flash_event/transportation/transport_start_edit_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'login/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/splash_screen.dart';
-import 'screens/admin_home_desktop_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
 

@@ -21,6 +21,7 @@ part 'admin_form_state.dart';
 class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
   AdminFormBloc() : super(const AdminFormState()) {
     on<InitEvent>(_initState);
+    on<InitNewEvent>(_initStateNew);
     on<NameChanged>(_onNameChanged);
     on<DescriptionChanged>(_onDescriptionChanged);
     on<InitAddEmail>(_addEmail);
@@ -56,6 +57,11 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
       ));
     }
 
+
+  }
+
+  Future<void> _initStateNew(InitNewEvent event, Emitter<AdminFormState> emit) async {
+    emit(state.copyWith(formKey: formKey));
 
   }
 

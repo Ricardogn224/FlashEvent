@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
+import 'package:flutter_flash_event/admin/admin_event_new_screen.dart';
 import 'package:flutter_flash_event/admin/bloc/admin_bloc.dart';
 
 class AdminEventScreen extends StatelessWidget {
@@ -30,6 +31,14 @@ class AdminEventScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    // "Create a New Event" button
+                    ElevatedButton(
+                      onPressed: () {
+                        AdminEventNewScreen.navigateTo(context);
+                      },
+                      child: const Text('Create a New Event'),
+                    ),
+                    const SizedBox(height: 16.0), // Space between button and table
                     if (state.status == AdminStatus.loading)
                       const Expanded(
                         child: Center(
