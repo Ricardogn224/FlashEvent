@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"fmt"
@@ -24,29 +25,18 @@ func contains(slice []uint, item uint) bool {
 	return false
 }
 
-var jwtKey = []byte("your_secret_key")
+var JwtKey = []byte("your_secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-// MigrateUser crée la table User si elle n'existe pas
-func MigrateUser(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
-}
-func MigrateChat(db *gorm.DB) {
-	db.AutoMigrate(&models.Message{}, &models.ChatRoom{})
-}
-
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
 func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table User si elle n'existe pas
-		MigrateUser(db)
-
-		// migrer chat
-		MigrateChat(db)
+		// Initialiser les tables nécessaires si elles n'existent pas
+		database.MigrateAll(db)
 
 		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -75,8 +65,8 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 // LoginUser gère la connexion d'un utilisateur
 func LoginUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table User si elle n'existe pas
-		MigrateUser(db)
+		// Initialiser les tables nécessaires si elles n'existent pas
+		database.MigrateAll(db)
 
 		var credentials models.User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
@@ -105,7 +95,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(jwtKey)
+		tokenString, err := token.SignedString(JwtKey)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -127,7 +117,7 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return JwtKey, nil
 	})
 
 	if err != nil || !token.Valid {
@@ -160,7 +150,6 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 // GetAllUserEmails returns all user emails
 func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -226,7 +215,7 @@ func GetUserByID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetUserByID returns a user by their ID
+// GetUserByEmail returns a user by their email
 func GetUserByEmail(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -252,11 +241,15 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		tokenStr := authHeader[len("Bearer "):]
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			authHeader = "Bearer " + authHeader
+		}
+
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 		claims := &Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			return JwtKey, nil
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {

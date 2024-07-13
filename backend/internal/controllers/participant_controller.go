@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
@@ -9,14 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// creation de la table user
-
-func MigrateParticipant(db *gorm.DB) {
-	db.AutoMigrate(&models.Participant{})
-}
-
 func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
-	MigrateParticipant(db)
+	database.MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
 		var invitationAnswer models.InvitationAnswer
 		if err := json.NewDecoder(r.Body).Decode(&invitationAnswer); err != nil {
@@ -48,7 +43,7 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 
 func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 	// Initialiser la table Event si elle n'existe pas
-	MigrateParticipant(db)
+	database.MigrateParticipant(db)
 	// Valider que l'utilisateur et l'événement existent
 	var user models.User
 	if err := db.First(&user, participant.UserID).Error; err != nil {
@@ -68,7 +63,7 @@ func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 }
 
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
-	MigrateParticipant(db)
+	database.MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
 		var participantAdd models.ParticipantAdd
 		if err := json.NewDecoder(r.Body).Decode(&participantAdd); err != nil {
@@ -148,13 +143,13 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetParticipantsByEventID retrieves all participants associated with the provided event ID
+// GetParticipantsByTransportationID retrieves all participants associated with the provided transportation ID
 func GetParticipantsByTransportationID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		transportationId := params["transportationId"]
 
-		// Fetch all participants with the given event ID
+		// Fetch all participants with the given transportation ID
 		var participants []models.Participant
 		if err := db.Where("transportation_id = ?", transportationId).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -190,7 +185,6 @@ func GetParticipantsWithUserByTransportationID(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Define a structure to hold the response data
-
 		var results []models.ParticipantWithUser
 
 		// Fetch participants with their user information

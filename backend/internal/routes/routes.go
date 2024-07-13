@@ -11,7 +11,33 @@ import (
 	"gorm.io/gorm"
 )
 
-func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
+func RegisterPublicRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
+	api.AddEndpoint(
+		endpoint.New(
+			http.MethodPost, "/register",
+			endpoint.Handler(http.HandlerFunc(controllers.RegisterUser(db))),
+			endpoint.Summary("Register a new user"),
+			endpoint.Description("Register a new user with a username and password"),
+			endpoint.Body(models.User{}, "User object that needs to be registered", true),
+			endpoint.Response(http.StatusCreated, "Successfully registered user", endpoint.SchemaResponseOption(models.User{})),
+		),
+		endpoint.New(
+			http.MethodPost, "/login",
+			endpoint.Handler(http.HandlerFunc(controllers.LoginUser(db))),
+			endpoint.Summary("Login a user"),
+			endpoint.Description("Login a user and get a token"),
+			endpoint.Body(models.User{}, "User credentials", true),
+			endpoint.Response(http.StatusOK, "Successfully logged in", endpoint.SchemaResponseOption(map[string]string{"token": ""})),
+		),
+	)
+
+	api.Walk(func(path string, e *swag.Endpoint) {
+		h := e.Handler.(http.HandlerFunc)
+		router.Path(path).Methods(e.Method).Handler(h)
+	})
+}
+
+func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 	api.AddEndpoint(
 		endpoint.New(
 			http.MethodGet, "/events",
@@ -19,7 +45,6 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Summary("Get all events"),
 			endpoint.Description("Retrieve all events from the store"),
 			endpoint.Response(http.StatusOK, "Successfully retrieved events", endpoint.SchemaResponseOption([]models.Event{})),
-			endpoint.Security("BearerAuth"),
 		),
 		endpoint.New(
 			http.MethodPost, "/event",
@@ -53,22 +78,6 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Body(models.Event{}, "Event object with updated details", true),
 			endpoint.Response(http.StatusOK, "Successfully updated event", endpoint.SchemaResponseOption(models.Event{})),
 			endpoint.Security("BearerAuth"),
-		),
-		endpoint.New(
-			http.MethodPost, "/register",
-			endpoint.Handler(http.HandlerFunc(controllers.RegisterUser(db))),
-			endpoint.Summary("Register a new user"),
-			endpoint.Description("Register a new user with a username and password"),
-			endpoint.Body(models.User{}, "User object that needs to be registered", true),
-			endpoint.Response(http.StatusCreated, "Successfully registered user", endpoint.SchemaResponseOption(models.User{})),
-		),
-		endpoint.New(
-			http.MethodPost, "/login",
-			endpoint.Handler(http.HandlerFunc(controllers.LoginUser(db))),
-			endpoint.Summary("Login a user"),
-			endpoint.Description("Login a user and get a token"),
-			endpoint.Body(models.User{}, "User credentials", true),
-			endpoint.Response(http.StatusOK, "Successfully logged in", endpoint.SchemaResponseOption(map[string]string{"token": ""})),
 		),
 		endpoint.New(
 			http.MethodGet, "/users",
@@ -257,16 +266,14 @@ func RegisterRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 	)
 
-	// Ajout des routes Swagger
-	router.Path("/swagger/json").Methods("GET").Handler(api.Handler())
-	router.PathPrefix("/swagger/ui").Handler(swag.UIHandler("/swagger/ui", "/swagger/json", true))
-
-	// Route pour WebSocket
-	router.HandleFunc("/ws", controllers.WebSocketEndpoint(db)).Methods("GET")
-
-	// Enregistrement des routes avec sécurité Swagger
 	api.Walk(func(path string, e *swag.Endpoint) {
 		h := e.Handler.(http.HandlerFunc)
 		router.Path(path).Methods(e.Method).Handler(h)
 	})
+}
+
+func RegisterSwaggerRoutes(router *mux.Router, api *swag.API) {
+	// Ajout des routes Swagger
+	router.Path("/swagger/json").Methods("GET").Handler(api.Handler())
+	router.PathPrefix("/swagger/ui").Handler(swag.UIHandler("/swagger/ui", "/swagger/json", true))
 }

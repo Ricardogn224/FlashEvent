@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
@@ -11,15 +12,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// MigrateMessage crée la table Message dans la base de données
-func MigrateMessage(db *gorm.DB) {
-	db.AutoMigrate(&models.Message{})
-}
-
 // SendMessage envoie un message dans une salle de chat
 func SendMessage(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
+		database.MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
 
 		vars := mux.Vars(r)
 		chatRoomId, err := strconv.Atoi(vars["chatRoomId"])
@@ -43,8 +39,8 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 		}
 
 		message := models.Message{
-			UserID:     uint(user.ID),
-			ChatRoomID: uint(chatRoomID),
+			UserID:     user.ID,
+			ChatRoomID: chatRoomID,
 			Content:    msg.Content,
 			Timestamp:  time.Now(),
 		}
@@ -62,7 +58,7 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 // GetMessagesByChatRoom récupère les messages d'une salle de chat
 func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
+		database.MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
 
 		vars := mux.Vars(r)
 		chatRoomId, err := strconv.Atoi(vars["chatRoomId"])
@@ -104,6 +100,8 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 // AddMessageToChat permet d'envoyer un message dans la salle de chat de l'événement
 func AddMessageToChat(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
+
 		vars := mux.Vars(r)
 		eventID, err := strconv.Atoi(vars["eventId"])
 		if err != nil {

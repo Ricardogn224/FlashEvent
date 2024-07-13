@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
@@ -10,15 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// MigrateChatRoom creates the ChatRoom table in the database
-func MigrateChatRoom(db *gorm.DB) {
-	db.AutoMigrate(&models.ChatRoom{})
-}
-
-// AddChatRoom adds a new chat room associated with an event
+// AddChatRoom ajoute une nouvelle salle de chat associée à un événement
 func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		MigrateChatRoom(db) // Ensure the ChatRoom table is created
+		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
 
 		var chatRoom models.ChatRoom
 		if err := json.NewDecoder(r.Body).Decode(&chatRoom); err != nil {
@@ -41,10 +37,10 @@ func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetChatRooms retrieves all chat rooms for a specific event
+// GetChatRooms récupère toutes les salles de chat pour un événement spécifique
 func GetChatRooms(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		MigrateChatRoom(db) // Ensure the ChatRoom table is created
+		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
 
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
