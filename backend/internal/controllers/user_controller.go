@@ -241,7 +241,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		tokenStr := authHeader[len("Bearer "):]
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			authHeader = "Bearer " + authHeader
+		}
+
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 		claims := &Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
