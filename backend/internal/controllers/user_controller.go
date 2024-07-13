@@ -25,7 +25,7 @@ func contains(slice []uint, item uint) bool {
 	return false
 }
 
-var jwtKey = []byte("your_secret_key")
+var JwtKey = []byte("your_secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
@@ -95,7 +95,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(jwtKey)
+		tokenString, err := token.SignedString(JwtKey)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -117,7 +117,7 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return JwtKey, nil
 	})
 
 	if err != nil || !token.Valid {
@@ -245,7 +245,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		claims := &Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			return JwtKey, nil
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {

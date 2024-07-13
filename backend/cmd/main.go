@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/controllers"
 	"backend/internal/database"
 	"backend/internal/routes"
 	"log"
@@ -28,18 +29,25 @@ func main() {
 		option.Schemes("http", "https"),
 		option.Security("BearerAuth", "read:events"),
 		option.SecurityScheme("BearerAuth",
-			option.APIKeySecurity("token", "header"),
+			option.APIKeySecurity("Authorization", "header"),
 		),
 	)
 
 	// Création du routeur
 	router := mux.NewRouter()
 
-	// Enregistrement des routes
-	routes.RegisterRoutes(router, api, db)
+	// Enregistrement des routes publiques
+	routes.RegisterPublicRoutes(router, api, db)
 
-	// Servir la documentation Swagger
-	router.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", api.Handler()))
+	// Middleware d'authentification
+	authRouter := router.PathPrefix("/").Subrouter()
+	authRouter.Use(controllers.AuthMiddleware)
+
+	// Enregistrement des routes authentifiées
+	routes.RegisterAuthRoutes(authRouter, api, db)
+
+	// Enregistrement des routes Swagger
+	routes.RegisterSwaggerRoutes(router, api)
 
 	// Démarrage du serveur HTTP
 	log.Fatal(http.ListenAndServe(":8080", router))

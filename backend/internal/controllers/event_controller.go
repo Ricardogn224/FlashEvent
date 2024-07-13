@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend/internal/models"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -57,13 +58,17 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Printf("Error decoding request body: %v", err)
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
+
+		log.Printf("Received eventAdd: %+v", eventAdd)
 
 		// Find the user by email
 		var user models.User
 		if err := db.Where("email = ?", eventAdd.Email).First(&user).Error; err != nil {
+			log.Printf("User not found: %v", err)
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
@@ -76,6 +81,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		}
 		result := db.Create(&event)
 		if result.Error != nil {
+			log.Printf("Error creating event: %v", result.Error)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -88,7 +94,8 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			Response: true,
 		}
 		if err := db.Create(&participant).Error; err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Error creating participant: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
