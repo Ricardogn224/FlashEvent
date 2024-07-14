@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/admin/admin_event_new_screen.dart';
 import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
 import 'package:flutter_flash_event/admin/admin_event_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_add_oarticipant.dart';
+import 'package:flutter_flash_event/admin/admin_user_new_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
@@ -40,6 +42,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => AdminUserScreen());
     case AdminEventScreen.routeName:
       return MaterialPageRoute(builder: (_) => AdminEventScreen());
+    case AdminEventNewScreen.routeName:
+      return MaterialPageRoute(builder: (_) => AdminEventNewScreen());
+    case AdminUserNewScreen.routeName:
+      return MaterialPageRoute(builder: (_) => AdminUserNewScreen());
     case InvitationScreen.routeName:
       return MaterialPageRoute(builder: (_) => InvitationScreen());
     case EventScreen.routeName:

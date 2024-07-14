@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
+import 'package:flutter_flash_event/admin/admin_user_new_screen.dart';
 import 'package:flutter_flash_event/admin/bloc/admin_bloc.dart';
 
 class AdminUserScreen extends StatelessWidget {
@@ -33,6 +34,12 @@ class AdminUserScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        AdminUserNewScreen.navigateTo(context);
+                      },
+                      child: const Text('Nouvel utilisateur'),
+                    ),
                     if (state.status == AdminStatus.loading)
                       const Expanded(
                         child: Center(

@@ -36,7 +36,7 @@ class AdminEventScreen extends StatelessWidget {
                       onPressed: () {
                         AdminEventNewScreen.navigateTo(context);
                       },
-                      child: const Text('Create a New Event'),
+                      child: const Text('Nouvel évènement'),
                     ),
                     const SizedBox(height: 16.0), // Space between button and table
                     if (state.status == AdminStatus.loading)
