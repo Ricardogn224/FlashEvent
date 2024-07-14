@@ -1,183 +1,313 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
+import 'package:flutter_flash_event/Invitation/bloc/invitation_bloc.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
+import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart'; // Import screen
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => HomeBloc()..add(HomeDataLoaded()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HomeBloc()..add(HomeDataLoaded()),
+        ),
+        BlocProvider(
+          create: (context) => InvitationBloc()..add(InvitationDataLoaded()),
+        ),
+      ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
         body: SafeArea(
           child: BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) {
-              if (state is HomeLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+            builder: (context, homeState) {
+              return BlocBuilder<InvitationBloc, InvitationState>(
+                builder: (context, invitationState) {
+                  if (homeState is HomeLoading || invitationState.status == InvitationStatus.loading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-              if (state is HomeDataLoadError) {
-                return Center(
-                  child: Text(state.errorMessage),
-                );
-              }
+                  if (homeState is HomeDataLoadError) {
+                    return Center(
+                      child: Text(homeState.errorMessage),
+                    );
+                  }
 
-              if (state is HomeDataLoadSuccess) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  if (invitationState.status == InvitationStatus.error) {
+                    return Center(
+                      child: Text(invitationState.errorMessage ?? 'Erreur lors du chargement des invitations'),
+                    );
+                  }
+
+                  if (homeState is HomeDataLoadSuccess && invitationState.status == InvitationStatus.success) {
+                    final int eventCount = homeState.events.length;
+                    final int invitationCount = invitationState.invitations?.length ?? 0;
+
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.menu),
-                            onPressed: () {
-                              // Action pour le menu
-                            },
-                          ),
-                          Image.asset(
-                            'assets/flash-event-logo.png',
-                            height: 60, // Ajuster la taille du logo selon vos besoins
-                          ),
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.grey.shade300,
-                            child: IconButton(
-                              icon: const Icon(Icons.person),
-                              onPressed: () => MyAccountScreen.navigateTo(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Find Events',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Let's start having fun",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      ListTile(
-                        title: Text('Liste des invitations'),
-                        trailing: Icon(Icons.adb),
-                        onTap: () => InvitationScreen.navigateTo(context),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.all(16.0),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Mes évènements',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 200, // Définir la hauteur maximale de la section des événements
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final event = state.events[index];
-                            return GestureDetector(
-                              onTap: () => EventScreen.navigateTo(context, id: event.id),
-                              child: Card(
-                                margin: const EdgeInsets.symmetric(horizontal: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Container(
-                                  width: 200, // Définir une largeur fixe pour les cartes
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 4,
-                                          horizontal: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: const Text(
-                                          '17 Dec',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        event.name,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      const Text(
-                                        'Saturday',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.menu),
+                                onPressed: () {
+                                  // Action pour le menu
+                                },
+                              ),
+                              Image.asset(
+                                'assets/flash-event-logo.png',
+                                height: 60, // Ajuster la taille du logo selon vos besoins
+                              ),
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.grey.shade300,
+                                child: IconButton(
+                                  icon: const Icon(Icons.person),
+                                  onPressed: () => MyAccountScreen.navigateTo(context),
                                 ),
                               ),
-                            );
-                          },
-                          itemCount: state.events.length,
-                        ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Recherche',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.all(16.0),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Stack(
+                                children: [
+                                  Icon(Icons.person_add, size: 30),
+                                  Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: BoxConstraints(
+                                        minWidth: 14,
+                                        minHeight: 14,
+                                      ),
+                                      child: Text(
+                                        '$invitationCount',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Invitations',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          if (invitationCount == 0)
+                            Center(
+                              child: Text(
+                                'Aucune invitation à afficher pour le moment',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          else
+                            SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                itemCount: invitationCount,
+                                itemBuilder: (context, index) {
+                                  final invitation = invitationState.invitations![index];
+                                  return ListTile(
+                                    leading: Icon(Icons.event),
+                                    title: Text(invitation.eventName),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: true));
+                                          },
+                                          icon: Icon(Icons.check),
+                                          label: Text('Accepter'),
+                                        ),
+                                        SizedBox(width: 10),
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: false));
+                                          },
+                                          icon: Icon(Icons.close),
+                                          label: Text('Refuser'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Stack(
+                                children: [
+                                  Icon(Icons.event, size: 30),
+                                  Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: BoxConstraints(
+                                        minWidth: 14,
+                                        minHeight: 14,
+                                      ),
+                                      child: Text(
+                                        '$eventCount',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Événements',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          if (eventCount == 0)
+                            Center(
+                              child: Text(
+                                'Aucun événement à afficher pour le moment',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          else
+                            SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  final event = homeState.events[index];
+                                  return GestureDetector(
+                                    onTap: () => EventScreen.navigateTo(context, id: event.id),
+                                    child: Card(
+                                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Container(
+                                        width: 200,
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                vertical: 4,
+                                                horizontal: 8,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade300,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Text(
+                                                '17 Déc',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              event.name,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            const Text(
+                                              'Samedi',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                itemCount: eventCount,
+                              ),
+                            ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
+                    );
+                  }
 
-              return const SizedBox();
+                  return const SizedBox();
+                },
+              );
             },
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            // Navigate to the add event screen
-            Navigator.pushNamed(context, '/event_new');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => FormEventCreateScreen()),
+            );
           },
-          child: Icon(Icons.add),
           backgroundColor: const Color(0xFF6058E9),
+          child: const Icon(Icons.add),
         ),
       ),
     );
