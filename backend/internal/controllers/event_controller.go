@@ -81,6 +81,9 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		event := models.Event{
 			Name:            eventAdd.Name,
 			Description:     eventAdd.Description,
+			Place:           eventAdd.Place,
+			DateStart:       eventAdd.DateStart,
+			DateEnd:         eventAdd.DateEnd,
 			TransportActive: eventAdd.TransportActive,
 			CreatedBy:       user.ID, // Enregistrer l'ID du créateur
 		}
