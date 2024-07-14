@@ -1,6 +1,6 @@
 module backend
 
-go 1.20
+go 1.20  // Utilisez une version valide ici
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
