@@ -96,22 +96,22 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               Stack(
                                 children: [
-                                  Icon(Icons.person_add, size: 30),
+                                  const Icon(Icons.person_add, size: 30),
                                   Positioned(
                                     right: 0,
                                     child: Container(
-                                      padding: EdgeInsets.all(2),
+                                      padding: const EdgeInsets.all(2),
                                       decoration: BoxDecoration(
                                         color: Colors.red,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      constraints: BoxConstraints(
+                                      constraints: const BoxConstraints(
                                         minWidth: 14,
                                         minHeight: 14,
                                       ),
                                       child: Text(
                                         '$invitationCount',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 8,
                                         ),
@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           if (invitationCount == 0)
-                            Center(
+                            const Center(
                               child: Text(
                                 'Aucune invitation à afficher pour le moment',
                                 style: TextStyle(
@@ -150,7 +150,7 @@ class HomeScreen extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   final invitation = invitationState.invitations![index];
                                   return ListTile(
-                                    leading: Icon(Icons.event),
+                                    leading: const Icon(Icons.event),
                                     title: Text(invitation.eventName),
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -159,16 +159,16 @@ class HomeScreen extends StatelessWidget {
                                           onPressed: () {
                                             context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: true));
                                           },
-                                          icon: Icon(Icons.check),
-                                          label: Text('Accepter'),
+                                          icon: const Icon(Icons.check),
+                                          label: const Text('Accepter'),
                                         ),
-                                        SizedBox(width: 10),
+                                        const SizedBox(width: 10),
                                         ElevatedButton.icon(
                                           onPressed: () {
                                             context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: false));
                                           },
-                                          icon: Icon(Icons.close),
-                                          label: Text('Refuser'),
+                                          icon: const Icon(Icons.close),
+                                          label: const Text('Refuser'),
                                         ),
                                       ],
                                     ),
@@ -181,22 +181,22 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               Stack(
                                 children: [
-                                  Icon(Icons.event, size: 30),
+                                  const Icon(Icons.event, size: 30),
                                   Positioned(
                                     right: 0,
                                     child: Container(
-                                      padding: EdgeInsets.all(2),
+                                      padding: const EdgeInsets.all(2),
                                       decoration: BoxDecoration(
                                         color: Colors.red,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      constraints: BoxConstraints(
+                                      constraints: const BoxConstraints(
                                         minWidth: 14,
                                         minHeight: 14,
                                       ),
                                       child: Text(
                                         '$eventCount',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 8,
                                         ),
@@ -218,7 +218,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           if (eventCount == 0)
-                            Center(
+                            const Center(
                               child: Text(
                                 'Aucun événement à afficher pour le moment',
                                 style: TextStyle(
@@ -303,7 +303,7 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => FormEventCreateScreen()),
+              MaterialPageRoute(builder: (context) => const FormEventCreateScreen()),
             );
           },
           backgroundColor: const Color(0xFF6058E9),
