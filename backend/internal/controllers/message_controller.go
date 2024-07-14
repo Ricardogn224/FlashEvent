@@ -25,16 +25,16 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 		}
 		chatRoomID := uint(chatRoomId)
 
-		var msg models.MessageAdd
+		var msg models.Message
 		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		// Validate that the user exists
-		var user models.User
-		if err := db.Where("email = ?", msg.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
@@ -116,55 +116,136 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// AddMessageToChat permet d'envoyer un message dans la salle de chat de l'événement
-func AddMessageToChat(db *gorm.DB) http.HandlerFunc {
+// GetAllMessages retrieves all messages
+func GetAllMessages(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateMessage(db) // Initialiser la table Message si elle n'existe pas
+		database.MigrateMessage(db) // Initialize the Message table if it doesn't exist
+
+		var messages []models.Message
+		if err := db.Find(&messages).Error; err != nil {
+			http.Error(w, "Failed to retrieve messages", http.StatusInternalServerError)
+			return
+		}
+
+		var responseMessages []models.MessageResponse
+		for _, message := range messages {
+			var user models.User
+			if err := db.First(&user, message.UserID).Error; err != nil {
+				http.Error(w, "Failed to retrieve user info", http.StatusInternalServerError)
+				return
+			}
+			responseMessages = append(responseMessages, models.MessageResponse{
+				ID:         message.ID,
+				ChatRoomID: message.ChatRoomID,
+				UserID:     user.ID,
+				Email:      user.Email,
+				Username:   user.Username,
+				Content:    message.Content,
+				Timestamp:  message.Timestamp,
+			})
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseMessages)
+	}
+}
+
+// GetMessageByID retrieves a message by its ID
+func GetMessageByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateMessage(db) // Initialize the Message table if it doesn't exist
 
 		vars := mux.Vars(r)
-		eventID, err := strconv.Atoi(vars["eventId"])
+		messageId, err := strconv.Atoi(vars["messageId"])
 		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			http.Error(w, "Invalid message ID", http.StatusBadRequest)
+			return
+		}
+		messageID := uint(messageId)
+
+		var message models.Message
+		if err := db.First(&message, messageID).Error; err != nil {
+			http.Error(w, "Message not found", http.StatusNotFound)
 			return
 		}
 
-		var message models.MessageAdd
-		if err := json.NewDecoder(r.Body).Decode(&message); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		var event models.Event
-		if err := db.First(&event, eventID).Error; err != nil {
-			http.Error(w, "Event not found", http.StatusNotFound)
-			return
-		}
-
-		// Validate that the user exists
 		var user models.User
-		if err := db.Where("email = ?", message.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
+		if err := db.First(&user, message.UserID).Error; err != nil {
+			http.Error(w, "Failed to retrieve user info", http.StatusInternalServerError)
 			return
 		}
 
-		// Check user role
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "User" {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
-
-		chatMessage := models.Message{
-			ChatRoomID: event.ID, // Utilisez l'ID de l'événement comme ChatRoomID
+		responseMessage := models.MessageResponse{
+			ID:         message.ID,
+			ChatRoomID: message.ChatRoomID,
 			UserID:     user.ID,
+			Email:      user.Email,
+			Username:   user.Username,
 			Content:    message.Content,
-			Timestamp:  time.Now(),
+			Timestamp:  message.Timestamp,
 		}
-		if err := db.Create(&chatMessage).Error; err != nil {
-			http.Error(w, "Failed to send message", http.StatusInternalServerError)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseMessage)
+	}
+}
+
+// UpdateMessageByID updates a message by its ID
+func UpdateMessageByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateMessage(db) // Initialize the Message table if it doesn't exist
+
+		vars := mux.Vars(r)
+		messageId, err := strconv.Atoi(vars["messageId"])
+		if err != nil {
+			http.Error(w, "Invalid message ID", http.StatusBadRequest)
+			return
+		}
+		messageID := uint(messageId)
+
+		var message models.Message
+		if err := db.First(&message, messageID).Error; err != nil {
+			http.Error(w, "Message not found", http.StatusNotFound)
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(chatMessage)
+		var updatedMessage models.Message
+		if err := json.NewDecoder(r.Body).Decode(&updatedMessage); err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		message.Content = updatedMessage.Content
+		message.Timestamp = time.Now() // Update the timestamp to the current time
+
+		if err := db.Save(&message).Error; err != nil {
+			http.Error(w, "Failed to update message", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(message)
+	}
+}
+
+// DeleteMessageByID deletes a message by its ID
+func DeleteMessageByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateMessage(db) // Initialize the Message table if it doesn't exist
+
+		vars := mux.Vars(r)
+		messageId, err := strconv.Atoi(vars["messageId"])
+		if err != nil {
+			http.Error(w, "Invalid message ID", http.StatusBadRequest)
+			return
+		}
+		messageID := uint(messageId)
+
+		if err := db.Delete(&models.Message{}, messageID).Error; err != nil {
+			http.Error(w, "Failed to delete message", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

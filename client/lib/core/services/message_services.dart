@@ -47,7 +47,7 @@ class MessageServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/event/${message.chatRoomId}/message'),
+      Uri.parse('http://10.0.2.2:8000/chat-rooms/${message.chatRoomId}/messages'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
