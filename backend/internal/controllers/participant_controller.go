@@ -5,6 +5,7 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -54,28 +55,6 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// addParticipantEvent ajoute un participant à un événement
-func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
-	// Initialiser la table Event si elle n'existe pas
-	database.MigrateParticipant(db)
-	// Valider que l'utilisateur et l'événement existent
-	var user models.User
-	if err := db.First(&user, participant.UserID).Error; err != nil {
-		return err
-	}
-	var event models.Event
-	if err := db.First(&event, participant.EventID).Error; err != nil {
-		return err
-	}
-
-	// Créer le participant
-	if err := db.Create(&participant).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // AddParticipant ajoute un participant à un événement
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	database.MigrateParticipant(db)
@@ -94,7 +73,7 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 
 		// Validate that the user exists
 		var newUser models.User
-		if err := db.Where("email = ?", participantAdd.Email).First(&newUser).Error; err != nil {
+		if err := db.Where("email = ?", user.Email).First(&newUser).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
@@ -125,6 +104,130 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(participant)
+	}
+}
+
+func GetParticipantByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateParticipant(db)
+
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["participantId"])
+		if err != nil {
+			http.Error(w, "Invalid participant ID", http.StatusBadRequest)
+			return
+		}
+
+		var participant models.Participant
+		if err := db.First(&participant, id).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Participant not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(participant)
+	}
+}
+
+// DeleteParticipantByID deletes a participant by their ID
+func DeleteParticipantByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateParticipant(db)
+
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["participantId"])
+		if err != nil {
+			http.Error(w, "Invalid participant ID", http.StatusBadRequest)
+			return
+		}
+
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var participant models.Participant
+		if err := db.First(&participant, id).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Participant not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Only AdminPlatform, AdminEvent, or the participant themselves can delete the participant
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		if err := db.Delete(&participant).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// UpdateParticipant updates a participant's details
+func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		params := mux.Vars(r)
+		participantID := params["participantId"]
+
+		var updatedParticipant models.Participant
+		if err := json.NewDecoder(r.Body).Decode(&updatedParticipant); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Find the participant by ID
+		var participant models.Participant
+		if err := db.First(&participant, participantID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Participant not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Only AdminPlatform, AdminEvent, or the participant themselves can update the participant details
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		// Update the participant fields
+		participant.TransportationID = updatedParticipant.TransportationID
+		participant.Active = updatedParticipant.Active
+
+		if updatedParticipant.TransportationID == 0 {
+			participant.TransportationID = 0
+		}
+
+		// Save the updated participant to the database
+		if err := db.Save(&participant).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(participant)
 	}
 }
@@ -272,59 +375,5 @@ func GetInvitationsByUser(db *gorm.DB) http.HandlerFunc {
 		// Respond with the retrieved invitations
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(invitations)
-	}
-}
-
-// UpdateParticipant updates a participant's details
-func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := GetUserFromToken(r, db)
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		params := mux.Vars(r)
-		participantID := params["participantId"]
-
-		var updatedParticipant models.Participant
-		if err := json.NewDecoder(r.Body).Decode(&updatedParticipant); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		// Find the participant by ID
-		var participant models.Participant
-		if err := db.First(&participant, participantID).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				http.Error(w, "Participant not found", http.StatusNotFound)
-			} else {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		// Only AdminPlatform, AdminEvent, or the participant themselves can update the participant details
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
-
-		// Update the participant fields
-		participant.TransportationID = updatedParticipant.TransportationID
-		participant.Active = updatedParticipant.Active
-
-		if updatedParticipant.TransportationID == 0 {
-			participant.TransportationID = 0
-		}
-
-		// Save the updated participant to the database
-		if err := db.Save(&participant).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(participant)
 	}
 }

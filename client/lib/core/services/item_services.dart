@@ -39,7 +39,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/item'),
+      Uri.parse('http://10.0.2.2:8000/items'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
