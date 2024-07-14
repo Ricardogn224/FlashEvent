@@ -264,6 +264,34 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Successfully updated event", endpoint.SchemaResponseOption(models.Event{})),
 			endpoint.Security("BearerAuth"),
 		),
+
+		endpoint.New(
+			http.MethodPost, "/event/{eventId}/cagnotte",
+			endpoint.Handler(controllers.AuthMiddleware(controllers.AddCagnotte(db))),
+			endpoint.Summary("Ajouter une cagnotte"),
+			endpoint.Description("Ajouter une cagnotte à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Response(http.StatusCreated, "Cagnotte ajoutée avec succès", endpoint.SchemaResponseOption(models.Cagnotte{})),
+			endpoint.Security("BearerAuth"),
+		),
+		endpoint.New(
+			http.MethodPost, "/cagnotte/{cagnotteId}/contribution",
+			endpoint.Handler(controllers.AuthMiddleware(controllers.ContributeToCagnotte(db))),
+			endpoint.Summary("Contribuer à une cagnotte"),
+			endpoint.Description("Contribuer à une cagnotte existante"),
+			endpoint.Path("cagnotteId", "integer", "ID de la cagnotte", true),
+			endpoint.Response(http.StatusCreated, "Contribution ajoutée avec succès", endpoint.SchemaResponseOption(models.Contribution{})),
+			endpoint.Security("BearerAuth"),
+		),
+		endpoint.New(
+			http.MethodGet, "/cagnotte/{cagnotteId}/contributors",
+			endpoint.Handler(controllers.AuthMiddleware(controllers.GetContributorsByCagnotteID(db))),
+			endpoint.Summary("Voir les contributeurs d'une cagnotte"),
+			endpoint.Description("Voir la liste des personnes ayant contribué à une cagnotte"),
+			endpoint.Path("cagnotteId", "integer", "ID de la cagnotte", true),
+			endpoint.Response(http.StatusOK, "Liste des contributeurs récupérée avec succès", endpoint.SchemaResponseOption([]models.Contribution{})),
+			endpoint.Security("BearerAuth"),
+		),
 	)
 
 	api.Walk(func(path string, e *swag.Endpoint) {
