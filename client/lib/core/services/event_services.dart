@@ -44,7 +44,7 @@ class EventServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/event'),
+      Uri.parse('http://10.0.2.2:8000/events'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -71,7 +71,7 @@ class EventServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/event/$id'),
+        Uri.parse('http://10.0.2.2:8000/events/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers

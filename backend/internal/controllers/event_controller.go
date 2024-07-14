@@ -147,8 +147,8 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var updatedEvent models.Event
-		if err := json.NewDecoder(r.Body).Decode(&updatedEvent); err != nil {
+		var updates map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -172,15 +172,57 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Mise à jour de l'événement dans la base de données
-		result := db.Model(&models.Event{}).Where("id = ?", id).Updates(&updatedEvent)
+		// Mise à jour partielle de l'événement dans la base de données
+		result := db.Model(&event).Updates(updates)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(updatedEvent)
+		json.NewEncoder(w).Encode(event)
+	}
+}
+
+// DeleteEventByID supprime un événement par son ID
+func DeleteEventByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		MigrateEvent(db)
+
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Vérifier que l'utilisateur a le droit de supprimer cet événement
+		var event models.Event
+		if err := db.First(&event, id).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		// Suppression de l'événement dans la base de données
+		if err := db.Delete(&event).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
@@ -258,6 +300,10 @@ func AuthenticatedUpdateEventByID(db *gorm.DB) http.HandlerFunc {
 
 func AuthenticatedAddUserToEvent(db *gorm.DB) http.HandlerFunc {
 	return AuthMiddleware(AddUserToEvent(db)).(http.HandlerFunc)
+}
+
+func AuthenticatedDeleteEventByID(db *gorm.DB) http.HandlerFunc {
+	return AuthMiddleware(DeleteEventByID(db)).(http.HandlerFunc)
 }
 
 // AddFoodToEvent ajoute des informations sur la nourriture à un événement
