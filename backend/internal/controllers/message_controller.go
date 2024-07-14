@@ -38,6 +38,12 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		// Check user role
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "User" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		message := models.Message{
 			UserID:     user.ID,
 			ChatRoomID: chatRoomID,
@@ -67,6 +73,19 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 		chatRoomID := uint(chatRoomId)
+
+		// Get the authenticated user
+		authUser, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Check user role
+		if authUser.Role != "AdminPlatform" && authUser.Role != "AdminEvent" && authUser.Role != "User" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 
 		var messages []models.Message
 		if err := db.Where("chat_room_id = ?", chatRoomID).Find(&messages).Error; err != nil {
@@ -125,6 +144,12 @@ func AddMessageToChat(db *gorm.DB) http.HandlerFunc {
 		var user models.User
 		if err := db.Where("email = ?", message.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		// Check user role
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "User" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 

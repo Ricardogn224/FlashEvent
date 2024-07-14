@@ -25,7 +25,16 @@ func contains(slice []uint, item uint) bool {
 	return false
 }
 
-var JwtKey = []byte("your_secret_key")
+func HasRole(user *models.User, roles ...string) bool {
+	for _, role := range roles {
+		if user.Role == role {
+			return true
+		}
+	}
+	return false
+}
+
+var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
@@ -95,7 +104,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(JwtKey)
+		tokenString, err := token.SignedString(jwtKey)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -117,7 +126,7 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return JwtKey, nil
+		return jwtKey, nil
 	})
 
 	if err != nil || !token.Valid {
@@ -241,15 +250,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			authHeader = "Bearer " + authHeader
-		}
-
-		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenStr := authHeader[len("Bearer "):]
 		claims := &Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return JwtKey, nil
+			return jwtKey, nil
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {

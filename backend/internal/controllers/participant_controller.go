@@ -10,9 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// AnswerInvitation permet de répondre à une invitation
 func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 	database.MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		var invitationAnswer models.InvitationAnswer
 		if err := json.NewDecoder(r.Body).Decode(&invitationAnswer); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -23,6 +30,12 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 		var participant models.Participant
 		if err := db.Where("id = ?", invitationAnswer.ParticipantID).First(&participant).Error; err != nil {
 			http.Error(w, "Participant not found", http.StatusNotFound)
+			return
+		}
+
+		// Ensure that only the participant or an admin can respond to the invitation
+		if user.ID != participant.UserID && user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
@@ -41,6 +54,7 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// addParticipantEvent ajoute un participant à un événement
 func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 	// Initialiser la table Event si elle n'existe pas
 	database.MigrateParticipant(db)
@@ -62,9 +76,16 @@ func addParticipantEvent(db *gorm.DB, participant models.Participant) error {
 	return nil
 }
 
+// AddParticipant ajoute un participant à un événement
 func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	database.MigrateParticipant(db)
 	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		var participantAdd models.ParticipantAdd
 		if err := json.NewDecoder(r.Body).Decode(&participantAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -72,8 +93,8 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Validate that the user exists
-		var user models.User
-		if err := db.Where("email = ?", participantAdd.Email).First(&user).Error; err != nil {
+		var newUser models.User
+		if err := db.Where("email = ?", participantAdd.Email).First(&newUser).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
@@ -85,9 +106,15 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		// Only AdminPlatform and AdminEvent can add participants to events
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		// Create a new Participant instance
 		participant := models.Participant{
-			UserID:  user.ID,
+			UserID:  newUser.ID,
 			EventID: event.ID,
 		}
 
@@ -102,6 +129,7 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// GetParticipantByEventId récupère un participant par ID d'événement
 func GetParticipantByEventId(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := GetUserFromToken(r, db)
@@ -250,6 +278,12 @@ func GetInvitationsByUser(db *gorm.DB) http.HandlerFunc {
 // UpdateParticipant updates a participant's details
 func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		params := mux.Vars(r)
 		participantID := params["participantId"]
 
@@ -267,6 +301,12 @@ func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
 			} else {
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
+			return
+		}
+
+		// Only AdminPlatform, AdminEvent, or the participant themselves can update the participant details
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 

@@ -29,3 +29,4 @@ services:
       - database
     environment:
       - DATABASE_URL=postgresql://janire:password@database:5432/articlesDB
+    restart: always

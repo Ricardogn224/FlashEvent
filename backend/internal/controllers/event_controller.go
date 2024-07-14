@@ -65,19 +65,24 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 
 		log.Printf("Received eventAdd: %+v", eventAdd)
 
-		// Find the user by email
-		var user models.User
-		if err := db.Where("email = ?", eventAdd.Email).First(&user).Error; err != nil {
-			log.Printf("User not found: %v", err)
-			http.Error(w, "User not found", http.StatusNotFound)
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		// Create the event
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		// Créer l'événement
 		event := models.Event{
 			Name:            eventAdd.Name,
 			Description:     eventAdd.Description,
 			TransportActive: eventAdd.TransportActive,
+			CreatedBy:       user.ID, // Enregistrer l'ID du créateur
 		}
 		result := db.Create(&event)
 		if result.Error != nil {
@@ -86,7 +91,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Create the participant using the retrieved user ID
+		// Créer le participant avec l'ID de l'utilisateur récupéré
 		participant := models.Participant{
 			UserID:   user.ID,
 			EventID:  event.ID,
@@ -148,6 +153,25 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Vérifier que l'utilisateur a le droit de modifier cet événement
+		var event models.Event
+		if err := db.First(&event, id).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		// Mise à jour de l'événement dans la base de données
 		result := db.Model(&models.Event{}).Where("id = ?", id).Updates(&updatedEvent)
 		if result.Error != nil {
@@ -168,7 +192,7 @@ func AddUserToEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "ID d'événement invalide", http.StatusBadRequest)
 			return
 		}
-		eventID := uint(eventIDInt) // Correction : utilisation de :=
+		eventID := uint(eventIDInt)
 
 		var request struct {
 			Email string `json:"email"`
@@ -178,21 +202,34 @@ func AddUserToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var user models.User
-		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Vérifier que l'utilisateur a le droit d'ajouter un participant à cet événement
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		var newUser models.User
+		if err := db.Where("email = ?", request.Email).First(&newUser).Error; err != nil {
 			http.Error(w, "Utilisateur introuvable", http.StatusNotFound)
 			return
 		}
 
-		var event models.Event
-		if err := db.First(&event, eventID).Error; err != nil {
-			http.Error(w, "Événement introuvable", http.StatusNotFound)
-			return
-		}
-
 		participant := models.Participant{
-			UserID:  user.ID,
-			EventID: uint(eventID),
+			UserID:  newUser.ID,
+			EventID: eventID,
 			Active:  true,
 		}
 
@@ -244,7 +281,25 @@ func AddFoodToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Enregistrer les informations sur la nourriture dans la base de données
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Vérifier que l'utilisateur a le droit d'ajouter de la nourriture à cet événement
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		foodItem := models.FoodItem{
 			EventID: eventID,
 			Food:    request.Food,
@@ -277,6 +332,18 @@ func ActivateTransport(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		event.TransportActive = transportUpdate.TransportActive
 
 		if err := db.Save(&event).Error; err != nil {
@@ -291,8 +358,6 @@ func ActivateTransport(db *gorm.DB) http.HandlerFunc {
 
 func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		// Extraire l'ID de l'événement à partir des paramètres de la requête
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -301,7 +366,6 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 		}
 		eventID := uint(eventIDInt)
 
-		// Check if transport is active for the event
 		var event models.Event
 		if err := db.First(&event, eventID).Error; err != nil {
 			http.Error(w, "Event not found", http.StatusNotFound)
@@ -318,21 +382,18 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Trouver l'utilisateur par email
 		var user models.User
 		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
-		// Vérifier si l'utilisateur a déjà une réservation de transport pour cet événement
 		var existingTransportation models.Transportation
 		if err := db.Where("event_id = ? AND user_id = ?", eventID, user.ID).First(&existingTransportation).Error; err == nil {
 			http.Error(w, "You already have a transportation reservation for this event", http.StatusConflict)
 			return
 		}
 
-		// Enregistrer les informations sur le transport dans la base de données
 		transportation := models.Transportation{
 			EventID:    eventID,
 			UserID:     user.ID,
@@ -360,7 +421,6 @@ func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
 		}
 		eventID := uint(eventIDInt)
 
-		// Check if transport is active for the event
 		var event models.Event
 		if err := db.First(&event, eventID).Error; err != nil {
 			http.Error(w, "Event not found", http.StatusNotFound)
@@ -397,7 +457,7 @@ func AddUtilitiesToEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "ID d'événement invalide", http.StatusBadRequest)
 			return
 		}
-		eventID := uint(eventIDInt) // Correction : utilisation de :=
+		eventID := uint(eventIDInt)
 
 		var request struct {
 			Material string `json:"material"`
@@ -408,7 +468,24 @@ func AddUtilitiesToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Enregistrer les informations sur le matériel et son utilité dans la base de données
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, eventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		utilities := models.Utilities{
 			EventID:  eventID,
 			Material: request.Material,
@@ -448,7 +525,18 @@ func AddActivityToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Ajoutez l'activité à l'événement
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		var activities []string
 		if err := json.Unmarshal(event.Activities, &activities); err != nil {
 			http.Error(w, "Failed to parse activities", http.StatusInternalServerError)

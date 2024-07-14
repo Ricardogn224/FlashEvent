@@ -10,6 +10,7 @@ type Event struct {
 	TransportActive bool           `json:"transport_active" gorm:"default:false"`
 	Activities      datatypes.JSON `json:"activities"` // Utilisation de JSON pour les activités
 	TransportStart  string         `json:"transport_start"`
+	CreatedBy       uint           `json:"created_by"` // ID de l'utilisateur qui a créé l'événement
 }
 
 // EventAdd représente le corps de la requête pour ajouter un événement

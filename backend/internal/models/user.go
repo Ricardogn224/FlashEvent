@@ -8,4 +8,5 @@ type User struct {
 	Lastname  string `json:"lastname" required:""`
 	Username  string `json:"username" required:""`
 	Password  string `json:"password" required:""`
+	Role      string `json:"role" gorm:"default:user"` // Ajout du champ Role
 }
