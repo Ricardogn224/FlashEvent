@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        go-version: [1.20]  # You can add more versions here (e.g., [1.18, 1.19, 1.20])
+        go-version: [1.18, 1.19, 1.20]  # You can add more versions here (e.g., [1.18, 1.19, 1.20])
 
     steps:
     - name: Checkout code
