@@ -1,3 +1,5 @@
 ./database/
 /.idea/
 /database
+
+/backend/.env
