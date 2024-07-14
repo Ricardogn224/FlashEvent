@@ -19,6 +19,12 @@ class FormEventCreateBloc extends Bloc<FormEventCreateEvent, FormEventCreateStat
     on<EventDateEndChanged>((event, emit) {
       emit(state.copyWith(dateEnd: event.dateEnd));
     });
+    on<EventTimeStartChanged>((event, emit) {
+      emit(state.copyWith(timeStart: event.timeStart));
+    });
+    on<EventTimeEndChanged>((event, emit) {
+      emit(state.copyWith(timeEnd: event.timeEnd));
+    });
     on<EventTransportActiveChanged>((event, emit) {
       emit(state.copyWith(transportActive: event.transportActive));
     });
@@ -27,7 +33,7 @@ class FormEventCreateBloc extends Bloc<FormEventCreateEvent, FormEventCreateStat
 
       try {
         // Simulate an API call
-        await Future.delayed(Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 2));
 
         emit(state.copyWith(status: FormStatus.success));
       } catch (e) {

@@ -22,11 +22,11 @@ import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/transportation/transport_start_edit_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';
-import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart'; // Import du fichier d'écran de création d'événement
+import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_bloc.dart';
-import 'package:flutter_flash_event/login/login_screen.dart';
-import 'package:flutter_flash_event/screens/register_screen.dart';
-import 'package:flutter_flash_event/screens/splash_screen.dart';
+import 'login/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/splash_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   final args = settings.arguments;
@@ -34,21 +34,21 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/login':
       return MaterialPageRoute(builder: (_) => LoginScreen());
     case '/register':
-      return MaterialPageRoute(builder: (_) => RegisterScreen());
+      return MaterialPageRoute(builder: (_) => const RegisterScreen());
     case '/home':
-      return MaterialPageRoute(builder: (_) => HomeScreen());
+      return MaterialPageRoute(builder: (_) => const HomeScreen());
     case AdminHomeDesktop.routeName:
-      return MaterialPageRoute(builder: (_) => AdminHomeDesktop());
+      return MaterialPageRoute(builder: (_) => const AdminHomeDesktop());
     case AdminUserScreen.routeName:
-      return MaterialPageRoute(builder: (_) => AdminUserScreen());
+      return MaterialPageRoute(builder: (_) => const AdminUserScreen());
     case AdminEventScreen.routeName:
-      return MaterialPageRoute(builder: (_) => AdminEventScreen());
+      return MaterialPageRoute(builder: (_) => const AdminEventScreen());
     case AdminEventNewScreen.routeName:
-      return MaterialPageRoute(builder: (_) => AdminEventNewScreen());
+      return MaterialPageRoute(builder: (_) => const AdminEventNewScreen());
     case AdminUserNewScreen.routeName:
-      return MaterialPageRoute(builder: (_) => AdminUserNewScreen());
+      return MaterialPageRoute(builder: (_) => const AdminUserNewScreen());
     case InvitationScreen.routeName:
-      return MaterialPageRoute(builder: (_) => InvitationScreen());
+      return MaterialPageRoute(builder: (_) => const InvitationScreen());
     case EventScreen.routeName:
       return MaterialPageRoute(builder: (context) => EventScreen(id: args as int));
     case ParticipantScreen.routeName:
@@ -79,11 +79,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (context) => FormEventCreateBloc(),
-          child: FormEventCreateScreen(),
+          child: const FormEventCreateScreen(),
         ),
       );
     case '/my-account':
-      return MaterialPageRoute(builder: (_) => MyAccountScreen());
+      return MaterialPageRoute(builder: (_) => const MyAccountScreen());
     default:
       return MaterialPageRoute(builder: (_) => SplashScreen());
   }
