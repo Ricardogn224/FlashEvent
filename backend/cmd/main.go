@@ -8,11 +8,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/zc2638/swag"
 	"github.com/zc2638/swag/option"
 )
 
 func main() {
+	// Charger les variables d'environnement
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
 	// Connexion à la base de données
 	db, err := database.ConnectDB()
 	if err != nil {
