@@ -11,6 +11,11 @@ require (
 	github.com/zc2638/swag v1.14.0
 	golang.org/x/crypto v0.25.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	github.com/gorilla/websocket v1.4.2
+	github.com/joho/godotenv v1.5.1
+	github.com/zc2638/swag v1.6.0
+	golang.org/x/crypto v0.23.0
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/datatypes v1.2.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/driver/sqlite v1.5.6
