@@ -6,8 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_flash_event/firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'package:flutter_flash_event/routes.dart' as custom_routes;
-import 'package:flutter/foundation.dart'
-    show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,9 +38,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: SplashScreen(),
-        onGenerateRoute: custom_routes
-            .generateRoute, // Use the route generation function from routes.dart
+        initialRoute: '/splash',
+        onGenerateRoute: custom_routes.generateRoute, // Use the route generation function from routes.dart
       ),
     );
   }
