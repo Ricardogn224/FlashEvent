@@ -32,16 +32,9 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		database.MigrateItem(db) // Initialiser la table Item si elle n'existe pas
 
-		var itemRequestAdd models.ItemEventAdd
+		var itemRequestAdd models.ItemEvent
 		if err := json.NewDecoder(r.Body).Decode(&itemRequestAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		// Validate that the user exists
-		var user models.User
-		if err := db.Where("email = ?", itemRequestAdd.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
@@ -77,7 +70,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 
 		// Create a new ItemEvent instance
 		itemRequest := models.ItemEvent{
-			UserID:  user.ID,
+			UserID:  authUser.ID,
 			EventID: itemRequestAdd.EventID,
 			Name:    itemRequestAdd.Name,
 		}
@@ -112,10 +105,10 @@ func GetItemsByEventID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// DeleteItem supprime un élément par son ID
-func DeleteItem(db *gorm.DB) http.HandlerFunc {
+// GetItemByID retrieves an item by its ID
+func GetItemByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateItem(db) // Initialiser la table Item si elle n'existe pas
+		database.MigrateItem(db) // Ensure the table Item exists
 
 		params := mux.Vars(r)
 		itemID, err := strconv.Atoi(params["itemId"])
@@ -124,10 +117,40 @@ func DeleteItem(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Find the item by ID
 		var item models.ItemEvent
 		if err := db.First(&item, itemID).Error; err != nil {
-			http.Error(w, "Item not found", http.StatusNotFound)
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Item not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(item)
+	}
+}
+
+// DeleteItemByID deletes an item by its ID
+func DeleteItemByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateItem(db) // Ensure the table Item exists
+
+		params := mux.Vars(r)
+		itemID, err := strconv.Atoi(params["itemId"])
+		if err != nil {
+			http.Error(w, "Invalid item ID", http.StatusBadRequest)
+			return
+		}
+
+		var item models.ItemEvent
+		if err := db.First(&item, itemID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Item not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -149,12 +172,69 @@ func DeleteItem(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Delete the item
 		if err := db.Delete(&item).Error; err != nil {
 			http.Error(w, "Failed to delete item", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// UpdateItemByID updates an item's details by its ID
+func UpdateItemByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		database.MigrateItem(db) // Ensure the table Item exists
+
+		params := mux.Vars(r)
+		itemID, err := strconv.Atoi(params["itemId"])
+		if err != nil {
+			http.Error(w, "Invalid item ID", http.StatusBadRequest)
+			return
+		}
+
+		var updatedItem models.ItemEvent
+		if err := json.NewDecoder(r.Body).Decode(&updatedItem); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var item models.ItemEvent
+		if err := db.First(&item, itemID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Item not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Verify user roles and permissions
+		authUser, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, item.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if authUser.Role != "AdminPlatform" && (authUser.Role != "AdminEvent" || event.CreatedBy != authUser.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		item.Name = updatedItem.Name
+
+		if err := db.Save(&item).Error; err != nil {
+			http.Error(w, "Failed to update item", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(item)
 	}
 }

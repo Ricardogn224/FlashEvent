@@ -422,15 +422,16 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var request models.TransportationAdd
+		var request models.Transportation
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		var user models.User
-		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
@@ -456,8 +457,22 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// GetAllTransportations retrieves all transportation records
+func GetAllTransportations(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var transportations []models.Transportation
+		if err := db.Find(&transportations).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(transportations)
+	}
+}
+
 // GetTransportationByEvent retourne tous les détails de transport pour un événement spécifique
-func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
+func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
@@ -491,6 +506,99 @@ func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(transportation)
+	}
+}
+
+// GetTransportationByID retrieves a transportation by its ID
+func GetTransportationByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		transportationID, err := strconv.Atoi(vars["transportationId"])
+		if err != nil {
+			http.Error(w, "Invalid transportation ID", http.StatusBadRequest)
+			return
+		}
+
+		var transportation models.Transportation
+		if err := db.First(&transportation, transportationID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Transportation not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(transportation)
+	}
+}
+
+// UpdateTransportationByID updates a transportation's details by its ID
+func UpdateTransportationByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		transportationID, err := strconv.Atoi(vars["transportationId"])
+		if err != nil {
+			http.Error(w, "Invalid transportation ID", http.StatusBadRequest)
+			return
+		}
+
+		var updatedTransportation models.Transportation
+		if err := json.NewDecoder(r.Body).Decode(&updatedTransportation); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var transportation models.Transportation
+		if err := db.First(&transportation, transportationID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Transportation not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		transportation.Vehicle = updatedTransportation.Vehicle
+		transportation.SeatNumber = updatedTransportation.SeatNumber
+
+		if err := db.Save(&transportation).Error; err != nil {
+			http.Error(w, "Failed to update transportation", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(transportation)
+	}
+}
+
+// DeleteTransportationByID deletes a transportation by its ID
+func DeleteTransportationByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		transportationID, err := strconv.Atoi(vars["transportationId"])
+		if err != nil {
+			http.Error(w, "Invalid transportation ID", http.StatusBadRequest)
+			return
+		}
+
+		var transportation models.Transportation
+		if err := db.First(&transportation, transportationID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Transportation not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if err := db.Delete(&transportation).Error; err != nil {
+			http.Error(w, "Failed to delete transportation", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
