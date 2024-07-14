@@ -41,5 +41,3 @@ jobs:
       run: |
         cd backend
         go test ./... -v
-
-    
