@@ -31,5 +31,5 @@ jobs:
 
       - name: Run tests
         run: |
-          cd test
+          cd backend/test
           go test ./...
