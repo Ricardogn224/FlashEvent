@@ -21,12 +21,14 @@ jobs:
       - name: Display Go version
         run: go version
 
-      - name: Set up backend directory and dependencies
-        run: |
-          cd backend
-          go mod tidy
+      - name: Change to backend directory
+        working-directory: backend
+        run: pwd
+
+      - name: Set up dependencies
+        working-directory: backend
+        run: go mod tidy
 
       - name: Run tests
-        run: |
-          cd backend
-          go test ./test/...
+        working-directory: backend
+        run: go test ./test/...
