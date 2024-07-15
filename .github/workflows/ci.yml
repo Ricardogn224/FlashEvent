@@ -21,10 +21,7 @@ jobs:
       - name: Display Go version
         run: go version
 
-      - name: Change to backend directory
-        run: cd backend
-
-      - name: Install dependencies
+      - name: Set up backend directory and dependencies
         run: |
           cd backend
           go mod tidy
