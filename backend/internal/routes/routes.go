@@ -335,7 +335,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Tags("Food"),
 		),
 		endpoint.New(
-			http.MethodPost, "/event/{eventId}/transportations",
+			http.MethodPost, "/events/{eventId}/transportations",
 			endpoint.Handler(http.HandlerFunc(controllers.AddTransportationToEvent(db))),
 			endpoint.Summary("Ajouter un moyen de transport à un événement"),
 			endpoint.Description("Permettre à un participant d'ajouter un moyen de transport à un événement"),
@@ -537,7 +537,6 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Delete a feature by its ID"),
 			endpoint.Path("featureId", "integer", "ID of the feature to delete", true),
 			endpoint.Response(http.StatusNoContent, "Successfully deleted feature"),
-			endpoint.SchemaResponseOption(nil),
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Features"),
 		),
