@@ -51,7 +51,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		}
 
 		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "user" {
-			log.Println("User is not authorized to create an event.")
+			log.Println("User is not authorized to create an event. ", user.Role)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

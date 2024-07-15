@@ -12,14 +12,22 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomeDataLoaded>((event, emit) async {
-      emit(HomeLoading());
+      await _loadEvents(emit);
+    });
 
-      try {
-        final events = await EventServices.getEvents();
-        emit(HomeDataLoadSuccess(events: events));
-      } on ApiException catch (error) {
-        emit(HomeDataLoadError(errorMessage: 'An error occurred.'));
-      }
+    on<ReloadEvents>((event, emit) async {
+      await _loadEvents(emit);
     });
   }
+
+  Future<void> _loadEvents(Emitter<HomeState> emit) async {
+    emit(HomeLoading());
+    try {
+      final events = await EventServices.getEvents();
+      emit(HomeDataLoadSuccess(events: events));
+    } on ApiException catch (error) {
+      emit(HomeDataLoadError(errorMessage: 'An error occurred.'));
+    }
+  }
 }
+
