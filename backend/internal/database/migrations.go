@@ -31,6 +31,10 @@ func MigrateItem(db *gorm.DB) {
 	db.AutoMigrate(&models.ItemEvent{})
 }
 
+func MigrateFeature(db *gorm.DB) {
+	db.AutoMigrate(&models.Feature{})
+}
+
 // MigrateMessage migre la table Message
 func MigrateMessage(db *gorm.DB) {
 	db.AutoMigrate(&models.Message{})
@@ -61,6 +65,7 @@ func MigrateAll(db *gorm.DB) {
 	MigrateFood(db)
 	MigrateTransportation(db)
 	MigrateParticipant(db)
+	MigrateFeature(db)
 	MigrateMessage(db)
 	MigrateItem(db)
 	MigrateChatRoom(db)
