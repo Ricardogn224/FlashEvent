@@ -8,13 +8,18 @@ abstract class AdminFormEvent extends Equatable {
 }
 
 class FormSubmitEvent extends AdminFormEvent {
-  final VoidCallback onSuccess;
-  final Function(String) onError;
+  final int id;
+  final void Function() onSuccess;
+  final void Function(String errorMessage) onError;
 
-  const FormSubmitEvent({required this.onSuccess, required this.onError});
+  const FormSubmitEvent({
+    required this.id,
+    required this.onSuccess,
+    required this.onError,
+  });
 
   @override
-  List<Object> get props => [onSuccess, onError];
+  List<Object> get props => [onSuccess, onError, id];
 }
 
 class FormNewSubmitEvent extends AdminFormEvent {
@@ -60,6 +65,15 @@ class EmailChanged extends AdminFormEvent {
   final BlocFormItem email;
   @override
   List<Object> get props => [email];
+}
+
+class TransportActiveChanged extends AdminFormEvent {
+  final bool transportActive;
+
+  const TransportActiveChanged({required this.transportActive});
+
+  @override
+  List<Object> get props => [transportActive];
 }
 
 class InitAddEmail extends AdminFormEvent {

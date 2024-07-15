@@ -71,7 +71,9 @@ class AdminUserScreen extends StatelessWidget {
                                     IconButton(
                                       icon: Icon(Icons.delete),
                                       onPressed: () {
-                                        // Handle delete action
+                                        // Dispatch delete event here
+                                        context.read<AdminBloc>().add(
+                                            DeleteUserEvent(id: user.id));
                                       },
                                     ),
                                   ],

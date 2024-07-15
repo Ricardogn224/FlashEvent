@@ -49,15 +49,7 @@ class EventServices {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
       },
-      body: jsonEncode(<String, dynamic>{
-        'name': event.name,
-        'description': event.description,
-        'place': event.place,
-        'date_start': event.dateStart,
-        'date_end': event.dateEnd,
-        'transport_active': event.transportActive,
-        'email': email ?? '',
-      }),
+      body: json.encode(event.toJson()),
     );
 
         print('Token : ${token}');
@@ -95,6 +87,57 @@ class EventServices {
     } catch (error) {
       throw ApiException(
           message: 'Unknown error while requesting product with id $id');
+    }
+  }
+
+  static Future<http.Response> updateEventById(Event event) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.patch(
+        Uri.parse('http://10.0.2.2:8000/events/${event.id}'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+        body: json.encode(event.toJson()),
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error while updating event with id ${event.id}',
+            statusCode: response.statusCode);
+      }
+
+      return response;
+    } catch (error) {
+      throw ApiException(
+          message: 'Unknown error while updating event with id ${event.id}');
+    }
+  }
+
+  static Future<void> deleteEventById(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:8000/events/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error while deleting event with id $id',
+            statusCode: response.statusCode);
+      }
+    } catch (error) {
+      throw ApiException(
+          message: 'Unknown error while deleting event with id $id');
     }
   }
 }

@@ -42,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text,
         password: _passwordController.text,
         id: 0,
+        role : '',
       );
 
       try {
