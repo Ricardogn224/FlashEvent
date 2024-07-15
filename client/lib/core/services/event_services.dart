@@ -64,6 +64,8 @@ class EventServices {
 
 
     if (response.statusCode == 201) {
+      print('Succes: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return response;
     } else {
       print('Error: ${response.statusCode}');
