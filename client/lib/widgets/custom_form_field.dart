@@ -23,15 +23,13 @@ class CustomFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController effectiveController =
-        controller ?? TextEditingController(text: initialValue);
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        initialValue: initialValue,
         inputFormatters: inputFormatters,
         validator: validator,
-        controller: effectiveController,
+        controller: controller,
         focusNode: focusNode,
         decoration: InputDecoration(hintText: hintText),
         onChanged: (value) {

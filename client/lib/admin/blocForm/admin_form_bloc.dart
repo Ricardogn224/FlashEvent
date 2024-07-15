@@ -25,6 +25,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     on<DescriptionChanged>(_onDescriptionChanged);
     on<InitAddEmail>(_addEmail);
     on<EmailChanged>(_onEmailChanged);
+    on<TransportActiveChanged>(_onTransportActiveChanged);
     on<FetchEmailSuggestions>(_onFetchEmailSuggestions);
     on<RemoveParticipant>(_onRemoveParticipant);
     on<FormParticipantSubmitEvent>(_onFormParticipantSubmitted);
@@ -45,6 +46,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         formKey: formKey,
         name: BlocFormItem(value: eventParty.name ?? '', error: 'Enter name'),
         description: BlocFormItem(value: eventParty.description ?? '', error: 'Enter description'),
+        transportActive: BlocFormItemBool(value: eventParty.transportActive),
         participants: participants,
         status: FormStatus.valid,
       ));
@@ -85,6 +87,19 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     );
   }
 
+
+  Future<void> _onTransportActiveChanged(
+      TransportActiveChanged event, Emitter<AdminFormState> emit) async {
+
+    emit(state.copyWith(
+
+      transportActive: BlocFormItemBool(value: event.transportActive),
+
+    ));
+
+  }
+
+
   Future<void> _onFormReset(FormResetEvent event, Emitter<AdminFormState> emit) async {
     state.formKey?.currentState?.reset();
   }
@@ -92,23 +107,27 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
   Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<AdminFormState> emit) async {
     if (state.formKey!.currentState!.validate()) {
       Event newEvent = Event(
-        id: 0, // Replace with actual id
+        id: event.id, // Replace with actual id
         name: state.name.value,
         description: state.description.value,
+        transportActive: state.transportActive.value,
         place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
         dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
-        transportActive: false,
         transportStart: '',
       );
 
-      // Handle the submission logic here
-      // For example, call an API to save the event
-
-      // If successful, call event.onSuccess()
-      event.onSuccess();
+      try {
+        final response = await EventServices.updateEventById(newEvent);
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          event.onSuccess();
+        } else {
+          event.onError('Event update failed');
+        }
+      } catch (e) {
+        event.onError('Error: $e');
+      }
     } else {
-      // If validation fails, you can call event.onError() with a message
       event.onError('Validation failed');
     }
   }
@@ -122,7 +141,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
         dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
-        transportActive: false,
+        transportActive: state.transportActive.value,
         transportStart: '',
       );
 

@@ -32,5 +32,31 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         emit(state.copyWith(status: AdminStatus.error, errorMessage: 'An error occurred'));
       }
     });
+
+    on<DeleteEvent>((event, emit) async {
+      emit(state.copyWith(status: AdminStatus.loading));
+
+      try {
+        await EventServices.deleteEventById(event.id);
+        final events = await EventServices.getEvents();
+        emit(state.copyWith(status: AdminStatus.success, events: events));
+      } on ApiException catch (error) {
+        emit(state.copyWith(status: AdminStatus.error, errorMessage: 'An error occurred'));
+      }
+    });
+
+    on<DeleteUserEvent>((event, emit) async {
+      emit(state.copyWith(status: AdminStatus.loading));
+
+      try {
+        await UserServices.deleteUserById(event.id);
+        final users = await UserServices.getUsers();
+        emit(state.copyWith(status: AdminStatus.success, users: users));
+      } on ApiException catch (error) {
+        emit(state.copyWith(status: AdminStatus.error, errorMessage: 'An error occurred'));
+      }
+    });
   }
+
+
 }
