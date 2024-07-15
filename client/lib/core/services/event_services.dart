@@ -49,12 +49,19 @@ class EventServices {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
       },
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, dynamic>{
         'name': event.name,
         'description': event.description,
+        'place': event.place,
+        'date_start': event.dateStart,
+        'date_end': event.dateEnd,
+        'transport_active': event.transportActive,
         'email': email ?? '',
       }),
     );
+
+        print('Token : ${token}');
+
 
     if (response.statusCode == 201) {
       return response;

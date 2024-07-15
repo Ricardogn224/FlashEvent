@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 part 'form_transport_event.dart';
 part 'form_transport_state.dart';
 
-
 class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
   FormTransportBloc() : super(const FormTransportState()) {
     on<InitEvent>(_initState);
@@ -31,8 +30,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
     ));
   }
 
-  Future<void> _onNameChanged(
-      NameChanged event, Emitter<FormTransportState> emit) async {
+  Future<void> _onNameChanged(NameChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         name: BlocFormItem(
@@ -44,8 +42,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
     );
   }
 
-  Future<void> _onDescriptionChanged(
-      DescriptionChanged event, Emitter<FormTransportState> emit) async {
+  Future<void> _onDescriptionChanged(DescriptionChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         description: BlocFormItem(
@@ -56,22 +53,18 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
     );
   }
 
-  Future<void> _onTransportStartChanged(
-      TransportStartChanged event, Emitter<FormTransportState> emit) async {
+  Future<void> _onTransportStartChanged(TransportStartChanged event, Emitter<FormTransportState> emit) async {
     emit(
       state.copyWith(
         transportStart: BlocFormItem(
-          value: event.transportStart.value
+          value: event.transportStart.value,
         ),
         formKey: formKey,
       ),
     );
   }
 
-  Future<void> _onFormReset(
-      FormResetEvent event,
-      Emitter<FormTransportState> emit,
-      ) async {
+  Future<void> _onFormReset(FormResetEvent event, Emitter<FormTransportState> emit) async {
     state.formKey?.currentState?.reset();
   }
 
@@ -81,8 +74,11 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
         id: 0,
         name: state.name.value,
         description: state.description.value,
+        place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
+        dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
+        dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         transportActive: false,
-        transportStart: '',
+        transportStart: state.transportStart.value,
       );
 
       try {
