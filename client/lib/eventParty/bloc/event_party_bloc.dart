@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:flutter_flash_event/core/models/user.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
+import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'event_party_event.dart';
@@ -14,10 +16,15 @@ class EventPartyBloc extends Bloc<EventPartyEvent, EventPartyState> {
 
       try {
         final eventParty = await EventServices.getEvent(id: event.id);
-        print(eventParty);
-        emit(state.copyWith(status: EventPartyStatus.success, eventParty: eventParty));
+        final participants = await UserServices.getUsersParticipants(id: event.id);
+
+        emit(state.copyWith(
+          status: EventPartyStatus.success,
+          eventParty: eventParty,
+          participants: participants,
+        ));
       } on ApiException catch (error) {
-        emit(state.copyWith(status: EventPartyStatus.error, errorMessage: 'An error occurred'));
+        emit(state.copyWith(status: EventPartyStatus.error, errorMessage: 'An error occurred: ${error.message}'));
       }
     });
   }

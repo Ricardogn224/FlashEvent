@@ -7,6 +7,7 @@ class AdminFormUserState extends Equatable {
     this.username = const BlocFormItem(error: 'Enter lastname'),
     this.email = const BlocFormItem(error: 'Enter email'),
     this.password = const BlocFormItem(error: 'Enter password'),
+    this.role = const BlocFormItemBool(value: false),
     this.isAdmin = false,
     this.formKey,
     this.status = FormStatus.none,
@@ -15,6 +16,7 @@ class AdminFormUserState extends Equatable {
   final BlocFormItem firstname;
   final BlocFormItem lastname;
   final BlocFormItem username;
+  final BlocFormItemBool role;
   final BlocFormItem email;
   final BlocFormItem password;
   final bool isAdmin;
@@ -25,6 +27,7 @@ class AdminFormUserState extends Equatable {
     BlocFormItem? firstname,
     BlocFormItem? lastname,
     BlocFormItem? email,
+    BlocFormItemBool? role,
     BlocFormItem? username,
     BlocFormItem? password,
     bool? isAdmin,
@@ -36,6 +39,7 @@ class AdminFormUserState extends Equatable {
       lastname: lastname ?? this.lastname,
       email: email ?? this.email,
       username: username ?? this.username,
+      role: role ?? this.role,
       password: password ?? this.password,
       isAdmin: isAdmin ?? this.isAdmin,
       formKey: formKey ?? this.formKey,
@@ -44,7 +48,7 @@ class AdminFormUserState extends Equatable {
   }
 
   @override
-  List<Object> get props => [firstname, lastname, email, username, isAdmin];
+  List<Object> get props => [firstname, lastname, email, username, isAdmin, role];
 }
 
 enum FormStatus { none, inProgress, valid, error }

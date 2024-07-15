@@ -5,6 +5,7 @@ import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart'; // Import screen
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -232,8 +233,16 @@ class HomeScreen extends StatelessWidget {
                               height: 200,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
+                                itemCount: eventCount,
                                 itemBuilder: (context, index) {
                                   final event = homeState.events[index];
+                                  final eventStart = DateTime.parse(event.dateStart);
+                                  final eventEnd = DateTime.parse(event.dateEnd);
+                                  final eventStartDate = DateFormat.yMMMd().format(eventStart); // Format the start date
+                                  final eventStartTime = DateFormat.Hm().format(eventStart); // Format the start time
+                                  final eventEndDate = DateFormat.yMMMd().format(eventEnd); // Format the end date
+                                  final eventEndTime = DateFormat.Hm().format(eventEnd); // Format the end time
+
                                   return GestureDetector(
                                     onTap: () => EventScreen.navigateTo(context, id: event.id),
                                     child: Card(
@@ -256,9 +265,9 @@ class HomeScreen extends StatelessWidget {
                                                 color: Colors.grey.shade300,
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
-                                              child: const Text(
-                                                '17 Déc',
-                                                style: TextStyle(
+                                              child: Text(
+                                                '$eventStartDate $eventStartTime - $eventEndDate $eventEndTime',
+                                                style: const TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -273,9 +282,9 @@ class HomeScreen extends StatelessWidget {
                                               ),
                                             ),
                                             const SizedBox(height: 4),
-                                            const Text(
-                                              'Samedi',
-                                              style: TextStyle(
+                                            Text(
+                                              event.place,
+                                              style: const TextStyle(
                                                 color: Colors.grey,
                                               ),
                                             ),
@@ -285,7 +294,6 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                itemCount: eventCount,
                               ),
                             ),
                         ],

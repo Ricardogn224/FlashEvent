@@ -51,7 +51,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		}
 
 		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "user" {
-			log.Println("User is not authorized to create an event.")
+			log.Println("User is not authorized to create an event. ", user.Role)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -76,20 +76,23 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 		}
 		log.Printf("Event created successfully: %+v", event)
 
-		// Créer le participant avec l'ID de l'utilisateur récupéré
-		participant := models.Participant{
-			UserID:   user.ID,
-			EventID:  event.ID,
-			Active:   true, // Set the participant as active by default
-			Response: true,
+		if user.Role != "AdminPlatform" {
+			// Créer le participant avec l'ID de l'utilisateur récupéré
+			participant := models.Participant{
+				UserID:   user.ID,
+				EventID:  event.ID,
+				Active:   true, // Set the participant as active by default
+				Response: true,
+			}
+
+			log.Println("Creating participant...")
+			if err := db.Create(&participant).Error; err != nil {
+				log.Printf("Error creating participant: %v", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+			log.Printf("Participant created successfully: %+v", participant)
 		}
-		log.Println("Creating participant...")
-		if err := db.Create(&participant).Error; err != nil {
-			log.Printf("Error creating participant: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		log.Printf("Participant created successfully: %+v", participant)
 
 		// Répondre avec succès
 		w.WriteHeader(http.StatusCreated)
@@ -156,7 +159,7 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+		if user.Role != "AdminPlatform" && event.CreatedBy != user.ID {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

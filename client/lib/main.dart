@@ -4,7 +4,6 @@ import 'package:flutter_flash_event/authentication/authentication_bloc.dart';
 import 'package:flutter_flash_event/authentication/authentication_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_flash_event/firebase_options.dart';
-import 'screens/splash_screen.dart';
 import 'package:flutter_flash_event/routes.dart' as custom_routes;
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 

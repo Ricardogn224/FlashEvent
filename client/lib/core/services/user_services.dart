@@ -34,6 +34,7 @@ class UserServices {
     }
   }
 
+
   static Future<User> getCurrentUserByEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -185,6 +186,57 @@ class UserServices {
     } catch (error) {
       throw ApiException(
           message: 'Unknown error while requesting user with id $id');
+    }
+  }
+
+  static Future<http.Response> updateUserById(User user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.patch(
+        Uri.parse('http://10.0.2.2:8000/users/${user.id}'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+        body: json.encode(user.toJson()),
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error while updating user with id ${user.id}',
+            statusCode: response.statusCode);
+      }
+
+      return response;
+    } catch (error) {
+      throw ApiException(
+          message: 'Unknown error while updating user with id ${user.id}');
+    }
+  }
+
+  static Future<void> deleteUserById(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:8000/users/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error while deleting user with id $id',
+            statusCode: response.statusCode);
+      }
+    } catch (error) {
+      throw ApiException(
+          message: 'Unknown error while deleting user with id $id');
     }
   }
 }
