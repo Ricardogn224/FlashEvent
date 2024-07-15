@@ -17,7 +17,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/participant'),
+      Uri.parse('http://10.0.2.2:8000/participants'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -112,7 +112,7 @@ class ParticipantServices {
     if (participant.id == 0) {
       try {
         final responseParticipant = await http.get(
-          Uri.parse('http://10.0.2.2:8000//${participant.eventId}'),
+          Uri.parse('http://10.0.2.2:8000/${participant.eventId}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers

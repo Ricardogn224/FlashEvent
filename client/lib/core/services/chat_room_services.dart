@@ -13,7 +13,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/event/$id/chat-rooms'),
+        Uri.parse('http://10.0.2.2:8000/events/$id/chat-rooms'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers

@@ -5,7 +5,9 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/gomail.v2"
 	"gorm.io/gorm"
 )
 
@@ -41,6 +44,8 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+var otpStore = make(map[string]string)
+
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
 func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -49,25 +54,138 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 
 		var user models.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Invalid request payload: %v", err), http.StatusBadRequest)
 			return
 		}
 
+		// Valider les champs requis
+		if user.Email == "" || user.Firstname == "" || user.Lastname == "" || user.Password == "" {
+			http.Error(w, "Email, firstname, lastname and password are required fields", http.StatusBadRequest)
+			return
+		}
+
+		// Vérifier si l'email existe déjà
+		var existingUser models.User
+		if err := db.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
+			http.Error(w, "Email already exists", http.StatusConflict)
+			return
+		}
+
+		// Attribuer le rôle "user" par défaut
+		user.Role = "user"
+
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error hashing password: %v", err), http.StatusInternalServerError)
 			return
 		}
 		user.Password = string(hashedPassword)
 
 		result := db.Create(&user)
 		if result.Error != nil {
+			http.Error(w, fmt.Sprintf("Error creating user: %v", result.Error), http.StatusInternalServerError)
+			return
+		}
+
+		sendWelcomeEmail(user.Email)
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
+// sendWelcomeEmail envoie un e-mail de bienvenue
+func sendWelcomeEmail(email string) {
+	mailer := gomail.NewMessage()
+	mailer.SetHeader("From", os.Getenv("SMTP_USER"))
+	mailer.SetHeader("To", email)
+	mailer.SetHeader("Subject", "Welcome to Event Platform")
+	mailer.SetBody("text/plain", "Thank you for registering!")
+
+	dialer := gomail.NewDialer(os.Getenv("SMTP_HOST"), 465, os.Getenv("SMTP_USER"), os.Getenv("SMTP_PASS"))
+	dialer.SSL = true
+
+	if err := dialer.DialAndSend(mailer); err != nil {
+		fmt.Println("Error sending welcome email:", err)
+	}
+}
+
+// ForgotPassword gère la demande de réinitialisation du mot de passe
+func ForgotPassword(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var request struct {
+			Email string `json:"email"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var user models.User
+		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		otp := fmt.Sprintf("%06d", rand.Intn(1000000))
+		otpStore[request.Email] = otp
+		sendOTPEmail(request.Email, otp)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": "OTP sent to your email"})
+	}
+}
+
+// sendOTPEmail envoie un e-mail contenant l'OTP
+func sendOTPEmail(email, otp string) {
+	mailer := gomail.NewMessage()
+	mailer.SetHeader("From", os.Getenv("SMTP_USER"))
+	mailer.SetHeader("To", email)
+	mailer.SetHeader("Subject", "Password Reset OTP")
+	mailer.SetBody("text/plain", fmt.Sprintf("Your OTP for password reset is: %s", otp))
+
+	dialer := gomail.NewDialer(os.Getenv("SMTP_HOST"), 465, os.Getenv("SMTP_USER"), os.Getenv("SMTP_PASS"))
+	dialer.SSL = true
+
+	if err := dialer.DialAndSend(mailer); err != nil {
+		fmt.Println("Error sending OTP email:", err)
+	}
+}
+
+// ResetPassword gère la réinitialisation du mot de passe avec OTP
+func ResetPassword(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var request struct {
+			Email       string `json:"email"`
+			OTP         string `json:"otp"`
+			NewPassword string `json:"new_password"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		storedOTP, exists := otpStore[request.Email]
+		if !exists || storedOTP != request.OTP {
+			http.Error(w, "Invalid or expired OTP", http.StatusUnauthorized)
+			return
+		}
+
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(user)
+		if err := db.Model(&models.User{}).Where("email = ?", request.Email).Update("password", string(hashedPassword)).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		delete(otpStore, request.Email)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Password reset successful"})
 	}
 }
 
@@ -156,6 +274,103 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// GetUserByID returns a user by their ID
+func GetUserByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["userId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		var user models.User
+		result := db.First(&user, id)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				http.Error(w, "User not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
+// UpdateUserByID updates a user by their ID
+func UpdateUserByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["userId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		var updates map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if password, ok := updates["password"].(string); ok && password != "" {
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+			updates["password"] = string(hashedPassword)
+		} else {
+			delete(updates, "password")
+		}
+
+		var existingUser models.User
+		result := db.First(&existingUser, id)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				http.Error(w, "User not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if err := db.Model(&existingUser).Updates(updates).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(existingUser)
+	}
+}
+
+// DeleteUserByID deletes a user by their ID
+func DeleteUserByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["userId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		if err := db.Delete(&models.User{}, id).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "User not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
 // GetAllUserEmails returns all user emails
 func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -198,32 +413,6 @@ func GetAllUserEmails(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetUserByID returns a user by their ID
-func GetUserByID(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["userId"])
-		if err != nil {
-			http.Error(w, "Invalid user ID", http.StatusBadRequest)
-			return
-		}
-
-		var user models.User
-		result := db.First(&user, id)
-		if result.Error != nil {
-			if result.Error == gorm.ErrRecordNotFound {
-				http.Error(w, "User not found", http.StatusNotFound)
-			} else {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(user)
-	}
-}
-
 // GetUserByEmail returns a user by their email
 func GetUserByEmail(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -250,7 +439,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		tokenStr := authHeader[len("Bearer "):]
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 		claims := &Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {

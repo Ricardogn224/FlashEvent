@@ -11,30 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// Migrate les différentes tables
-func MigrateEvent(db *gorm.DB) {
-	db.AutoMigrate(&models.Event{})
-}
-
-func MigrateFood(db *gorm.DB) {
-	db.AutoMigrate(&models.FoodItem{})
-}
-
-func MigrateTransportation(db *gorm.DB) {
-	db.AutoMigrate(&models.Transportation{})
-}
-
-func MigrateParticipant(db *gorm.DB) {
-	db.AutoMigrate(&models.Participant{})
-}
-
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser les tables si elles n'existent pas
-		MigrateEvent(db)
-		MigrateFood(db)
-		MigrateTransportation(db)
-		MigrateParticipant(db)
 
 		var events []models.Event
 		result := db.Find(&events)
@@ -130,7 +109,6 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 func FindEventByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table Event si elle n'existe pas
-		MigrateEvent(db)
 
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["eventId"])
@@ -155,7 +133,6 @@ func FindEventByID(db *gorm.DB) http.HandlerFunc {
 func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser la table Event si elle n'existe pas
-		MigrateEvent(db)
 
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["eventId"])
@@ -164,8 +141,8 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var updatedEvent models.Event
-		if err := json.NewDecoder(r.Body).Decode(&updatedEvent); err != nil {
+		var updates map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -189,15 +166,55 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Mise à jour de l'événement dans la base de données
-		result := db.Model(&models.Event{}).Where("id = ?", id).Updates(&updatedEvent)
+		// Mise à jour partielle de l'événement dans la base de données
+		result := db.Model(&event).Updates(updates)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(updatedEvent)
+		json.NewEncoder(w).Encode(event)
+	}
+}
+
+// DeleteEventByID supprime un événement par son ID
+func DeleteEventByID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser la table Event si elle n'existe pas
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Vérifier que l'utilisateur a le droit de supprimer cet événement
+		var event models.Event
+		if err := db.First(&event, id).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		// Suppression de l'événement dans la base de données
+		if err := db.Delete(&event).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
@@ -275,6 +292,10 @@ func AuthenticatedUpdateEventByID(db *gorm.DB) http.HandlerFunc {
 
 func AuthenticatedAddUserToEvent(db *gorm.DB) http.HandlerFunc {
 	return AuthMiddleware(AddUserToEvent(db)).(http.HandlerFunc)
+}
+
+func AuthenticatedDeleteEventByID(db *gorm.DB) http.HandlerFunc {
+	return AuthMiddleware(DeleteEventByID(db)).(http.HandlerFunc)
 }
 
 // AddFoodToEvent ajoute des informations sur la nourriture à un événement
@@ -370,98 +391,6 @@ func ActivateTransport(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(event)
-	}
-}
-
-func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		eventIDInt, err := strconv.Atoi(vars["eventId"])
-		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
-			return
-		}
-		eventID := uint(eventIDInt)
-
-		var event models.Event
-		if err := db.First(&event, eventID).Error; err != nil {
-			http.Error(w, "Event not found", http.StatusNotFound)
-			return
-		}
-		if !event.TransportActive {
-			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
-			return
-		}
-
-		var request models.TransportationAdd
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		var user models.User
-		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
-			http.Error(w, "User not found", http.StatusNotFound)
-			return
-		}
-
-		var existingTransportation models.Transportation
-		if err := db.Where("event_id = ? AND user_id = ?", eventID, user.ID).First(&existingTransportation).Error; err == nil {
-			http.Error(w, "You already have a transportation reservation for this event", http.StatusConflict)
-			return
-		}
-
-		transportation := models.Transportation{
-			EventID:    eventID,
-			UserID:     user.ID,
-			Vehicle:    request.Vehicle,
-			SeatNumber: request.SeatNumber,
-		}
-		if err := db.Create(&transportation).Error; err != nil {
-			http.Error(w, "Failed to add transportation to event", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(transportation)
-	}
-}
-
-// GetTransportationByEvent retourne tous les détails de transport pour un événement spécifique
-func GetTransportationByEvent(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		eventIDInt, err := strconv.Atoi(vars["eventId"])
-		if err != nil {
-			http.Error(w, "Invalid event ID", http.StatusBadRequest)
-			return
-		}
-		eventID := uint(eventIDInt)
-
-		var event models.Event
-		if err := db.First(&event, eventID).Error; err != nil {
-			http.Error(w, "Event not found", http.StatusNotFound)
-			return
-		}
-		if !event.TransportActive {
-			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
-			return
-		}
-
-		var transportation []models.Transportation
-		result := db.Where("event_id = ?", eventID).Find(&transportation)
-		if result.Error != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		if len(transportation) == 0 {
-			http.Error(w, "No transportation found for this event", http.StatusNotFound)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(transportation)
 	}
 }
 
