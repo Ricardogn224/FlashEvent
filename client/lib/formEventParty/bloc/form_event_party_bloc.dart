@@ -80,6 +80,9 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
         description: state.description.value,
         transportActive: false,
         transportStart: '',
+        place: '',
+        dateStart: '',
+        dateEnd: '',
       );
 
       try {
