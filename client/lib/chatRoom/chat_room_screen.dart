@@ -53,6 +53,14 @@ class ChatRoomScreen extends StatelessWidget {
                         itemCount: state.chatRooms?.length,
                       ),
                     ),
+                  FloatingActionButton(
+                    onPressed: () async {
+
+
+                      // Handle the new participant data if needed
+                    },
+                    child: Icon(Icons.add),
+                  ),
                 ],
               ),
             ),

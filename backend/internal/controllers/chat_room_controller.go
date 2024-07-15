@@ -15,6 +15,15 @@ import (
 // AddChatRoom adds a new chat room associated with an event
 func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract eventId from URL parameters
+		vars := mux.Vars(r)
+		eventIdStr := vars["eventId"]
+		eventId, err := strconv.Atoi(eventIdStr)
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
 		database.MigrateChatRoom(db)            // Initialize the ChatRoom table if it doesn't exist
 		database.MigrateChatRoomParticipant(db) // Initialize the ChatRoomParticipant table if it doesn't exist
 
@@ -24,8 +33,10 @@ func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if chatRoom.EventID == 0 || chatRoom.Name == "" {
-			http.Error(w, "EventID and Name are required", http.StatusBadRequest)
+		chatRoom.EventID = uint(eventId)
+
+		if chatRoom.Name == "" {
+			http.Error(w, "Name is required", http.StatusBadRequest)
 			return
 		}
 

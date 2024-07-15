@@ -8,7 +8,7 @@ import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dar
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,8 @@ class HomeScreen extends StatelessWidget {
             builder: (context, homeState) {
               return BlocBuilder<InvitationBloc, InvitationState>(
                 builder: (context, invitationState) {
-                  if (homeState is HomeLoading || invitationState.status == InvitationStatus.loading) {
+                  if (homeState is HomeLoading ||
+                      invitationState.status == InvitationStatus.loading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -42,13 +43,16 @@ class HomeScreen extends StatelessWidget {
 
                   if (invitationState.status == InvitationStatus.error) {
                     return Center(
-                      child: Text(invitationState.errorMessage ?? 'Erreur lors du chargement des invitations'),
+                      child: Text(invitationState.errorMessage ??
+                          'Erreur lors du chargement des invitations'),
                     );
                   }
 
-                  if (homeState is HomeDataLoadSuccess && invitationState.status == InvitationStatus.success) {
+                  if (homeState is HomeDataLoadSuccess &&
+                      invitationState.status == InvitationStatus.success) {
                     final int eventCount = homeState.events.length;
-                    final int invitationCount = invitationState.invitations?.length ?? 0;
+                    final int invitationCount =
+                        invitationState.invitations?.length ?? 0;
 
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -73,7 +77,8 @@ class HomeScreen extends StatelessWidget {
                                 backgroundColor: Colors.grey.shade300,
                                 child: IconButton(
                                   icon: const Icon(Icons.person),
-                                  onPressed: () => MyAccountScreen.navigateTo(context),
+                                  onPressed: () =>
+                                      MyAccountScreen.navigateTo(context),
                                 ),
                               ),
                             ],
@@ -147,9 +152,11 @@ class HomeScreen extends StatelessWidget {
                             SizedBox(
                               height: 200,
                               child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
                                 itemCount: invitationCount,
                                 itemBuilder: (context, index) {
-                                  final invitation = invitationState.invitations![index];
+                                  final invitation =
+                                  invitationState.invitations![index];
                                   return ListTile(
                                     leading: const Icon(Icons.event),
                                     title: Text(invitation.eventName),
@@ -158,7 +165,11 @@ class HomeScreen extends StatelessWidget {
                                       children: [
                                         ElevatedButton.icon(
                                           onPressed: () {
-                                            context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: true));
+                                            context.read<InvitationBloc>().add(
+                                                InvitationAnsw(
+                                                    participantId:
+                                                    invitation.participantId,
+                                                    active: true));
                                           },
                                           icon: const Icon(Icons.check),
                                           label: const Text('Accepter'),
@@ -166,7 +177,11 @@ class HomeScreen extends StatelessWidget {
                                         const SizedBox(width: 10),
                                         ElevatedButton.icon(
                                           onPressed: () {
-                                            context.read<InvitationBloc>().add(InvitationAnsw(participantId: invitation.participantId, active: false));
+                                            context.read<InvitationBloc>().add(
+                                                InvitationAnsw(
+                                                    participantId:
+                                                    invitation.participantId,
+                                                    active: false));
                                           },
                                           icon: const Icon(Icons.close),
                                           label: const Text('Refuser'),
@@ -236,17 +251,38 @@ class HomeScreen extends StatelessWidget {
                                 itemCount: eventCount,
                                 itemBuilder: (context, index) {
                                   final event = homeState.events[index];
-                                  final eventStart = DateTime.parse(event.dateStart);
-                                  final eventEnd = DateTime.parse(event.dateEnd);
-                                  final eventStartDate = DateFormat.yMMMd().format(eventStart); // Format the start date
-                                  final eventStartTime = DateFormat.Hm().format(eventStart); // Format the start time
-                                  final eventEndDate = DateFormat.yMMMd().format(eventEnd); // Format the end date
-                                  final eventEndTime = DateFormat.Hm().format(eventEnd); // Format the end time
+                                  final eventStart = event.dateStart != null &&
+                                      event.dateStart.isNotEmpty
+                                      ? DateTime.parse(event.dateStart)
+                                      : null;
+                                  final eventEnd = event.dateEnd != null &&
+                                      event.dateEnd.isNotEmpty
+                                      ? DateTime.parse(event.dateEnd)
+                                      : null;
+
+                                  final eventStartDate =
+                                  eventStart != null
+                                      ? DateFormat.yMMMd().format(eventStart)
+                                      : 'Undefined'; // Format the start date
+                                  final eventStartTime =
+                                  eventStart != null
+                                      ? DateFormat.Hm().format(eventStart)
+                                      : ''; // Format the start time
+                                  final eventEndDate =
+                                  eventEnd != null
+                                      ? DateFormat.yMMMd().format(eventEnd)
+                                      : 'Undefined'; // Format the end date
+                                  final eventEndTime =
+                                  eventEnd != null
+                                      ? DateFormat.Hm().format(eventEnd)
+                                      : ''; // Format the end time
 
                                   return GestureDetector(
-                                    onTap: () => EventScreen.navigateTo(context, id: event.id),
+                                    onTap: () =>
+                                        EventScreen.navigateTo(context, id: event.id),
                                     child: Card(
-                                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                                      margin:
+                                      const EdgeInsets.symmetric(horizontal: 8),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -254,16 +290,19 @@ class HomeScreen extends StatelessWidget {
                                         width: 200,
                                         padding: const EdgeInsets.all(12.0),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(
+                                              padding:
+                                              const EdgeInsets.symmetric(
                                                 vertical: 4,
                                                 horizontal: 8,
                                               ),
                                               decoration: BoxDecoration(
                                                 color: Colors.grey.shade300,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '$eventStartDate $eventStartTime - $eventEndDate $eventEndTime',
@@ -283,7 +322,7 @@ class HomeScreen extends StatelessWidget {
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
-                                              event.place,
+                                              event.place ?? 'Undefined',
                                               style: const TextStyle(
                                                 color: Colors.grey,
                                               ),
