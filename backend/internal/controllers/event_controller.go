@@ -31,27 +31,35 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser les tables si elles n'existent pas
+		log.Println("Initializing tables if they do not exist...")
+		MigrateEvent(db)
+		MigrateFood(db)
+		MigrateTransportation(db)
 
+		// Décoder la requête
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
-
 		log.Printf("Received eventAdd: %+v", eventAdd)
 
 		// Vérifier les rôles de l'utilisateur
+		log.Println("Verifying user role...")
 		user, err := GetUserFromToken(r, db)
 		if err != nil {
+			log.Printf("Error getting user from token: %v", err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
+		if user.Role != "AdminPlatform" && user.Role != "AdminEvent"  && user.Role != "user" {
+			log.Println("User is not authorized to create an event.")
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
+		log.Printf("User %d is authorized to create an event.", user.ID)
 
 		// Créer l'événement
 		event := models.Event{
@@ -63,12 +71,14 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			TransportActive: eventAdd.TransportActive,
 			CreatedBy:       user.ID, // Enregistrer l'ID du créateur
 		}
+		log.Println("Creating event...")
 		result := db.Create(&event)
 		if result.Error != nil {
 			log.Printf("Error creating event: %v", result.Error)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+		log.Printf("Event created successfully: %+v", event)
 
 		// Créer le participant avec l'ID de l'utilisateur récupéré
 		participant := models.Participant{
@@ -77,16 +87,23 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			Active:   true, // Set the participant as active by default
 			Response: true,
 		}
+		log.Println("Creating participant...")
 		if err := db.Create(&participant).Error; err != nil {
 			log.Printf("Error creating participant: %v", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+		log.Printf("Participant created successfully: %+v", participant)
 
+		// Répondre avec succès
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(event)
+		if err := json.NewEncoder(w).Encode(event); err != nil {
+			log.Printf("Error encoding response: %v", err)
+		}
+		log.Println("Event creation response sent.")
 	}
 }
+
 
 // FindEventByID récupère un événement par son ID
 func FindEventByID(db *gorm.DB) http.HandlerFunc {
