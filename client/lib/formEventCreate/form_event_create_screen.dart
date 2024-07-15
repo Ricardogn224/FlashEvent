@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_bloc.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_event.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_state.dart';
-import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:intl/intl.dart';
 
 class FormEventCreateScreen extends StatelessWidget {
@@ -18,6 +17,7 @@ class FormEventCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
         title: const Text('Créer un événement'),
       ),
@@ -27,13 +27,21 @@ class FormEventCreateScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: BlocListener<FormEventCreateBloc, FormEventCreateState>(
             listener: (context, state) {
-              if (state.status == FormStatus.success) {
+              if (state.status == FormStatus.loading) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state.status == FormStatus.success) {
+                Navigator.pop(context); // Dismiss the loading dialog
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Événement créé avec succès')),
-                );
-                context.read<HomeBloc>().add(ReloadEvents());  // Ajouter ceci pour recharger les événements
-                Navigator.pop(context);
+                ).closed.then((_) {
+                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                });
               } else if (state.status == FormStatus.error) {
+                Navigator.pop(context); // Dismiss the loading dialog
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Erreur: ${state.errorMessage}')),
                 );
@@ -44,30 +52,33 @@ class FormEventCreateScreen extends StatelessWidget {
                 return Form(
                   child: Column(
                     children: [
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Nom de l\'événement'),
+                      _buildTextField(
+                        label: 'Nom de l\'événement',
                         onChanged: (value) {
                           context.read<FormEventCreateBloc>().add(
                                 EventNameChanged(name: value),
                               );
                         },
                       ),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Description'),
+                      const SizedBox(height: 20),
+                      _buildTextField(
+                        label: 'Description',
                         onChanged: (value) {
                           context.read<FormEventCreateBloc>().add(
                                 EventDescriptionChanged(description: value),
                               );
                         },
                       ),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Lieu'),
+                      const SizedBox(height: 20),
+                      _buildTextField(
+                        label: 'Lieu',
                         onChanged: (value) {
                           context.read<FormEventCreateBloc>().add(
                                 EventPlaceChanged(place: value),
                               );
                         },
                       ),
+                      const SizedBox(height: 20),
                       _DateTimePicker(
                         labelText: 'Date de début',
                         selectedDate: state.dateStart,
@@ -83,6 +94,7 @@ class FormEventCreateScreen extends StatelessWidget {
                               );
                         },
                       ),
+                      const SizedBox(height: 20),
                       _DateTimePicker(
                         labelText: 'Date de fin',
                         selectedDate: state.dateEnd,
@@ -98,6 +110,7 @@ class FormEventCreateScreen extends StatelessWidget {
                               );
                         },
                       ),
+                      const SizedBox(height: 20),
                       SwitchListTile(
                         title: const Text('Transport Actif'),
                         value: state.transportActive,
@@ -108,16 +121,29 @@ class FormEventCreateScreen extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
-                          final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
-                          context.read<FormEventCreateBloc>().add(EventFormSubmitted(
-                            dateTimeStart: dateTimeStart,
-                            dateTimeEnd: dateTimeEnd,
-                          ));
-                        },
-                        child: const Text('Créer l\'événement'),
+                      Builder( // Use Builder to get the correct context
+                        builder: (context) => SizedBox(
+                          width: double.infinity, // Make button same width as inputs
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6058E9), // Custom button color
+                              foregroundColor: Colors.white, // Button text color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                            ),
+                            onPressed: () {
+                              final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
+                              final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
+                              context.read<FormEventCreateBloc>().add(EventFormSubmitted(
+                                dateTimeStart: dateTimeStart,
+                                dateTimeEnd: dateTimeEnd,
+                              ));
+                            },
+                            child: const Text('Créer l\'événement'),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -127,6 +153,22 @@ class FormEventCreateScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({required String label, required ValueChanged<String> onChanged}) {
+    return TextFormField(
+      decoration: InputDecoration(
+        hintText: 'Entrez $label',
+        labelText: label,
+        fillColor: Colors.white,
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      onChanged: onChanged,
     );
   }
 
@@ -187,48 +229,51 @@ class _DateTimePicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(labelText, style: valueStyle),
-        Row(
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: InkWell(
-                onTap: () => _selectDate(context),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Date',
-                  ),
-                  baseStyle: valueStyle,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(DateFormat.yMMMd().format(selectedDate), style: valueStyle),
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                    ],
-                  ),
-                ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => _selectDate(context),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              hintText: 'Sélectionnez une date',
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none,
               ),
             ),
-            const SizedBox(width: 12.0),
-            Expanded(
-              flex: 1,
-              child: InkWell(
-                onTap: () => _selectTime(context),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Heure',
-                  ),
-                  baseStyle: valueStyle,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(selectedTime.format(context), style: valueStyle),
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                    ],
-                  ),
-                ),
+            baseStyle: valueStyle,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(DateFormat.yMMMd().format(selectedDate), style: valueStyle),
+                const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => _selectTime(context),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              hintText: 'Sélectionnez une heure',
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none,
               ),
             ),
-          ],
+            baseStyle: valueStyle,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(selectedTime.format(context), style: valueStyle),
+                const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              ],
+            ),
+          ),
         ),
       ],
     );
