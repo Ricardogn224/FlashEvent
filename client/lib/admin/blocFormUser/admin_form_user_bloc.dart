@@ -21,6 +21,7 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
     on<FirstnameChanged>(_onFirstnameChanged);
     on<LastnameChanged>(_onLastnameChanged);
     on<EmailChanged>(_onEmailChanged);
+    on<RoleChanged>(_onRoleChanged);
     on<UsernameChanged>(_onUsernameChanged);
     on<PasswordChanged>(_onPasswordChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
@@ -42,6 +43,7 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
         lastname: BlocFormItem(value: user.lastname ?? '', error: 'Enter name'),
         email: BlocFormItem(value: user.email ?? '', error: 'Enter email'),
         username: BlocFormItem(value: user.username ?? '', error: 'Enter username'),
+        role: BlocFormItemBool(value: user.role == 'user' ? false : true),
         status: FormStatus.valid,
       ));
     } on ApiException catch (error) {
@@ -127,6 +129,13 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
     );
   }
 
+  Future<void> _onRoleChanged(
+      RoleChanged event, Emitter<AdminFormUserState> emit) async {
+    emit(state.copyWith(
+      role: BlocFormItemBool(value: event.role),
+    ));
+  }
+
   Future<void> _onFormReset(
       FormResetEvent event,
       Emitter<AdminFormUserState> emit,
@@ -137,11 +146,33 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
   Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<AdminFormUserState> emit) async {
     if (state.formKey!.currentState!.validate()) {
 
-      // Handle the submission logic here
-      // For example, call an API to save the event
+      String roleContent = '';
+      if (state.role.value == false){
+        roleContent = 'user';
+      } else {
+        roleContent = 'AdminPlatform';
+      }
 
-      // If successful, call event.onSuccess()
-      event.onSuccess();
+      User newUser = User(
+          id: event.id,
+          firstname: state.firstname.value,
+          lastname: state.lastname.value,
+          username: state.username.value,
+          email: state.email.value,
+          password: state.password.value,
+          role: roleContent
+      );
+
+      try {
+        final response = await UserServices.updateUserById(newUser);
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          event.onSuccess();
+        } else {
+          event.onError('User edit failed');
+        }
+      } catch (e) {
+        event.onError('Error: $e');
+      }
     } else {
       // If validation fails, you can call event.onError() with a message
       event.onError('Validation failed');
@@ -151,13 +182,21 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
   Future<void> _onFormNewSubmitted(FormNewSubmitEvent event, Emitter<AdminFormUserState> emit) async {
     if (state.formKey!.currentState!.validate()) {
 
+      String roleContent = '';
+      if (state.role.value == false){
+        roleContent = 'user';
+      } else {
+        roleContent = 'AdminPlatform';
+      }
+
       User newUser = User(
           id: 0,
           firstname: state.firstname.value,
           lastname: state.lastname.value,
           username: state.username.value,
           email: state.email.value,
-          password: state.password.value
+          password: state.password.value,
+          role: roleContent
       );
 
       try {

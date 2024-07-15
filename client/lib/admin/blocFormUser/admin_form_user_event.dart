@@ -8,13 +8,18 @@ abstract class AdminFormUserEvent extends Equatable {
 }
 
 class FormSubmitEvent extends AdminFormUserEvent {
-  final VoidCallback onSuccess;
-  final Function(String) onError;
+  final int id;
+  final void Function() onSuccess;
+  final void Function(String errorMessage) onError;
 
-  const FormSubmitEvent({required this.onSuccess, required this.onError});
+  const FormSubmitEvent({
+    required this.id,
+    required this.onSuccess,
+    required this.onError,
+  });
 
   @override
-  List<Object> get props => [onSuccess, onError];
+  List<Object> get props => [onSuccess, onError, id];
 }
 
 class FormNewSubmitEvent extends AdminFormUserEvent {
@@ -76,6 +81,15 @@ class PasswordChanged extends AdminFormUserEvent {
   List<Object> get props => [password];
 }
 
+class RoleChanged extends AdminFormUserEvent {
+  final bool role;
+
+  const RoleChanged({required this.role});
+
+  @override
+  List<Object> get props => [role];
+}
+
 class ToggleAdminRoleEvent extends AdminFormUserEvent {
   final int id;
   final bool isAdmin;
@@ -84,4 +98,15 @@ class ToggleAdminRoleEvent extends AdminFormUserEvent {
 
   @override
   List<Object> get props => [id, isAdmin];
+}
+
+class DeleteEvent extends AdminFormUserEvent {
+  final int id;
+  final VoidCallback onSuccess;
+  final Function(String) onError;
+
+  DeleteEvent({required this.id, required this.onSuccess, required this.onError});
+
+  @override
+  List<Object> get props => [id, onSuccess, onError];
 }

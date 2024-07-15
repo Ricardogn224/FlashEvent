@@ -14,9 +14,13 @@ import (
 // AddChatRoom ajoute une nouvelle salle de chat associée à un événement
 func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoom(db)            // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoomParticipant(db) // Initialiser la table ChatRoomParticipant si elle n'existe pas
 
-		var chatRoom models.ChatRoom
+		var chatRoom struct {
+			models.ChatRoom
+			Participants []uint `json:"participants"` // IDs des participants
+		}
 		if err := json.NewDecoder(r.Body).Decode(&chatRoom); err != nil {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
@@ -27,20 +31,30 @@ func AddChatRoom(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if err := db.Create(&chatRoom).Error; err != nil {
+		if err := db.Create(&chatRoom.ChatRoom).Error; err != nil {
 			http.Error(w, "Failed to create chat room", http.StatusInternalServerError)
 			return
 		}
 
+		for _, userID := range chatRoom.Participants {
+			chatRoomParticipant := models.ChatRoomParticipant{
+				UserID:     userID,
+				ChatRoomID: chatRoom.ID,
+				RoomType:   "Private", // Or "Public" based on your logic
+			}
+			db.Create(&chatRoomParticipant)
+		}
+
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(chatRoom)
+		json.NewEncoder(w).Encode(chatRoom.ChatRoom)
 	}
 }
 
 // GetChatRooms récupère toutes les salles de chat pour un événement spécifique
 func GetChatRooms(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoom(db)            // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoomParticipant(db) // Initialiser la table ChatRoomParticipant si elle n'existe pas
 
 		vars := mux.Vars(r)
 		eventIDInt, err := strconv.Atoi(vars["eventId"])
@@ -61,9 +75,11 @@ func GetChatRooms(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// GetChatRoomByID récupère une salle de chat par son ID
 func GetChatRoomByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoom(db)            // Initialiser la table ChatRoom si elle n'existe pas
+		database.MigrateChatRoomParticipant(db) // Initialiser la table ChatRoomParticipant si elle n'existe pas
 
 		vars := mux.Vars(r)
 		chatRoomID, err := strconv.Atoi(vars["chatRoomId"])
@@ -78,12 +94,24 @@ func GetChatRoomByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var chatRoomParticipant models.ChatRoomParticipant
+		if err := db.Where("user_id = ? AND chat_room_id = ?", user.ID, chatRoomID).First(&chatRoomParticipant).Error; err != nil {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(chatRoom)
 	}
 }
 
-// UpdateChatRoomByID updates a chat room by its ID
+// UpdateChatRoomByID met à jour une salle de chat par son ID
 func UpdateChatRoomByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
@@ -98,6 +126,18 @@ func UpdateChatRoomByID(db *gorm.DB) http.HandlerFunc {
 		var chatRoom models.ChatRoom
 		if err := db.First(&chatRoom, chatRoomID).Error; err != nil {
 			http.Error(w, "Chat room not found", http.StatusNotFound)
+			return
+		}
+
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var chatRoomParticipant models.ChatRoomParticipant
+		if err := db.Where("user_id = ? AND chat_room_id = ?", user.ID, chatRoomID).First(&chatRoomParticipant).Error; err != nil {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
@@ -120,7 +160,7 @@ func UpdateChatRoomByID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// DeleteChatRoomByID deletes a chat room by its ID
+// DeleteChatRoomByID supprime une salle de chat par son ID
 func DeleteChatRoomByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		database.MigrateChatRoom(db) // Initialiser la table ChatRoom si elle n'existe pas
@@ -129,6 +169,18 @@ func DeleteChatRoomByID(db *gorm.DB) http.HandlerFunc {
 		chatRoomID, err := strconv.Atoi(vars["chatRoomId"])
 		if err != nil {
 			http.Error(w, "Invalid chat room ID", http.StatusBadRequest)
+			return
+		}
+
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var chatRoomParticipant models.ChatRoomParticipant
+		if err := db.Where("user_id = ? AND chat_room_id = ?", user.ID, chatRoomID).First(&chatRoomParticipant).Error; err != nil {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
