@@ -51,6 +51,10 @@ func MigrateUtilities(db *gorm.DB) {
 	db.AutoMigrate(&models.Utilities{})
 }
 
+func MigrateChatRoomParticipant(db *gorm.DB) {
+	db.AutoMigrate(&models.ChatRoomParticipant{})
+}
+
 // MigrateAll migre toutes les tables
 func MigrateAll(db *gorm.DB) {
 	MigrateEvent(db)
@@ -62,4 +66,5 @@ func MigrateAll(db *gorm.DB) {
 	MigrateChatRoom(db)
 	MigrateUser(db)
 	MigrateUtilities(db)
+	MigrateChatRoomParticipant(db)
 }
