@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 part 'admin_form_event.dart';
 part 'admin_form_state.dart';
 
-
 class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
   AdminFormBloc() : super(const AdminFormState()) {
     on<InitEvent>(_initState);
@@ -57,17 +56,13 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         status: FormStatus.error,
       ));
     }
-
-
   }
 
   Future<void> _initStateNew(InitNewEvent event, Emitter<AdminFormState> emit) async {
     emit(state.copyWith(formKey: formKey));
-
   }
 
-  Future<void> _onNameChanged(
-      NameChanged event, Emitter<AdminFormState> emit) async {
+  Future<void> _onNameChanged(NameChanged event, Emitter<AdminFormState> emit) async {
     emit(
       state.copyWith(
         name: BlocFormItem(
@@ -79,8 +74,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     );
   }
 
-  Future<void> _onDescriptionChanged(
-      DescriptionChanged event, Emitter<AdminFormState> emit) async {
+  Future<void> _onDescriptionChanged(DescriptionChanged event, Emitter<AdminFormState> emit) async {
     emit(
       state.copyWith(
         description: BlocFormItem(
@@ -91,10 +85,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     );
   }
 
-  Future<void> _onFormReset(
-      FormResetEvent event,
-      Emitter<AdminFormState> emit,
-      ) async {
+  Future<void> _onFormReset(FormResetEvent event, Emitter<AdminFormState> emit) async {
     state.formKey?.currentState?.reset();
   }
 
@@ -104,6 +95,9 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         id: 0, // Replace with actual id
         name: state.name.value,
         description: state.description.value,
+        place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
+        dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
+        dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         transportActive: false,
         transportStart: '',
       );
@@ -125,6 +119,9 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         id: 0,
         name: state.name.value,
         description: state.description.value,
+        place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
+        dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
+        dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         transportActive: false,
         transportStart: '',
       );
@@ -149,8 +146,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     emit(state.copyWith(formKey: formKey));
   }
 
-  Future<void> _onEmailChanged(
-      EmailChanged event, Emitter<AdminFormState> emit) async {
+  Future<void> _onEmailChanged(EmailChanged event, Emitter<AdminFormState> emit) async {
     emit(
       state.copyWith(
         email: BlocFormItem(
@@ -199,20 +195,17 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
     }
   }
 
-  Future<void> _onRemoveParticipant( RemoveParticipant event, Emitter<AdminFormState> emit) async {
+  Future<void> _onRemoveParticipant(RemoveParticipant event, Emitter<AdminFormState> emit) async {
+    InvitationAnswer invitationAnswer = InvitationAnswer(
+      participantId: event.participantId,
+      active: false,
+    );
 
-
-      InvitationAnswer invitationAnswer = InvitationAnswer(
-          participantId: event.participantId,
-          active: false,
-      );
-
-      try {
-        await ParticipantServices.answerInvitation(invitationAnswer);
-        add(InitEvent(id: event.eventId));
-      } on ApiException catch (error) {
-        emit(state.copyWith(status: FormStatus.error));
-      }
+    try {
+      await ParticipantServices.answerInvitation(invitationAnswer);
+      add(InitEvent(id: event.eventId));
+    } on ApiException catch (error) {
+      emit(state.copyWith(status: FormStatus.error));
+    }
   }
-
 }
