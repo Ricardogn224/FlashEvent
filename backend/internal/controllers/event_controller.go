@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
 	"log"
@@ -13,7 +14,7 @@ import (
 
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser les tables si elles n'existent pas
+		database.MigrateAll(db) // Initialiser toutes les tables si elles n'existent pas
 
 		var events []models.Event
 		result := db.Find(&events)
@@ -30,12 +31,7 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser les tables si elles n'existent pas
-		log.Println("Initializing tables if they do not exist...")
-		MigrateEvent(db)
-		MigrateFood(db)
-		MigrateTransportation(db)
-
+		database.MigrateAll(db)
 		// Décoder la requête
 		var eventAdd models.EventAdd
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
