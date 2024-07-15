@@ -1,10 +1,14 @@
-name: Go
+name: Go CI
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Go ${{ matrix.go-version }}
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
@@ -21,14 +25,10 @@ jobs:
       - name: Display Go version
         run: go version
 
-      - name: Change to backend directory
-        working-directory: backend
-        run: pwd
-
-      - name: Set up dependencies
-        working-directory: backend
+      - name: Install dependencies
         run: go mod tidy
+        working-directory: ./backend
 
       - name: Run tests
-        working-directory: backend
         run: go test ./test/...
+        working-directory: ./backend
