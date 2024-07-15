@@ -1,19 +1,25 @@
-name: Go
+name: Go CI
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Augmentez la limite de temps à 10 minutes
+
     strategy:
       matrix:
         go-version: ['1.19', '1.20', '1.21.x']
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Go ${{ matrix.go-version }}
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
@@ -21,15 +27,16 @@ jobs:
       - name: Display Go version
         run: go version
 
-      - name: Change to backend directory
-        run: cd backend
-
       - name: Install dependencies
         run: |
-          cd backend
+          echo "Running go mod tidy"
           go mod tidy
+        working-directory: ./backend
 
       - name: Run tests
         run: |
-          cd backend
-          go test ./test/...
+          echo "Running tests"
+          go test -v ./test/...
+        working-directory: ./backend
+
+    
