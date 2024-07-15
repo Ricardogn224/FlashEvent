@@ -239,30 +239,4 @@ class UserServices {
           message: 'Unknown error while deleting user with id $id');
     }
   }
-
-  static Future<List<String>> getUnassociatedEmails(int chatRoomId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-
-    try {
-      final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId/unassociated-emails'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        List<String> unassociatedEmails = List<String>.from(responseData);
-        return unassociatedEmails;
-      } else {
-        throw ApiException(message: 'Failed to fetch unassociated emails', statusCode: response.statusCode);
-      }
-    } catch (error) {
-      log('Error occurred while retrieving unassociated emails.', error: error);
-      rethrow;
-    }
-  }
 }
