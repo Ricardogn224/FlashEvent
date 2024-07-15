@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_bloc.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_event.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_state.dart';
+import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:intl/intl.dart';
 
 class FormEventCreateScreen extends StatelessWidget {
@@ -30,6 +31,7 @@ class FormEventCreateScreen extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Événement créé avec succès')),
                 );
+                context.read<HomeBloc>().add(ReloadEvents());  // Ajouter ceci pour recharger les événements
                 Navigator.pop(context);
               } else if (state.status == FormStatus.error) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -71,13 +73,11 @@ class FormEventCreateScreen extends StatelessWidget {
                         selectedDate: state.dateStart,
                         selectedTime: state.timeStart,
                         onSelectedDate: (date) {
-                          print('Date de début sélectionnée: $date');
                           context.read<FormEventCreateBloc>().add(
                                 EventDateStartChanged(dateStart: date),
                               );
                         },
                         onSelectedTime: (time) {
-                          print('Heure de début sélectionnée: $time');
                           context.read<FormEventCreateBloc>().add(
                                 EventTimeStartChanged(timeStart: time),
                               );
@@ -88,13 +88,11 @@ class FormEventCreateScreen extends StatelessWidget {
                         selectedDate: state.dateEnd,
                         selectedTime: state.timeEnd,
                         onSelectedDate: (date) {
-                          print('Date de fin sélectionnée: $date');
                           context.read<FormEventCreateBloc>().add(
                                 EventDateEndChanged(dateEnd: date),
                               );
                         },
                         onSelectedTime: (time) {
-                          print('Heure de fin sélectionnée: $time');
                           context.read<FormEventCreateBloc>().add(
                                 EventTimeEndChanged(timeEnd: time),
                               );
@@ -118,7 +116,6 @@ class FormEventCreateScreen extends StatelessWidget {
                             dateTimeStart: dateTimeStart,
                             dateTimeEnd: dateTimeEnd,
                           ));
-                          print('Formulaire soumis avec début: $dateTimeStart et fin: $dateTimeEnd');
                         },
                         child: const Text('Créer l\'événement'),
                       ),
