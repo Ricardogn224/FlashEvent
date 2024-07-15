@@ -13,7 +13,7 @@ class ChatRoomBloc extends Bloc<ChatRoomEvent, ChatRoomState> {
       emit(state.copyWith(status: ChatRoomStatus.loading));
 
       try {
-        final chatRooms = await ChatRoomServices.getChatRooms(id: event.id);
+        final chatRooms = await ChatRoomServices.getUserChatRooms(event.id);
         emit(state.copyWith(status: ChatRoomStatus.success, chatRooms: chatRooms));
       } on ApiException catch (error) {
         emit(state.copyWith(status: ChatRoomStatus.error, errorMessage: 'An error occurred'));

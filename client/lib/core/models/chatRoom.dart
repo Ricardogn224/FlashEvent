@@ -16,4 +16,12 @@ class ChatRoom {
       eventId: json['event_id'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'event_id': eventId,
+    };
+  }
 }

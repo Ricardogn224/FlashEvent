@@ -420,6 +420,16 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Tags("ChatRoom"),
 		),
 		endpoint.New(
+			http.MethodGet, "/events/{eventId}/user-chat-rooms",
+			endpoint.Handler(http.HandlerFunc(controllers.GetChatRoomsByEventIDAndUserID(db))),
+			endpoint.Summary("Get user chat rooms"),
+			endpoint.Description("Retrieve all chat rooms for a specific event where the user is a participant"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
+			endpoint.Response(http.StatusOK, "User chat rooms retrieved", endpoint.SchemaResponseOption(&[]models.ChatRoom{})),
+			endpoint.Security("BearerAuth"),
+			endpoint.Tags("ChatRoom"),
+		),
+		endpoint.New(
 			http.MethodGet, "/events/{eventId}/chat-rooms",
 			endpoint.Handler(http.HandlerFunc(controllers.GetChatRooms(db))),
 			endpoint.Summary("Get chat rooms"),
@@ -454,6 +464,16 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Delete a chat room by its ID"),
 			endpoint.Path("chatRoomId", "integer", "ID of the chat room to delete", true),
 			endpoint.Response(http.StatusNoContent, "Chat room deleted"),
+			endpoint.Tags("ChatRoom"),
+		),
+		endpoint.New(
+			http.MethodGet, "/chat-rooms/{chatRoomId}/unassociated-emails",
+			endpoint.Handler(http.HandlerFunc(controllers.GetUnassociatedEmails(db))),
+			endpoint.Summary("Get unassociated emails"),
+			endpoint.Description("Retrieve the emails of users who are participants in the event but not associated with the chat room in ChatRoomParticipant"),
+			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
+			endpoint.Response(http.StatusOK, "Unassociated emails retrieved", endpoint.SchemaResponseOption(&[]string{})),
+			endpoint.Security("BearerAuth"),
 			endpoint.Tags("ChatRoom"),
 		),
 		endpoint.New(
