@@ -83,22 +83,40 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetItemsByEventID retourne les éléments par ID d'événement
+// GetItemsByEventID returns the items by event ID
 func GetItemsByEventID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateItem(db) // Initialiser la table Item si elle n'existe pas
+		database.MigrateItem(db) // Initialize the Item table if it doesn't exist
 
 		params := mux.Vars(r)
 		eventID := params["eventId"]
 
 		var items []models.ItemEvent
 		if err := db.Where("event_id = ?", eventID).Find(&items).Error; err != nil {
-			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		var responseItems []models.ItemEventResponse
+		for _, item := range items {
+			var user models.User
+			if err := db.First(&user, item.UserID).Error; err != nil {
+				http.Error(w, "Failed to retrieve user info", http.StatusInternalServerError)
+				return
+			}
+
+			responseItems = append(responseItems, models.ItemEventResponse{
+				ID:        item.ID,
+				Name:      item.Name,
+				UserID:    item.UserID,
+				EventID:   item.EventID,
+				Firstname: user.Firstname,
+				Lastname:  user.Lastname,
+			})
+		}
+
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(items)
+		json.NewEncoder(w).Encode(responseItems)
 	}
 }
 

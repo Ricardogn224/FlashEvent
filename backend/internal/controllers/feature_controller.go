@@ -132,22 +132,16 @@ func DeleteFeatureByID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-func GetFeatureActive(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		keyword := "transport" // The keyword to search for in feature names
+func IsTransportFeatureActive(db *gorm.DB) (bool, error) {
+	keyword := "transport" // The keyword to search for in feature names
 
-		var feature models.Feature
-		if err := db.Where("name LIKE ?", "%"+keyword+"%").First(&feature).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				// If no feature with the keyword in its name is found, return false for active status
-				json.NewEncoder(w).Encode(false)
-			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-			return
+	var feature models.Feature
+	if err := db.Where("name LIKE ?", "%"+keyword+"%").First(&feature).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil // Feature not found, return false
 		}
-
-		// Return the active status of the found feature
-		json.NewEncoder(w).Encode(feature.Active)
+		return false, err // Some other error occurred
 	}
+
+	return feature.Active, nil // Return the active status of the found feature
 }

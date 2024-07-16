@@ -25,8 +25,17 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "Event not found", http.StatusNotFound)
 			return
 		}
-		if !event.TransportActive {
-			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
+
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if !event.TransportActive || !transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
 			return
 		}
 
@@ -68,6 +77,20 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 // GetAllTransportations retrieves all transportation records
 func GetAllTransportations(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
+			return
+		}
+
 		var transportations []models.Transportation
 		if err := db.Find(&transportations).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -94,8 +117,16 @@ func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "Event not found", http.StatusNotFound)
 			return
 		}
-		if !event.TransportActive {
-			http.Error(w, "Transportation is not active for this event", http.StatusForbidden)
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if !event.TransportActive || !transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
 			return
 		}
 
@@ -131,6 +162,25 @@ func GetTransportationByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		var event models.Event
+		if err := db.First(&event, transportation.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if !event.TransportActive || !transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(transportation)
 	}
@@ -159,6 +209,25 @@ func UpdateTransportationByID(db *gorm.DB) http.HandlerFunc {
 			} else {
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, transportation.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if !event.TransportActive || !transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
 			return
 		}
 
@@ -192,6 +261,25 @@ func DeleteTransportationByID(db *gorm.DB) http.HandlerFunc {
 			} else {
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 			}
+			return
+		}
+
+		var event models.Event
+		if err := db.First(&event, transportation.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Check if the transport feature is active
+		transportFeatureActive, err := IsTransportFeatureActive(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Check if transportation is active for the event and the feature
+		if !event.TransportActive || !transportFeatureActive {
+			http.Error(w, "Transportation not available", http.StatusForbidden)
 			return
 		}
 
