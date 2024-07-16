@@ -10,9 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
+func MigrateFeature(db *gorm.DB) {
+	db.AutoMigrate(&models.Feature{})
+}
+
 // AddFeature adds a new feature
 func AddFeature(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		MigrateFeature(db)
 		var feature models.Feature
 		if err := json.NewDecoder(r.Body).Decode(&feature); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -32,6 +37,7 @@ func AddFeature(db *gorm.DB) http.HandlerFunc {
 // GetAllFeatures retrieves all features
 func GetAllFeatures(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		MigrateFeature(db)
 		var features []models.Feature
 		if err := db.Find(&features).Error; err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -123,5 +129,25 @@ func DeleteFeatureByID(db *gorm.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func GetFeatureActive(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		keyword := "transport" // The keyword to search for in feature names
+
+		var feature models.Feature
+		if err := db.Where("name LIKE ?", "%"+keyword+"%").First(&feature).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				// If no feature with the keyword in its name is found, return false for active status
+				json.NewEncoder(w).Encode(false)
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Return the active status of the found feature
+		json.NewEncoder(w).Encode(feature.Active)
 	}
 }

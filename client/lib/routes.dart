@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/admin/admin_event_new_screen.dart';
+import 'package:flutter_flash_event/admin/admin_feature_screen.dart';
 import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
@@ -62,6 +63,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => AdminUserEditScreen(id: args as int));
     case AdminEventEditScreen.routeName:
       return MaterialPageRoute(builder: (context) => AdminEventEditScreen(eventId: args as int));
+    case AdminFeatureScreen.routeName:
+      return MaterialPageRoute(builder: (context) => AdminFeatureScreen());
     case FormParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => FormParticipantScreen(eventId: args as int));
     case AdminUserAddParticipantScreen.routeName:

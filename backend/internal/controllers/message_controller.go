@@ -38,12 +38,6 @@ func SendMessage(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Check user role
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "User" {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
-
 		message := models.Message{
 			UserID:     user.ID,
 			ChatRoomID: chatRoomID,
@@ -82,7 +76,7 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Check user role
-		if authUser.Role != "AdminPlatform" && authUser.Role != "AdminEvent" && authUser.Role != "User" {
+		if authUser.Role == "AdminEvent" && authUser.Role != "User" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
