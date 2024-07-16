@@ -56,6 +56,8 @@ class FormItemEventBloc extends Bloc<FormEventItemEvent, FormItemEventState> {
         name: state.name.value,
         userId: 0,
         eventId: eventId,
+        firstname: '',
+        lastname: '',
       );
 
       try {

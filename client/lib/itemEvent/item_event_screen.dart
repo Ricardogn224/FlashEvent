@@ -28,7 +28,7 @@ class ItemEventScreen extends StatelessWidget {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Part'),
+                title: Text('Choses à ramener'),
               ),
               backgroundColor: Colors.white,
               body: Column(
@@ -47,7 +47,7 @@ class ItemEventScreen extends StatelessWidget {
                           return ListTile(
                             leading: Icon(Icons.person),
                             title: Text(itemEvent!.name),
-                            subtitle: Text('Email: ${itemEvent.userId}'),
+                            subtitle: Text('${itemEvent.firstname + ' ' + itemEvent.lastname}'),
                           );
                         },
                         itemCount: state.itemEvents?.length,
