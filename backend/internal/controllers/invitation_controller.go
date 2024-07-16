@@ -74,7 +74,7 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Ensure that only the participant or an admin can respond to the invitation
-		if user.ID != participant.UserID && user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
+		if user.ID != participant.UserID {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -82,6 +82,7 @@ func AnswerInvitation(db *gorm.DB) http.HandlerFunc {
 		// Update the participant's response and active status
 		participant.Response = true
 		participant.Active = invitationAnswer.Active
+		participant.Present = true
 
 		// Save the changes to the database
 		if err := db.Save(&participant).Error; err != nil {

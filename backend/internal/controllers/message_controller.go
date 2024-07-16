@@ -76,7 +76,7 @@ func GetMessagesByChatRoom(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Check user role
-		if authUser.Role == "AdminEvent" && authUser.Role != "User" {
+		if authUser.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
