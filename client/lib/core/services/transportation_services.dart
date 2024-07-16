@@ -20,6 +20,7 @@ class TransportationServices {
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
+      print(response.statusCode);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Error();
       }
@@ -49,7 +50,7 @@ class TransportationServices {
 
     final response = await http.post(
       Uri.parse(
-          'http://10.0.2.2:8000/event/${transportation.eventId}/transportations'),
+          'http://10.0.2.2:8000/events/${transportation.eventId}/transportations'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -61,6 +62,7 @@ class TransportationServices {
       }),
     );
 
+    print(response.statusCode);
     if (response.statusCode == 201) {
       return response;
     } else {

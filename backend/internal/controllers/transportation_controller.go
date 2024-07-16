@@ -79,7 +79,6 @@ func GetAllTransportations(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetTransportationByEvent retourne tous les détails de transport pour un événement spécifique
 func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -100,20 +99,15 @@ func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		var transportation []models.Transportation
-		result := db.Where("event_id = ?", eventID).Find(&transportation)
+		var transportations []models.Transportation
+		result := db.Where("event_id = ?", eventID).Find(&transportations)
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		if len(transportation) == 0 {
-			http.Error(w, "No transportation found for this event", http.StatusNotFound)
-			return
-		}
-
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(transportation)
+		json.NewEncoder(w).Encode(transportations)
 	}
 }
 

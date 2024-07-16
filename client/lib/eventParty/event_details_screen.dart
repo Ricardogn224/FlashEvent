@@ -4,6 +4,8 @@ import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_flash_event/core/services/participant_services.dart';
+import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
+import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
@@ -203,6 +205,36 @@ class _EventScreenState extends State<EventScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
+                            TextButton(
+                              onPressed: () {
+                                // Navigate to ChatRoomScreen with event ID or relevant data
+                                ChatRoomScreen.navigateTo(context, id: widget.id);
+                              },
+                              child: const Text(
+                                'Accéder aux salles de discussions',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Navigate to ChatRoomScreen with event ID or relevant data
+                                ItemEventScreen.navigateTo(context, id: widget.id);
+                              },
+                              child: const Text(
+                                'Les choses à ramener',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Navigate to ChatRoomScreen with event ID or relevant data
+                                TransportationScreen.navigateTo(context, id: widget.id);
+                              },
+                              child: const Text(
+                                'Le transport',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
                             TextButton(
                               onPressed: () {
                                 // Navigate to ChatRoomScreen with event ID or relevant data
