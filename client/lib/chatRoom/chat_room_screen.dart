@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/chatRoom/bloc/chat_room_bloc.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
+import 'package:flutter_flash_event/formChatRoom/chat_room_add_participant.dart';
+import 'package:flutter_flash_event/formChatRoom/form_chat_room_screen.dart';
 
 class ChatRoomScreen extends StatelessWidget {
   static const String routeName = '/chat-room';
@@ -35,10 +37,8 @@ class ChatRoomScreen extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  if (state.status == ChatRoomStatus.success &&
-                      chatRooms != null)
+                  if (state.status == ChatRoomStatus.success && chatRooms != null)
                     Expanded(
-                      // Add Expanded here
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final chatRoom = state.chatRooms?[index];
@@ -46,18 +46,22 @@ class ChatRoomScreen extends StatelessWidget {
                             leading: Icon(Icons.person),
                             title: Text(chatRoom!.name),
                             subtitle: Text('Nom: ${chatRoom.name}'),
-                            onTap: () => MessageChatScreen.navigateTo(context,
-                                id: chatRoom.id),
+                            onTap: () => MessageChatScreen.navigateTo(context, id: chatRoom.id),
+                            trailing: IconButton(
+                              icon: Icon(Icons.person_add),
+                              onPressed: () => ChatRoomAddParticipantScreen.navigateTo(
+                                context,
+                                chatRoom: chatRoom,
+                              ),
+                            ),
                           );
                         },
                         itemCount: state.chatRooms?.length,
                       ),
                     ),
                   FloatingActionButton(
-                    onPressed: () async {
-
-
-                      // Handle the new participant data if needed
+                    onPressed: () {
+                      FormChatRoomScreen.navigateTo(context, id: id);
                     },
                     child: Icon(Icons.add),
                   ),

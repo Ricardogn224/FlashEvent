@@ -35,7 +35,7 @@ class FormChatRoomScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     CustomFormField(
-                      hintText: 'Nombre de places',
+                      hintText: 'Nom de discussion',
                       onChange: (val) {
                         BlocProvider.of<FormChatRoomBloc>(context).add(
                             NameChanged(

@@ -467,6 +467,16 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Tags("ChatRoom"),
 		),
 		endpoint.New(
+			http.MethodPost, "/chat-rooms/{chatRoomId}/participants",
+			endpoint.Handler(http.HandlerFunc(controllers.AddChatRoomParticipant(db))),
+			endpoint.Summary("Add participant to chat room"),
+			endpoint.Description("Add a participant to a chat room by email"),
+			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
+			endpoint.Body(models.User{}, "Email of the participant to add", true),
+			endpoint.Response(http.StatusCreated, "Participant added", endpoint.SchemaResponseOption(&models.ChatRoomParticipant{})),
+			endpoint.Tags("ChatRoom"),
+		),
+		endpoint.New(
 			http.MethodGet, "/chat-rooms/{chatRoomId}/unassociated-emails",
 			endpoint.Handler(http.HandlerFunc(controllers.GetUnassociatedEmails(db))),
 			endpoint.Summary("Get unassociated emails"),
