@@ -8,7 +8,7 @@ import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dar
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +21,16 @@ class HomeScreen extends StatelessWidget {
           create: (context) => InvitationBloc()..add(InvitationDataLoaded()),
         ),
       ],
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF9F9F9),
-        body: SafeArea(
-          child: BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, homeState) {
-              return BlocBuilder<InvitationBloc, InvitationState>(
-                builder: (context, invitationState) {
-                  if (homeState is HomeLoading ||
-                      invitationState.status == InvitationStatus.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+      child: SafeArea(
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, homeState) {
+            return BlocBuilder<InvitationBloc, InvitationState>(
+              builder: (context, invitationState) {
+                if (homeState is HomeLoading || invitationState.status == InvitationStatus.loading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
                   if (homeState is HomeDataLoadError) {
                     return Center(
