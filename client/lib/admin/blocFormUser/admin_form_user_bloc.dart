@@ -200,7 +200,7 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
       );
 
       try {
-        final response = await AuthServices.registerUser(newUser);
+        final response = await UserServices.registerUserAdmin(newUser);
         if (response.statusCode == 201) {
           event.onSuccess();
         } else {
