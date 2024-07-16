@@ -29,7 +29,7 @@ class EventServices {
           }).toList() ??
           [];
     } catch (error) {
-      log('Error occurred while retrieving users.', error: error);
+      log('Error occurred while retrieving events.', error: error);
       rethrow;
     }
   }

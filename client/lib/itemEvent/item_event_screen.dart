@@ -55,11 +55,7 @@ class ItemEventScreen extends StatelessWidget {
                     ),
                   FloatingActionButton(
                     onPressed: () async {
-                      final newParticipant = await Navigator.of(context).push<Map<String, String>>(
-                        MaterialPageRoute(
-                            builder: (context) => FormItemEventScreen.navigateTo(context, id: id)
-                        ),
-                      );
+                      FormItemEventScreen.navigateTo(context, id: id);
 
                       // Handle the new participant data if needed
                     },
