@@ -48,7 +48,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		database.MigrateAll(db)
 		// Décoder la requête
-		var eventAdd models.EventAdd
+		var eventAdd models.Event
 		if err := json.NewDecoder(r.Body).Decode(&eventAdd); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)

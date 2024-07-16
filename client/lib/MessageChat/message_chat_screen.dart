@@ -26,7 +26,7 @@ class MessageChatScreen extends StatelessWidget {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                title: Text('HIHOU'),
+                title: Text('Messages'),
               ),
               backgroundColor: Colors.white,
               body: Column(
@@ -54,38 +54,37 @@ class MessageChatScreen extends StatelessWidget {
                         itemCount: state.messagesChats?.length,
                       ),
                     ),
-                  if (state.status == MessageChatStatus.success)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _controller,
-                              decoration: const InputDecoration(
-                                hintText: 'Enter your message...',
-                                border: OutlineInputBorder(),
-                              ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              hintText: 'Enter your message...',
+                              border: OutlineInputBorder(),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.send),
-                            onPressed: () {
-                              if (_controller.text.isNotEmpty) {
-                                context.read<MessageChatBloc>().add(
-                                  MessageChatAdded(
-                                    content: _controller.text,
-                                    chatRoomId: id,
-                                    email: '',
-                                  ),
-                                );
-                                _controller.clear();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () {
+                            if (_controller.text.isNotEmpty) {
+                              context.read<MessageChatBloc>().add(
+                                MessageChatAdded(
+                                  content: _controller.text,
+                                  chatRoomId: id,
+                                  email: '',
+                                ),
+                              );
+                              _controller.clear();
+                            }
+                          },
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
