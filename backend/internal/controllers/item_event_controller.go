@@ -38,6 +38,15 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		params := mux.Vars(r)
+
+		eventIDInt, err := strconv.Atoi(params["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		eventID := uint(eventIDInt)
 
 		// Verify user roles and permissions
 		authUser, err := GetUserFromToken(r, db)
@@ -49,7 +58,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 
 		// Check if the user is a participant of the event
 		var participant models.Participant
-		if err := db.Where("event_id = ? AND user_id = ?", itemRequestAdd.EventID, authUser.ID).First(&participant).Error; err != nil {
+		if err := db.Where("event_id = ? AND user_id = ?", eventID, authUser.ID).First(&participant).Error; err != nil {
 			log.Printf("Forbidden: user %d is not a participant of event %d", authUser.ID, itemRequestAdd.EventID)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -58,7 +67,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 		// Create a new ItemEvent instance
 		itemRequest := models.ItemEvent{
 			UserID:  authUser.ID,
-			EventID: itemRequestAdd.EventID,
+			EventID: eventID,
 			Name:    itemRequestAdd.Name,
 		}
 

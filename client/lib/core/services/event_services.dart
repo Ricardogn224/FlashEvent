@@ -8,44 +8,47 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class EventServices {
   static Future<List<Event>> getEvents() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('token');
-  
-  try {
-    print('Fetching events from server...');
-    
-    final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/events'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token', // Include token in headers
-      },
-    );
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-    print('toke: ${token}');
+    try {
+      print('Fetching events from server...');
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/events'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
 
-    // Simulate call length for loader display
-    await Future.delayed(const Duration(seconds: 1));
+      print('toke: ${token}');
 
-    if (response.statusCode < 200 || response.statusCode >= 400) {
-      print('Error: Server responded with status code ${response.statusCode}');
-      throw Error();
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      // Simulate call length for loader display
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        print(
+            'Error: Server responded with status code ${response.statusCode}');
+        throw Error();
+      }
+
+      final data = json.decode(response.body);
+      print('Data decoded successfully');
+
+      return (data as List<dynamic>?)?.map((e) {
+            return Event.fromJson(e);
+          }).toList() ??
+          [];
+    } catch (error) {
+      throw ApiException(
+          message:
+              'Get Events: Error occurred while retrieving events. Error: $error');
     }
-
-    final data = json.decode(response.body);
-    print('Data decoded successfully');
-
-    return (data as List<dynamic>?)?.map((e) {
-      return Event.fromJson(e);
-    }).toList() ?? [];
-  } catch (error) {
-    throw ApiException(
-          message: 'Get Events: Error occurred while retrieving users. Error: $error');
   }
-}
 
   static Future<http.Response> addEvent(Event event) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -65,8 +68,7 @@ class EventServices {
       body: json.encode(event.toJson()),
     );
 
-        print('Token : ${token}');
-
+    print('Token : ${token}');
 
     if (response.statusCode == 201) {
       print('Succes: ${response.statusCode}');
