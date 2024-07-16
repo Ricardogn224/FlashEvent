@@ -10,6 +10,7 @@ type Participant struct {
 	TransportationID uint  `json:"transportation_id"`
 	Active           bool  `json:"active" gorm:"default:false"`   // New active field
 	Response         bool  `json:"response" gorm:"default:false"` // New active field
+	Present          bool  `json:"present" gorm:"default:false"`
 }
 
 // ParticipantAdd représente les données nécessaires pour ajouter un participant
