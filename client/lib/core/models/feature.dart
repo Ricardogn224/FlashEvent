@@ -13,7 +13,7 @@ class Feature {
     return Feature(
       id: json['id'],
       name: json['name'],
-      active: json['active'],
+      active: json['active'] ?? false,
     );
   }
 
@@ -21,7 +21,7 @@ class Feature {
     return {
       'id': id,
       'name': name,
-      'active': active,
+      'active': active ?? false,
     };
   }
 }

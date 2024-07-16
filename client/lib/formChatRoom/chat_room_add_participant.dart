@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/core/models/chatRoom.dart';
 import 'package:flutter_flash_event/formChatRoom/bloc/form_chat_room_bloc.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
@@ -80,7 +81,7 @@ class ChatRoomAddParticipantScreen extends StatelessWidget {
                               onSuccess: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => ParticipantScreen(id: chatRoom.eventId)),
+                                  MaterialPageRoute(builder: (context) => ChatRoomScreen(id: chatRoom.eventId)),
                                 );
                               },
                               onError: (errorMessage) {

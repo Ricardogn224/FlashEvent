@@ -4,5 +4,5 @@ package models
 type Feature struct {
 	ID     uint   `gorm:"primaryKey" json:"id"`
 	Name   string `json:"name" required:""`
-	Active bool   `json:"transport_active" gorm:"default:false"`
+	Active bool   `json:"active" gorm:"default:false"`
 }

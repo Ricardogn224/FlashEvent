@@ -62,6 +62,9 @@ class AdminUserEditScreen extends StatelessWidget {
                           );
                         },
                         validator: (val) {
+                          if (state.firstname.value.isNotEmpty) {
+                            return null; // Bypass validation if initial value is not empty
+                          }
                           return state.firstname.error;
                         },
                       ),
@@ -77,6 +80,9 @@ class AdminUserEditScreen extends StatelessWidget {
                           );
                         },
                         validator: (val) {
+                          if (state.lastname.value.isNotEmpty) {
+                            return null; // Bypass validation if initial value is not empty
+                          }
                           return state.lastname.error;
                         },
                       ),
@@ -92,6 +98,9 @@ class AdminUserEditScreen extends StatelessWidget {
                           );
                         },
                         validator: (val) {
+                          if (state.username.value.isNotEmpty) {
+                            return null; // Bypass validation if initial value is not empty
+                          }
                           return state.username.error;
                         },
                       ),

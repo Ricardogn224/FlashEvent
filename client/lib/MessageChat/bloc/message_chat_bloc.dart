@@ -23,6 +23,7 @@ class MessageChatBloc extends Bloc<MessageChatEvent, MessageChatState> {
 
     on<MessageChatAdded>((event, emit) async {
       try {
+        print(event);
         final message = Message(
           content: event.content,
           email: '',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/admin_event_screen.dart';
+import 'package:flutter_flash_event/admin/admin_feature_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
@@ -49,7 +50,7 @@ class AdminHomeDesktop extends StatelessWidget {
                 title: 'Fonctionnalités',
                 onPressed: () {
                   // Navigate to Manage Events screen
-                  AdminEventScreen.navigateTo(context);
+                  AdminFeatureScreen.navigateTo(context);
                 },
               ),
             ],

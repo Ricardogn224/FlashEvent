@@ -36,7 +36,7 @@ class LoginScreen extends StatelessWidget {
               context.read<AuthenticationBloc>().add(LoggedIn());
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => AdminHomeDesktop()),
               );
             } else if (state is LoginFailure) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
