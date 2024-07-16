@@ -8,18 +8,18 @@ abstract class AdminFormEvent extends Equatable {
 }
 
 class FormSubmitEvent extends AdminFormEvent {
-  final int id;
+  final Event event;
   final void Function() onSuccess;
   final void Function(String errorMessage) onError;
 
   const FormSubmitEvent({
-    required this.id,
+    required this.event,
     required this.onSuccess,
     required this.onError,
   });
 
   @override
-  List<Object> get props => [onSuccess, onError, id];
+  List<Object> get props => [onSuccess, onError, event];
 }
 
 class FormNewSubmitEvent extends AdminFormEvent {

@@ -66,6 +66,15 @@ func RegisterPublicRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 	api.AddEndpoint(
 		endpoint.New(
+			http.MethodPost, "/registerAdmin",
+			endpoint.Handler(http.HandlerFunc(controllers.RegisterUserAdmin(db))),
+			endpoint.Summary("Register a new user"),
+			endpoint.Description("Register a new user with a username and password"),
+			endpoint.Body(models.User{}, "User object that needs to be registered", true),
+			endpoint.Response(http.StatusCreated, "Successfully registered user", endpoint.SchemaResponseOption(&models.User{})),
+			endpoint.Tags("Users"),
+		),
+		endpoint.New(
 			http.MethodGet, "/users",
 			endpoint.Handler(http.HandlerFunc(controllers.GetAllUsers(db))),
 			endpoint.Summary("Get all users"),

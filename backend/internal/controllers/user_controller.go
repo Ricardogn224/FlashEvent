@@ -5,6 +5,7 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -73,6 +74,64 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 
 		// Attribuer le rôle "user" par défaut
 		user.Role = "user"
+
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error hashing password: %v", err), http.StatusInternalServerError)
+			return
+		}
+		user.Password = string(hashedPassword)
+
+		result := db.Create(&user)
+		if result.Error != nil {
+			http.Error(w, fmt.Sprintf("Error creating user: %v", result.Error), http.StatusInternalServerError)
+			return
+		}
+
+		sendWelcomeEmail(user.Email)
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
+// RegisterUser gère l'enregistrement d'un nouvel utilisateur
+func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Initialiser les tables nécessaires si elles n'existent pas
+		database.MigrateAll(db)
+
+		var user models.User
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+			http.Error(w, fmt.Sprintf("Invalid request payload: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		// Verify user roles and permissions
+		authUser, err := GetUserFromToken(r, db)
+		if err != nil {
+			log.Printf("Unauthorized: %v", err)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		if authUser.Role != "AdminPlatform" && user.Role == "AdminPlatform" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Valider les champs requis
+		if user.Email == "" || user.Firstname == "" || user.Lastname == "" || user.Password == "" {
+			http.Error(w, "Email, firstname, lastname and password are required fields", http.StatusBadRequest)
+			return
+		}
+
+		// Vérifier si l'email existe déjà
+		var existingUser models.User
+		if err := db.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
+			http.Error(w, "Email already exists", http.StatusConflict)
+			return
+		}
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -310,9 +369,21 @@ func UpdateUserByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		authUser, err := GetUserFromToken(r, db)
+		if err != nil {
+			log.Printf("Unauthorized: %v", err)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		var updates map[string]interface{}
 		if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if authUser.Role != "AdminPlatform" && updates["role"].(string) == "AdminPlatform" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
