@@ -13,6 +13,7 @@ class ItemServices {
           await http.get(Uri.parse('http://10.0.2.2:8000/items-event//$id'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
+      print(response.statusCode);
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Error();
