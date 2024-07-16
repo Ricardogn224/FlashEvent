@@ -4,6 +4,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -41,31 +42,17 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 		// Verify user roles and permissions
 		authUser, err := GetUserFromToken(r, db)
 		if err != nil {
+			log.Printf("Unauthorized: %v", err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		// Check if the authenticated user is an admin or the creator of the event
-		if authUser.Role != "AdminPlatform" {
-			// Check if the user is an AdminEvent and the creator of the event
-			if authUser.Role == "AdminEvent" {
-				var event models.Event
-				if err := db.First(&event, itemRequestAdd.EventID).Error; err != nil {
-					http.Error(w, "Event not found", http.StatusNotFound)
-					return
-				}
-				if event.CreatedBy != authUser.ID {
-					http.Error(w, "Forbidden", http.StatusForbidden)
-					return
-				}
-			} else {
-				// Check if the user is a participant of the event
-				var participant models.Participant
-				if err := db.Where("event_id = ? AND user_id = ?", itemRequestAdd.EventID, authUser.ID).First(&participant).Error; err != nil {
-					http.Error(w, "Forbidden", http.StatusForbidden)
-					return
-				}
-			}
+		// Check if the user is a participant of the event
+		var participant models.Participant
+		if err := db.Where("event_id = ? AND user_id = ?", itemRequestAdd.EventID, authUser.ID).First(&participant).Error; err != nil {
+			log.Printf("Forbidden: user %d is not a participant of event %d", authUser.ID, itemRequestAdd.EventID)
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
 		}
 
 		// Create a new ItemEvent instance
@@ -77,6 +64,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 
 		// Création de l'élément
 		if err := db.Create(&itemRequest).Error; err != nil {
+			log.Printf("Erreur interne du serveur: %v", err)
 			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			return
 		}
@@ -167,7 +155,10 @@ func DeleteItemByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if authUser.Role != "AdminPlatform" && (authUser.Role != "AdminEvent" || event.CreatedBy != authUser.ID) {
+		// Check if the user is a participant of the event
+		var participant models.Participant
+		if err := db.Where("event_id = ? AND user_id = ?", item.EventID, authUser.ID).First(&participant).Error; err != nil {
+			log.Printf("Forbidden: user %d is not a participant of event %d", authUser.ID, item.EventID)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -222,7 +213,10 @@ func UpdateItemByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if authUser.Role != "AdminPlatform" && (authUser.Role != "AdminEvent" || event.CreatedBy != authUser.ID) {
+		// Check if the user is a participant of the event
+		var participant models.Participant
+		if err := db.Where("event_id = ? AND user_id = ?", item.EventID, authUser.ID).First(&participant).Error; err != nil {
+			log.Printf("Forbidden: user %d is not a participant of event %d", authUser.ID, item.EventID)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
