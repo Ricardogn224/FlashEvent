@@ -1,22 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
-import 'package:flutter_flash_event/admin/blocForm/admin_form_bloc.dart';
+import 'package:flutter_flash_event/admin/blocFormEvent/admin_form_bloc.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:flutter/services.dart';
 
+import '../core/models/event.dart';
+
 class AdminUserAddParticipantScreen extends StatelessWidget {
   static const String routeName = '/admin-new-participant';
 
-  static navigateTo(BuildContext context, {required int id}) {
-    Navigator.of(context).pushNamed(routeName, arguments: id);
+  static navigateTo(BuildContext context, {required Event event}) {
+    Navigator.of(context).pushNamed(routeName, arguments: event);
   }
 
-  final int eventId;
+  final Event event;
 
-  const AdminUserAddParticipantScreen({super.key, required this.eventId});
+  const AdminUserAddParticipantScreen({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                           return const Iterable<String>.empty();
                         }
                         BlocProvider.of<AdminFormBloc>(context)
-                            .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: eventId));
+                            .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: event.id));
                         return state.emailSuggestions.where((String option) {
                           return option.contains(textEditingValue.text.toLowerCase());
                         });
@@ -78,7 +80,7 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                               onSuccess: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => AdminEventEditScreen(eventId: eventId)),
+                                  MaterialPageRoute(builder: (context) => AdminEventEditScreen(event: event)),
                                 );
                               },
                               onError: (errorMessage) {
@@ -86,7 +88,7 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                                   SnackBar(content: Text(errorMessage)),
                                 );
                               },
-                              eventId: eventId,
+                              eventId: event.id,
                             ));
                           },
                           child: const Text('SUBMIT'),

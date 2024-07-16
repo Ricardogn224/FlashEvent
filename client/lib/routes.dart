@@ -60,13 +60,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case AdminUserEditScreen.routeName:
       return MaterialPageRoute(builder: (context) => AdminUserEditScreen(id: args as int));
     case AdminEventEditScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminEventEditScreen(eventId: args as int));
+      return MaterialPageRoute(builder: (context) => AdminEventEditScreen(event: args as Event));
     case AdminFeatureScreen.routeName:
       return MaterialPageRoute(builder: (context) => AdminFeatureScreen());
     case FormParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => FormParticipantScreen(eventId: args as int));
     case AdminUserAddParticipantScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminUserAddParticipantScreen(eventId: args as int));
+      return MaterialPageRoute(builder: (context) => AdminUserAddParticipantScreen(event: args as Event));
     case ChatRoomScreen.routeName:
       return MaterialPageRoute(builder: (context) => ChatRoomScreen(id: args as int));
     case FormChatRoomScreen.routeName:

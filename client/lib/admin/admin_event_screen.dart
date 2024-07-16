@@ -64,7 +64,7 @@ class AdminEventScreen extends StatelessWidget {
                                     IconButton(
                                       icon: Icon(Icons.edit),
                                       onPressed: () {
-                                        AdminEventEditScreen.navigateTo(context, id: event.id);
+                                        AdminEventEditScreen.navigateTo(context, event: event);
                                       },
                                     ),
                                     IconButton(
