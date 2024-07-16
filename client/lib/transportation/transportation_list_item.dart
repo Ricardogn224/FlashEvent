@@ -72,7 +72,7 @@ class _TransportationListItemState extends State<TransportationListItem> {
         if (_isExpanded)
           Center(
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.5,
+              width: MediaQuery.of(context).size.width * 0.7,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

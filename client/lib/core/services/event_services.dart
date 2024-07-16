@@ -108,7 +108,7 @@ class EventServices {
   static Future<http.Response> updateEventById(Event event) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-
+    print(token);
     try {
       final response = await http.patch(
         Uri.parse('http://10.0.2.2:8000/events/${event.id}'),
@@ -119,6 +119,7 @@ class EventServices {
         body: json.encode(event.toJson()),
       );
 
+      print(response.statusCode);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw ApiException(
             message: 'Error while updating event with id ${event.id}',

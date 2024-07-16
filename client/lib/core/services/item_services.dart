@@ -10,7 +10,7 @@ class ItemServices {
   static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
     try {
       final response =
-          await http.get(Uri.parse('http://10.0.2.2:8000/items-event//$id'));
+          await http.get(Uri.parse('http://10.0.2.2:8000/items-event/$id'));
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
       print(response.statusCode);

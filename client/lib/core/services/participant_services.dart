@@ -109,19 +109,22 @@ class ParticipantServices {
 
     int newIdParticipant = 0;
 
+
+
     if (participant.id == 0) {
       try {
         final responseParticipant = await http.get(
-          Uri.parse('http://10.0.2.2:8000/${participant.eventId}'),
+          Uri.parse('http://10.0.2.2:8000/get-participant/${participant.eventId}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
           },
         );
+        print(responseParticipant.statusCode);
         if (responseParticipant.statusCode < 200 ||
             responseParticipant.statusCode >= 400) {
           throw ApiException(
-              message: 'Error while requesting event with user id',
+              message: 'Error while requesting ',
               statusCode: responseParticipant.statusCode);
         }
 
@@ -143,6 +146,7 @@ class ParticipantServices {
       url = 'http://10.0.2.2:8000/participants/${participant.id}';
     }
 
+
     final response = await http.patch(
       Uri.parse(url),
       headers: <String, String>{
@@ -153,6 +157,7 @@ class ParticipantServices {
         'transportation_id': participant.transportationId,
       }),
     );
+
 
     if (response.statusCode == 200) {
       return response;
