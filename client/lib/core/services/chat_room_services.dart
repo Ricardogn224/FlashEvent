@@ -187,4 +187,28 @@ class ChatRoomServices {
       rethrow;
     }
   }
+
+  static Future<http.Response> addChatRoomParticipant(int chatRoomId, String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId/participants'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({"email": email}),
+    );
+
+    if (response.statusCode == 201) {
+      return response;
+    } else {
+      throw Exception('Failed to add participant to chat room');
+    }
+  }
 }

@@ -76,16 +76,13 @@ func AddChatRoomParticipant(db *gorm.DB) http.HandlerFunc {
 		database.MigrateChatRoomParticipant(db) // Initialize the ChatRoomParticipant table if it doesn't exist
 		database.MigrateUser(db)                // Initialize the User table if it doesn't exist
 
-		var requestBody struct {
-			Email string `json:"email"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+		var user models.User
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
 
-		if requestBody.Email == "" {
+		if user.Email == "" {
 			http.Error(w, "Email is required", http.StatusBadRequest)
 			return
 		}
@@ -98,15 +95,15 @@ func AddChatRoomParticipant(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Retrieve the user by email
-		var user models.User
-		if err := db.Where("email = ?", requestBody.Email).First(&user).Error; err != nil {
+		var userChatRoom models.User
+		if err := db.Where("email = ?", user.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
 		// Check if the user is already a participant in the chat room
 		var existingParticipant models.ChatRoomParticipant
-		if err := db.Where("user_id = ? AND chat_room_id = ?", user.ID, chatRoomID).First(&existingParticipant).Error; err == nil {
+		if err := db.Where("user_id = ? AND chat_room_id = ?", userChatRoom.ID, chatRoomID).First(&existingParticipant).Error; err == nil {
 			http.Error(w, "User is already a participant in the chat room", http.StatusConflict)
 			return
 		}
