@@ -62,14 +62,14 @@ class MessageChatScreen extends StatelessWidget {
                           Expanded(
                             child: TextField(
                               controller: _controller,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'Enter your message...',
                                 border: OutlineInputBorder(),
                               ),
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.send),
+                            icon: const Icon(Icons.send),
                             onPressed: () {
                               if (_controller.text.isNotEmpty) {
                                 context.read<MessageChatBloc>().add(
