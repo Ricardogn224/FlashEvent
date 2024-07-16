@@ -262,10 +262,11 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 
 		endpoint.New(
-			http.MethodPost, "/items",
+			http.MethodPost, "/events/{eventId}/items",
 			endpoint.Handler(http.HandlerFunc(controllers.AddItem(db))),
 			endpoint.Summary("Add a new item"),
 			endpoint.Description("Add a new item to an event"),
+			endpoint.Path("eventId", "integer", "ID of the event", true),
 			endpoint.Body(models.ItemEvent{}, "Item object that needs to be added", true),
 			endpoint.Response(http.StatusCreated, "Successfully added item", endpoint.SchemaResponseOption(&models.ItemEvent{})),
 			endpoint.Security("BearerAuth"),
@@ -322,7 +323,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Tags("Items"),
 		),
 		endpoint.New(
-			http.MethodPost, "/event/{eventId}/add-food",
+			http.MethodPost, "/events/{eventId}/add-food",
 			endpoint.Handler(http.HandlerFunc(controllers.AddFoodToEvent(db))),
 			endpoint.Summary("Ajouter de la nourriture à un événement"),
 			endpoint.Description("Permettre à un participant d'ajouter de la nourriture à un événement"),
