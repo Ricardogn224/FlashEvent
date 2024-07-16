@@ -19,7 +19,8 @@ class MessageChatScreen extends StatelessWidget {
     final TextEditingController _controller = TextEditingController();
 
     return BlocProvider(
-      create: (context) => MessageChatBloc()..add(MessageChatDataLoaded(id: id)),
+      create: (context) =>
+          MessageChatBloc()..add(MessageChatDataLoaded(id: id)),
       child: BlocBuilder<MessageChatBloc, MessageChatState>(
         builder: (context, state) {
           final messageChats = state.messagesChats;
@@ -37,7 +38,8 @@ class MessageChatScreen extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  if (state.status == MessageChatStatus.success && messageChats != null)
+                  if (state.status == MessageChatStatus.success &&
+                      messageChats != null)
                     Expanded(
                       child: ListView.builder(
                         itemBuilder: (context, index) {
@@ -48,7 +50,8 @@ class MessageChatScreen extends StatelessWidget {
                             subtitle: Text(
                               '${messageChat.username}\n${DateFormat.yMMMd().add_jm().format(messageChat.timestamp)}',
                             ),
-                            isThreeLine: true, // Ensure there is space for the timestamp
+                            isThreeLine:
+                                true, // Ensure there is space for the timestamp
                           );
                         },
                         itemCount: state.messagesChats?.length,
@@ -61,23 +64,23 @@ class MessageChatScreen extends StatelessWidget {
                         Expanded(
                           child: TextField(
                             controller: _controller,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Enter your message...',
                               border: OutlineInputBorder(),
                             ),
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.send),
+                          icon: const Icon(Icons.send),
                           onPressed: () {
                             if (_controller.text.isNotEmpty) {
                               context.read<MessageChatBloc>().add(
-                                MessageChatAdded(
-                                  content: _controller.text,
-                                  chatRoomId: id,
-                                  email: '',
-                                ),
-                              );
+                                    MessageChatAdded(
+                                      content: _controller.text,
+                                      chatRoomId: id,
+                                      email: '',
+                                    ),
+                                  );
                               _controller.clear();
                             }
                           },

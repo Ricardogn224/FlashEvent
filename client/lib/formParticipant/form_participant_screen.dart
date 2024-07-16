@@ -6,6 +6,7 @@ import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart';
 
 class FormParticipantScreen extends StatelessWidget {
   static const String routeName = '/new-participant';
@@ -22,7 +23,8 @@ class FormParticipantScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => FormParticipantBloc(eventId: eventId)..add(InitEvent()),
-      child: Scaffold(
+      child: MainScreen(
+        child: Scaffold(
         appBar: AppBar(
           title: const Text('Form Validation'),
         ),
@@ -106,6 +108,7 @@ class FormParticipantScreen extends StatelessWidget {
           },
         ),
       ),
+      )
     );
   }
 }

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/Invitation/bloc/invitation_bloc.dart';
-import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
-import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
-import 'package:flutter_flash_event/participant/bloc/participant_bloc.dart';
 
 class InvitationScreen extends StatelessWidget {
   static const String routeName = '/invitation';
@@ -11,7 +8,6 @@ class InvitationScreen extends StatelessWidget {
   static navigateTo(BuildContext context) {
     Navigator.of(context).pushNamed(routeName);
   }
-
 
   const InvitationScreen({super.key});
 
@@ -23,13 +19,13 @@ class InvitationScreen extends StatelessWidget {
         builder: (context, state) {
           final invitations = state.invitations;
 
-          return SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Invitations'),
-              ),
-              backgroundColor: Colors.white,
-              body: Column(
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Invitations'),
+            ),
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Column(
                 children: [
                   if (state.status == InvitationStatus.loading)
                     const Expanded(
@@ -38,7 +34,7 @@ class InvitationScreen extends StatelessWidget {
                       ),
                     ),
                   if (state.status == InvitationStatus.success && invitations != null)
-                    Expanded( // Add Expanded here
+                    Expanded(
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final invitation = state.invitations?[index];

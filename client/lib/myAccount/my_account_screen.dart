@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/myAccount/bloc/my_account_bloc.dart';
+import 'package:flutter_flash_event/core/services/auth_services.dart';
 
 class MyAccountScreen extends StatelessWidget {
   static const String routeName = '/my-account';
@@ -10,6 +11,12 @@ class MyAccountScreen extends StatelessWidget {
   }
 
   const MyAccountScreen({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    await AuthServices.logoutUser();
+    // Navigate to login screen or home
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {

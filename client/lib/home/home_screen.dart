@@ -70,7 +70,8 @@ class HomeScreen extends StatelessWidget {
                               ),
                               Image.asset(
                                 'assets/flash-event-logo.png',
-                                height: 60, // Ajuster la taille du logo selon vos besoins
+                                height:
+                                    60, // Ajuster la taille du logo selon vos besoins
                               ),
                               CircleAvatar(
                                 radius: 20,
@@ -156,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                                 itemCount: invitationCount,
                                 itemBuilder: (context, index) {
                                   final invitation =
-                                  invitationState.invitations![index];
+                                      invitationState.invitations![index];
                                   return ListTile(
                                     leading: const Icon(Icons.event),
                                     title: Text(invitation.eventName),
@@ -167,8 +168,8 @@ class HomeScreen extends StatelessWidget {
                                           onPressed: () {
                                             context.read<InvitationBloc>().add(
                                                 InvitationAnsw(
-                                                    participantId:
-                                                    invitation.participantId,
+                                                    participantId: invitation
+                                                        .participantId,
                                                     active: true));
                                           },
                                           icon: const Icon(Icons.check),
@@ -179,8 +180,8 @@ class HomeScreen extends StatelessWidget {
                                           onPressed: () {
                                             context.read<InvitationBloc>().add(
                                                 InvitationAnsw(
-                                                    participantId:
-                                                    invitation.participantId,
+                                                    participantId: invitation
+                                                        .participantId,
                                                     active: false));
                                           },
                                           icon: const Icon(Icons.close),
@@ -252,37 +253,33 @@ class HomeScreen extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   final event = homeState.events[index];
                                   final eventStart = event.dateStart != null &&
-                                      event.dateStart.isNotEmpty
+                                          event.dateStart.isNotEmpty
                                       ? DateTime.parse(event.dateStart)
                                       : null;
                                   final eventEnd = event.dateEnd != null &&
-                                      event.dateEnd.isNotEmpty
+                                          event.dateEnd.isNotEmpty
                                       ? DateTime.parse(event.dateEnd)
                                       : null;
 
-                                  final eventStartDate =
-                                  eventStart != null
+                                  final eventStartDate = eventStart != null
                                       ? DateFormat.yMMMd().format(eventStart)
                                       : 'Undefined'; // Format the start date
-                                  final eventStartTime =
-                                  eventStart != null
+                                  final eventStartTime = eventStart != null
                                       ? DateFormat.Hm().format(eventStart)
                                       : ''; // Format the start time
-                                  final eventEndDate =
-                                  eventEnd != null
+                                  final eventEndDate = eventEnd != null
                                       ? DateFormat.yMMMd().format(eventEnd)
                                       : 'Undefined'; // Format the end date
-                                  final eventEndTime =
-                                  eventEnd != null
+                                  final eventEndTime = eventEnd != null
                                       ? DateFormat.Hm().format(eventEnd)
                                       : ''; // Format the end time
 
                                   return GestureDetector(
-                                    onTap: () =>
-                                        EventScreen.navigateTo(context, id: event.id),
+                                    onTap: () => EventScreen.navigateTo(context,
+                                        id: event.id),
                                     child: Card(
-                                      margin:
-                                      const EdgeInsets.symmetric(horizontal: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 8),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -291,18 +288,18 @@ class HomeScreen extends StatelessWidget {
                                         padding: const EdgeInsets.all(12.0),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               padding:
-                                              const EdgeInsets.symmetric(
+                                                  const EdgeInsets.symmetric(
                                                 vertical: 4,
                                                 horizontal: 8,
                                               ),
                                               decoration: BoxDecoration(
                                                 color: Colors.grey.shade300,
                                                 borderRadius:
-                                                BorderRadius.circular(8),
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '$eventStartDate $eventStartTime - $eventEndDate $eventEndTime',
@@ -350,7 +347,8 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const FormEventCreateScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const FormEventCreateScreen()),
             );
           },
           backgroundColor: const Color(0xFF6058E9),
