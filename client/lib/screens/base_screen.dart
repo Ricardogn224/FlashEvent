@@ -5,7 +5,8 @@ import 'package:flutter_flash_event/authentication/authentication_bloc.dart';
 import 'package:flutter_flash_event/authentication/authentication_event.dart';
 import 'package:flutter_flash_event/authentication/authentication_state.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
-import '../login/login_screen.dart';
+import 'package:flutter_flash_event/login/login_screen.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart'; // Importez le MainScreen
 
 class BaseScreen extends StatelessWidget {
   const BaseScreen({super.key});
@@ -24,7 +25,7 @@ class BaseScreen extends StatelessWidget {
               ),
             );
           } else if (state is AuthenticationAuthenticated) {
-            return HomeScreen();
+            return MainScreen(); // Affichez MainScreen si authentifié
           } else if (state is AuthenticationUnauthenticated) {
             return LoginScreen();
           } else {

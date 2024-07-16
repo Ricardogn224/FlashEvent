@@ -42,8 +42,8 @@ class EventServices {
       return Event.fromJson(e);
     }).toList() ?? [];
   } catch (error) {
-    print('Get Events: Error occurred while retrieving users. Error: $error');
-    rethrow;
+    throw ApiException(
+          message: 'Get Events: Error occurred while retrieving users. Error: $error');
   }
 }
 

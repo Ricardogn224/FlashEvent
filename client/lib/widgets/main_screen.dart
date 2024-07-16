@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/home/home_screen.dart';
+import 'package:flutter_flash_event/connections/connections_screen.dart';
+import 'package:flutter_flash_event/explore/explore_screen.dart';
+import 'package:flutter_flash_event/notifications/notifications_screen.dart';
+import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  final Widget child;
-
-  const MainScreen({required this.child, Key? key}) : super(key: key);
-
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -12,48 +13,27 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+  final List<Widget> _pages = [
+    const HomeScreen(),
+    const ConnectionsScreen(),
+    const ExploreScreen(),
+    const NotificationsScreen(),
+    const MessageChatScreen(id: 1),
+  ];
+
   void _onItemTapped(int index) {
-    print("Item tapped: $index");
-
-    if (_selectedIndex != index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-
-      // Navigate to different screens based on the selected index
-      switch (index) {
-        case 0:
-          print("Navigating to: /home");
-          Navigator.pushNamed(context, '/home');
-          break;
-        case 1:
-          print("Navigating to: /connections");
-          Navigator.pushNamed(context, '/connections');
-          break;
-        case 2:
-          print("Navigating to: /explore");
-          Navigator.pushNamed(context, '/explore');
-          break;
-        case 3:
-          print("Navigating to: /notifications");
-          Navigator.pushNamed(context, '/notifications');
-          break;
-        case 4:
-          print("Navigating to: /messages");
-          Navigator.pushNamed(context, '/messages');
-          break;
-        default:
-          print("Unknown index: $index");
-      }
-    } else {
-      print("Selected index is the same as current index: $_selectedIndex");
-    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -62,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Acceuil',
+            label: 'Accueil',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
