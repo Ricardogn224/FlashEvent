@@ -33,7 +33,7 @@ class MessageServices {
           [];
     } catch (error) {
       throw ApiException(
-          message: 'Unknown error while requesting product with id $id');
+          message: 'Unknown error while requesting messagesj with id $id');
     }
   }
 

@@ -65,7 +65,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "user" {
+		if user.Role == "AdminEvent" {
 			log.Println("User is not authorized to create an event. ", user.Role)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -174,7 +174,7 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && event.CreatedBy != user.ID {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -216,7 +216,7 @@ func DeleteEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -263,7 +263,7 @@ func AddUserToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+		if user.Role != "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

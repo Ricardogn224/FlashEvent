@@ -4,6 +4,7 @@ import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/transportation/blocForm/form_transport_bloc.dart';
+import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:flutter/services.dart';
 
@@ -40,61 +41,60 @@ class TransportStartEditScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomFormField(
-                      initialValue: transportStart,
-                      hintText: 'Lieu de départ',
-                      onChange: (val) {
-                        BlocProvider.of<FormTransportBloc>(context).add(
-                          TransportStartChanged(
-                            transportStart: BlocFormItem(value: val!),
+              body: Container(
+                padding: const EdgeInsets.all(30),
+                child: Form(
+                  key: state.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomFormField(
+                        initialValue: transportStart,
+                        hintText: 'Lieu de départ',
+                        onChange: (val) {
+                          BlocProvider.of<FormTransportBloc>(context).add(
+                            TransportStartChanged(
+                              transportStart: BlocFormItem(value: val!),
+                            ),
+                          );
+                        },
+                        validator: (val) {
+                          return state.transportStart.error;
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<FormTransportBloc>(context).add(
+                                FormUpdateSubmitEvent(
+                                  event: event,
+                                  onSuccess: () {
+                                    TransportationScreen.navigateTo(context, id: event.id);
+                                  },
+                                  onError: (errorMessage) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(errorMessage)),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: const Text('SUBMIT'),
                           ),
-                        );
-                      },
-                      validator: (val) {
-                        return state.transportStart.error;
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<FormTransportBloc>(context).add(
-                              FormSubmitEvent(
-                                onSuccess: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(),
-                                    ),
-                                  );
-                                },
-                                onError: (errorMessage) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(errorMessage)),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: const Text('SUBMIT'),
-                        ),
-                        const SizedBox(width: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<FormTransportBloc>(context)
-                                .add(const FormResetEvent());
-                          },
-                          child: const Text('RESET'),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<FormTransportBloc>(context)
+                                  .add(const FormResetEvent());
+                            },
+                            child: const Text('RESET'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

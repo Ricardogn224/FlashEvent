@@ -107,14 +107,14 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
   Future<void> _onFormSubmitted(FormSubmitEvent event, Emitter<AdminFormState> emit) async {
     if (state.formKey!.currentState!.validate()) {
       Event newEvent = Event(
-        id: event.id, // Replace with actual id
+        id: event.event.id, // Replace with actual id
         name: state.name.value,
         description: state.description.value,
         transportActive: state.transportActive.value,
-        place: "Sample Place", // Fournir une valeur par défaut ou récupérer de l'état
-        dateStart: "2024-02-01 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
-        dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
-        transportStart: '',
+        place:  event.event.place, // Fournir une valeur par défaut ou récupérer de l'état
+        dateStart:  event.event.dateStart, // Fournir une valeur par défaut ou récupérer de l'état
+        dateEnd:  event.event.dateEnd, // Fournir une valeur par défaut ou récupérer de l'état
+        transportStart:  event.event.transportStart,
       );
 
       try {

@@ -8,27 +8,16 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 
 class EventServices {
   static Future<List<Event>> getEvents() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('token');
-  
-  try {
-    print('Fetching events from server...');
-    
-    final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/events'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token', // Include token in headers
-      },
-    );
-
-    print('toke: ${token}');
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
-    // Simulate call length for loader display
-    await Future.delayed(const Duration(seconds: 1));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:8000/events'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
+      // Simulate call length for loader display
+      await Future.delayed(const Duration(seconds: 1));
 
     if (response.statusCode < 200 || response.statusCode >= 400) {
       print('Error: Server responded with status code ${response.statusCode}');
@@ -119,6 +108,7 @@ class EventServices {
         body: json.encode(event.toJson()),
       );
 
+      print(response.statusCode);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw ApiException(
             message: 'Error while updating event with id ${event.id}',

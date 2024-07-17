@@ -1,27 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/admin_user_add_oarticipant.dart';
-import 'package:flutter_flash_event/admin/blocForm/admin_form_bloc.dart';
+import 'package:flutter_flash_event/admin/blocFormEvent/admin_form_bloc.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 
+import '../core/models/event.dart';
+
 class AdminEventEditScreen extends StatelessWidget {
   static const String routeName = '/admin-event-edit';
 
-  static navigateTo(BuildContext context, {required int id}) {
-    Navigator.of(context).pushNamed(routeName, arguments: id);
+  static navigateTo(BuildContext context, {required Event event}) {
+    Navigator.of(context).pushNamed(routeName, arguments: event);
   }
 
-  final int eventId;
+  final Event event;
 
-  const AdminEventEditScreen({super.key, required this.eventId});
+  const AdminEventEditScreen({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AdminFormBloc()..add(InitEvent(id: eventId)),
+      create: (context) => AdminFormBloc()..add(InitEvent(id: event.id)),
       child: BlocBuilder<AdminFormBloc, AdminFormState>(
         builder: (context, state) {
           final eventName = state.name.value;
@@ -103,7 +105,7 @@ class AdminEventEditScreen extends StatelessWidget {
                             onPressed: () {
                               BlocProvider.of<AdminFormBloc>(context).add(
                                 FormSubmitEvent(
-                                  id: eventId, // pass the event ID here
+                                  event: event, // pass the event ID here
                                   onSuccess: () {
                                     Navigator.pop(context);
                                   },
@@ -150,7 +152,7 @@ class AdminEventEditScreen extends StatelessWidget {
                                     .read<AdminFormBloc>()
                                     .add(RemoveParticipant(
                                   participantId: participant.id,
-                                  eventId: eventId,
+                                  eventId: event.id,
                                   active: false,
                                 )),
                               ),
@@ -162,7 +164,7 @@ class AdminEventEditScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
-                          AdminUserAddParticipantScreen.navigateTo(context, id: eventId);
+                          AdminUserAddParticipantScreen.navigateTo(context, event: event);
                         },
                         child: const Text('Add Participant'),
                       ),

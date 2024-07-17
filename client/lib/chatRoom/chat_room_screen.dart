@@ -26,7 +26,7 @@ class ChatRoomScreen extends StatelessWidget {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Part'),
+                title: Text('Discussions'),
               ),
               backgroundColor: Colors.white,
               body: Column(

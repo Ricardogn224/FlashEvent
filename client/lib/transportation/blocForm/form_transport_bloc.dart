@@ -18,6 +18,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
     on<DescriptionChanged>(_onDescriptionChanged);
     on<TransportStartChanged>(_onTransportStartChanged);
     on<FormSubmitEvent>(_onFormSubmitted);
+    on<FormUpdateSubmitEvent>(_onFormUpdateSubmitted);
     on<FormResetEvent>(_onFormReset);
   }
 
@@ -84,6 +85,36 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
       try {
         final response = await EventServices.addEvent(newEvent);
         if (response.statusCode == 201) {
+          event.onSuccess();
+        } else {
+          event.onError('Event creation failed');
+        }
+      } catch (e) {
+        event.onError('Error: $e');
+      }
+    }
+  }
+
+  Future<void> _onFormUpdateSubmitted(FormUpdateSubmitEvent event, Emitter<FormTransportState> emit) async {
+    print(event.event);
+    if (state.formKey!.currentState!.validate()) {
+      print(event.event);
+      final currentEvent = event.event; // You need to pass the current event in the event or have it in the state
+
+      Event updatedEvent = Event(
+        id: currentEvent.id,
+        name: currentEvent.name,
+        description: currentEvent.description,
+        place: currentEvent.place,
+        dateStart: currentEvent.dateStart,
+        dateEnd: currentEvent.dateEnd,
+        transportActive: currentEvent.transportActive,
+        transportStart: state.transportStart.value, // Update only transportStart
+      );
+
+      try {
+        final response = await EventServices.updateEventById(updatedEvent);
+        if (response.statusCode == 200) {
           event.onSuccess();
         } else {
           event.onError('Event creation failed');
