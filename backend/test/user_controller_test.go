@@ -9,55 +9,87 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	_ "github.com/mattn/go-sqlite3" // Import du driver sqlite3
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-func TestRegisterUser(t *testing.T) {
-	db := SetupTestDB()
-	// Ajout du setup de la base de données
+func setupTestDB() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
 	database.MigrateAll(db)
+	return db
+}
+
+func getTokenForUser(user models.User) string {
+	// Generate a JWT token for testing (vous devrez peut-être utiliser un générateur de token réel)
+	return "Bearer your_generated_token"
+}
+
+func TestSendMessage(t *testing.T) {
+	db := setupTestDB()
 
 	user := models.User{
-		Email:     "test@example.com",
-		Password:  "password123",
-		Firstname: "John",
-		Lastname:  "Doe",
+		Email:    "test@example.com",
+		Password: "password123",
+		Role:     "User",
 	}
-	jsonUser, _ := json.Marshal(user)
+	db.Create(&user)
 
-	req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(jsonUser))
+	chatRoom := models.ChatRoom{
+		Name:    "Test Chat Room",
+		EventID: 1,
+	}
+	db.Create(&chatRoom)
+
+	message := models.MessageAdd{
+		Email:   "test@example.com",
+		Content: "Hello, this is a test message",
+	}
+	jsonMessage, _ := json.Marshal(message)
+
+	req, _ := http.NewRequest("POST", "/chatrooms/1/messages", bytes.NewBuffer(jsonMessage))
+	req.Header.Set("Authorization", getTokenForUser(user))
 	rr := httptest.NewRecorder()
-	handler := controllers.RegisterUser(db)
+	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.SendMessage(db)))
 	handler.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusCreated, rr.Code)
 }
 
-func TestLoginUser(t *testing.T) {
-	db := SetupTestDB()
-	// Ajout du setup de la base de données
-	database.MigrateAll(db)
+func TestGetMessagesByChatRoom(t *testing.T) {
+	db := setupTestDB()
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
 	user := models.User{
-		Email:     "test@example.com",
-		Password:  string(hashedPassword),
-		Firstname: "John",
-		Lastname:  "Doe",
+		Email:    "test@example.com",
+		Password: "password123",
+		Role:     "User",
 	}
 	db.Create(&user)
 
-	loginUser := models.User{
-		Email:    "test@example.com",
-		Password: "password123",
+	chatRoom := models.ChatRoom{
+		Name:    "Test Chat Room",
+		EventID: 1,
 	}
-	jsonLoginUser, _ := json.Marshal(loginUser)
+	db.Create(&chatRoom)
 
-	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonLoginUser))
+	message := models.Message{
+		UserID:     user.ID,
+		ChatRoomID: chatRoom.ID,
+		Content:    "Hello, this is a test message",
+		Timestamp:  time.Now(),
+	}
+	db.Create(&message)
+
+	req, _ := http.NewRequest("GET", "/chatrooms/1/messages", nil)
+	req.Header.Set("Authorization", getTokenForUser(user))
 	rr := httptest.NewRecorder()
-	handler := controllers.LoginUser(db)
+	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.GetMessagesByChatRoom(db)))
 	handler.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
