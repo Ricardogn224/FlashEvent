@@ -48,6 +48,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     await prefs.remove('email');
     await prefs.remove('userId');
     await prefs.remove('role');
+
     emit(AuthenticationUnauthenticated());
   }
 }

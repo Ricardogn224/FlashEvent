@@ -42,6 +42,7 @@ class LoginScreen extends StatelessWidget {
                   builder: (context) => MainScreen(userRole: state.userRole),
                 ),
               );
+
             } else if (state is LoginFailure) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               ScaffoldMessenger.of(context).showSnackBar(

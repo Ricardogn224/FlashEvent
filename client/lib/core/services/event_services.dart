@@ -22,6 +22,7 @@ class EventServices {
     if (response.statusCode < 200 || response.statusCode >= 400) {
       print('Error: Server responded with status code ${response.statusCode}');
       throw Error();
+
     }
 
     final data = json.decode(response.body);
@@ -55,6 +56,7 @@ class EventServices {
     );
 
         print('Token : ${token}');
+
 
 
     if (response.statusCode == 201) {
@@ -97,6 +99,7 @@ class EventServices {
   static Future<http.Response> updateEventById(Event event) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
+
 
     try {
       final response = await http.patch(

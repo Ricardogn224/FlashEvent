@@ -4,6 +4,7 @@ import 'package:flutter_flash_event/myAccount/bloc/my_account_bloc.dart';
 import 'package:flutter_flash_event/core/services/auth_services.dart';
 import 'package:flutter_flash_event/login/login_screen.dart';
 
+
 class MyAccountScreen extends StatelessWidget {
   static const String routeName = '/my-account';
 
@@ -16,6 +17,7 @@ class MyAccountScreen extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     await AuthServices.logoutUser();
     // Navigate to LoginScreen
+
 
   }
 

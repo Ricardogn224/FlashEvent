@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
         ),
         home: SplashScreen(),
         onGenerateRoute: (settings) => generateRoute(settings),
+
       ),
     );
   }

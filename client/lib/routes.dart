@@ -34,6 +34,7 @@ import 'package:flutter_flash_event/screens/splash_screen.dart';
 import 'package:flutter_flash_event/widgets/main_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
+
   final args = settings.arguments;
   switch (settings.name) {
     case LoginScreen.routeName:
@@ -74,6 +75,7 @@ Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
       } else {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       }
+
     case InvitationScreen.routeName:
       return MaterialPageRoute(builder: (_) => const InvitationScreen());
     case EventScreen.routeName:
@@ -106,6 +108,7 @@ Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
       } else {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       }
+
     case ChatRoomScreen.routeName:
       return MaterialPageRoute(builder: (context) => ChatRoomScreen(id: args as int));
     case FormChatRoomScreen.routeName:

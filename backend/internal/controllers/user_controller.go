@@ -44,6 +44,7 @@ type Claims struct {
     Email string `json:"email"`
     Role  string `json:"role"` // Ajouter ce champ
     jwt.StandardClaims
+
 }
 
 var otpStore = make(map[string]string)
@@ -185,6 +186,7 @@ func ForgotPassword(db *gorm.DB) http.HandlerFunc {
 		if err := db.Where("email = ?", request.Email).First(&user).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
+
 		}
 
 		otp := fmt.Sprintf("%06d", rand.Intn(1000000))
@@ -243,6 +245,7 @@ func ResetPassword(db *gorm.DB) http.HandlerFunc {
 		}
 
 		delete(otpStore, request.Email)
+
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Password reset successful"})

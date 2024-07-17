@@ -125,6 +125,7 @@ func DeleteParticipantByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
@@ -286,6 +287,7 @@ func GetParticipantsByPresence(db *gorm.DB) http.HandlerFunc {
 		// Fetch all participants with the given event ID
 		var participants []models.Participant
 		if err := db.Where("event_id = ? AND active = ? AND response = ? AND present = ?", eventID, true, true, true).Find(&participants).Error; err != nil {
+
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}

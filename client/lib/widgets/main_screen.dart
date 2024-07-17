@@ -15,6 +15,7 @@ class MainScreen extends StatefulWidget {
 
   MainScreen({required this.userRole});
 
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -63,6 +64,7 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
 
+
     setState(() {
       _selectedIndex = index;
     });
@@ -76,6 +78,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
@@ -114,6 +117,7 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Notifications',
           ),
           const BottomNavigationBarItem(
+
             icon: Icon(Icons.message),
             label: 'Messages',
           ),

@@ -16,6 +16,7 @@ require (
 	gorm.io/driver/sqlite v1.4.3
 	gorm.io/gorm v1.25.10
 	modernc.org/sqlite v1.30.2
+
 )
 
 require (

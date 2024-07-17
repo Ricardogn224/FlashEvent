@@ -32,6 +32,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         String email = decodedToken['email'];
         String userRole = decodedToken['role']; // Assuming the role is stored in the token
 
+
         // Store token in session
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
@@ -43,6 +44,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         await prefs.setInt('userId', user.id);
         
+
         emit(LoginSuccess(userRole: userRole));
 
         //await FirebaseApi().initNotifications();
