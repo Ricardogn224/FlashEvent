@@ -48,7 +48,8 @@ class AdminHomeDesktop extends StatelessWidget {
               AdminButton(
                 title: 'Fonctionnalités',
                 onPressed: () {
-                  // Placeholder action for functionalities
+                  // Navigate to Manage Events screen
+                  AdminFeatureScreen.navigateTo(context);
                 },
               ),
             ],

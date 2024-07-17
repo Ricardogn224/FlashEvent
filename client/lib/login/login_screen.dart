@@ -49,6 +49,18 @@ class LoginScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => MainScreen()),
                 );
               }
+
+              if (state.userRole == 'AdminPlatform') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => AdminHomeDesktop()),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen()),
+                );
+              }
             } else if (state is LoginFailure) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               ScaffoldMessenger.of(context).showSnackBar(

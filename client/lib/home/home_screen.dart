@@ -7,21 +7,95 @@ import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dar
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
+import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        MultiBlocProvider(
+      providers: [
         BlocProvider(
-          create: (context) => HomeBloc()..add(HomeDataLoaded()),
+              create: (context) => HomeBloc()..add(HomeDataLoaded()),
+        ),
+      ],
         ),
       ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
         body: SafeArea(
+          child: Navigator(
+            onGenerateRoute: (RouteSettings settings) {
+              WidgetBuilder builder;
+              switch (settings.name) {
+                case '/':
+                  builder = (BuildContext context) => HomeContent();
+                  break;
+                case ChatRoomScreen.routeName:
+                  builder = (BuildContext context) => ChatRoomScreen(id: settings.arguments as int);
+                  break;
+                case EventScreen.routeName:
+                  builder = (BuildContext context) => EventScreen(id: settings.arguments as int);
+                  break;
+                case MyAccountScreen.routeName:
+                  builder = (BuildContext context) => const MyAccountScreen();
+                  break;
+                default:
+                  throw Exception('Invalid route: ${settings.name}');
+              }
+              return MaterialPageRoute(builder: builder, settings: settings);
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FormEventCreateScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFF6058E9),
+          child: const Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+}
+
+class HomeContent extends StatefulWidget {
+  @override
+  _HomeContentState createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  int _currentMyEventsPage = 0;
+  int _currentCreatedEventsPage = 0;
+  final PageController _myEventsPageController = PageController();
+  final PageController _createdEventsPageController = PageController();
+
+  @override
+  void dispose() {
+    _myEventsPageController.dispose();
+    _createdEventsPageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, homeState) {
+        if (homeState is HomeLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
           child: Navigator(
             onGenerateRoute: (RouteSettings settings) {
               WidgetBuilder builder;

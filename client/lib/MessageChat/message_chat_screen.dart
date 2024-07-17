@@ -28,6 +28,7 @@ class MessageChatScreen extends StatelessWidget {
             child: Scaffold(
               appBar: AppBar(
                 title: Text('Messages'),
+                title: Text('Messages'),
               ),
               backgroundColor: Colors.white,
               body: Column(
