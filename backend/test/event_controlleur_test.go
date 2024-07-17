@@ -19,7 +19,7 @@ func TestAddItem(t *testing.T) {
 
 	// Create a test user and event
 	testUser := models.User{
-		Email:     "testuser@example.com",
+		Email:     "ar@metooptic.fr",
 		Firstname: "Test",
 		Lastname:  "User",
 		Password:  "password",
