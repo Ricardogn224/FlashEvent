@@ -7,6 +7,8 @@ import 'package:flutter_flash_event/login/bloc/login_bloc.dart';
 import 'package:flutter_flash_event/login/bloc/login_event.dart';
 import 'package:flutter_flash_event/login/bloc/login_state.dart';
 import 'package:flutter_flash_event/widgets/main_screen.dart';
+import 'package:flutter_flash_event/screens/base_screen.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart';
 import '../screens/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -29,7 +31,8 @@ class LoginScreen extends StatelessWidget {
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => const Center(child: CircularProgressIndicator()),
+                builder: (context) =>
+                    const Center(child: CircularProgressIndicator()),
               );
             } else if (state is LoginSuccess) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
@@ -89,7 +92,8 @@ class LoginScreen extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Veuillez entrer votre email';
-                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                            .hasMatch(value)) {
                           return 'Veuillez entrer un email valide';
                         }
                         return null;
@@ -119,17 +123,22 @@ class LoginScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 20),
-                    Builder( // Utilisation de Builder pour obtenir le bon contexte
+                    Builder(
+                      // Utilisation de Builder pour obtenir le bon contexte
                       builder: (context) => SizedBox(
-                        width: double.infinity, // Assurer que le bouton ait la même largeur que les input
+                        width: double
+                            .infinity, // Assurer que le bouton ait la même largeur que les input
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6058E9), // Couleur personnalisée du bouton
-                            foregroundColor: Colors.white, // Couleur du texte sur le bouton
+                            backgroundColor: const Color(
+                                0xFF6058E9), // Couleur personnalisée du bouton
+                            foregroundColor:
+                                Colors.white, // Couleur du texte sur le bouton
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
                           ),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
@@ -149,7 +158,8 @@ class LoginScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterScreen()),
                         );
                       },
                       child: Padding(
@@ -157,7 +167,8 @@ class LoginScreen extends StatelessWidget {
                         child: Text(
                           'Pas encore inscrit ? Cliquez ici',
                           style: TextStyle(
-                            color: Theme.of(context).primaryColor, // Utilise la couleur principale du thème
+                            color: Theme.of(context)
+                                .primaryColor, // Utilise la couleur principale du thème
                             decoration: TextDecoration.underline,
                             fontWeight: FontWeight.bold,
                           ),
