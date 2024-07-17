@@ -41,7 +41,8 @@ func TestRegisterUser(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusCreated)
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusCreated)
 	}
 
 	var returnedUser models.User
@@ -50,7 +51,8 @@ func TestRegisterUser(t *testing.T) {
 	}
 
 	if returnedUser.Email != user.Email {
-		t.Errorf("handler returned unexpected user: got %v want %v", returnedUser.Email, user.Email)
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			returnedUser.Email, user.Email)
 	}
 }
 
@@ -73,7 +75,8 @@ func TestLoginUser(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
 	}
 
 	var responseBody map[string]string
@@ -92,7 +95,7 @@ func TestGetUserByID(t *testing.T) {
 	// Enregistrer un utilisateur
 	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"getuserbyid@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
-	req, _ := http.NewRequest("GET", "/user/1", nil)
+	req, _ := http.NewRequest("GET", "/user/2", nil)
 	rr := httptest.NewRecorder()
 
 	router := mux.NewRouter()
@@ -100,7 +103,8 @@ func TestGetUserByID(t *testing.T) {
 	router.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
 	}
 
 	var user models.User
@@ -109,7 +113,8 @@ func TestGetUserByID(t *testing.T) {
 	}
 
 	if user.Email != "getuserbyid@example.com" {
-		t.Errorf("handler returned unexpected user: got %v want %v", user.Email, "getuserbyid@example.com")
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			user.Email, "getuserbyid@example.com")
 	}
 }
 
