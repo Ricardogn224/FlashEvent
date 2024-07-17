@@ -251,9 +251,6 @@ func ResetPassword(db *gorm.DB) http.HandlerFunc {
 // LoginUser gère la connexion d'un utilisateur
 func LoginUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser les tables nécessaires si elles n'existent pas
-		database.MigrateAll(db)
-
 		var credentials models.User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -272,7 +269,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		expirationTime := time.Now().Add(5 * time.Minute)
+		expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 		claims := &Claims{
 			Email: user.Email,
 			StandardClaims: jwt.StandardClaims{
@@ -287,7 +284,6 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Au lieu de définir le cookie, on renvoie le token dans la réponse JSON
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 	}
