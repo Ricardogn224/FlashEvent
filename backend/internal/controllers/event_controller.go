@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"fmt"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -14,19 +15,33 @@ import (
 
 func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("GetAllEvents called")
+
 		database.MigrateAll(db) // Initialiser toutes les tables si elles n'existent pas
+		fmt.Println("Database migration completed")
 
 		var events []models.Event
 		result := db.Find(&events)
 		if result.Error != nil {
+			fmt.Println("Error retrieving events from database:", result.Error)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		fmt.Println("Events retrieved successfully:", events)
+
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(events)
+		err := json.NewEncoder(w).Encode(events)
+		if err != nil {
+			fmt.Println("Error encoding events to JSON:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println("Events encoded and sent successfully")
 	}
 }
+
 
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
@@ -50,7 +65,7 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.Role != "user" {
+		if user.Role == "AdminEvent" {
 			log.Println("User is not authorized to create an event. ", user.Role)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -159,7 +174,7 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && event.CreatedBy != user.ID {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -201,7 +216,7 @@ func DeleteEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -248,7 +263,7 @@ func AddUserToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && (user.Role != "AdminEvent" || event.CreatedBy != user.ID) {
+		if user.Role != "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

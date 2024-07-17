@@ -17,6 +17,17 @@ class FormSubmitEvent extends FormTransportEvent {
   List<Object> get props => [onSuccess, onError];
 }
 
+class FormUpdateSubmitEvent extends FormTransportEvent {
+  final VoidCallback onSuccess;
+  final Function(String) onError;
+  final Event event;
+
+  const FormUpdateSubmitEvent({required this.event, required this.onSuccess, required this.onError});
+
+  @override
+  List<Object> get props => [onSuccess, onError];
+}
+
 class FormResetEvent extends FormTransportEvent {
   const FormResetEvent();
 }

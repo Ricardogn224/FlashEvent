@@ -38,6 +38,15 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		params := mux.Vars(r)
+
+		eventIDInt, err := strconv.Atoi(params["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		eventID := uint(eventIDInt)
 
 		// Verify user roles and permissions
 		authUser, err := GetUserFromToken(r, db)
@@ -49,7 +58,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 
 		// Check if the user is a participant of the event
 		var participant models.Participant
-		if err := db.Where("event_id = ? AND user_id = ?", itemRequestAdd.EventID, authUser.ID).First(&participant).Error; err != nil {
+		if err := db.Where("event_id = ? AND user_id = ?", eventID, authUser.ID).First(&participant).Error; err != nil {
 			log.Printf("Forbidden: user %d is not a participant of event %d", authUser.ID, itemRequestAdd.EventID)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
@@ -58,7 +67,7 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 		// Create a new ItemEvent instance
 		itemRequest := models.ItemEvent{
 			UserID:  authUser.ID,
-			EventID: itemRequestAdd.EventID,
+			EventID: eventID,
 			Name:    itemRequestAdd.Name,
 		}
 
@@ -74,22 +83,40 @@ func AddItem(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetItemsByEventID retourne les éléments par ID d'événement
+// GetItemsByEventID returns the items by event ID
 func GetItemsByEventID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		database.MigrateItem(db) // Initialiser la table Item si elle n'existe pas
+		database.MigrateItem(db) // Initialize the Item table if it doesn't exist
 
 		params := mux.Vars(r)
 		eventID := params["eventId"]
 
 		var items []models.ItemEvent
 		if err := db.Where("event_id = ?", eventID).Find(&items).Error; err != nil {
-			http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		var responseItems []models.ItemEventResponse
+		for _, item := range items {
+			var user models.User
+			if err := db.First(&user, item.UserID).Error; err != nil {
+				http.Error(w, "Failed to retrieve user info", http.StatusInternalServerError)
+				return
+			}
+
+			responseItems = append(responseItems, models.ItemEventResponse{
+				ID:        item.ID,
+				Name:      item.Name,
+				UserID:    item.UserID,
+				EventID:   item.EventID,
+				Firstname: user.Firstname,
+				Lastname:  user.Lastname,
+			})
+		}
+
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(items)
+		json.NewEncoder(w).Encode(responseItems)
 	}
 }
 

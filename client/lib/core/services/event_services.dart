@@ -19,20 +19,22 @@ class EventServices {
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
-      if (response.statusCode < 200 || response.statusCode >= 400) {
-        throw Error();
-      }
-
-      final data = json.decode(response.body);
-      return (data as List<dynamic>?)?.map((e) {
-            return Event.fromJson(e);
-          }).toList() ??
-          [];
-    } catch (error) {
-      log('Error occurred while retrieving users.', error: error);
-      rethrow;
+    if (response.statusCode < 200 || response.statusCode >= 400) {
+      print('Error: Server responded with status code ${response.statusCode}');
+      throw Error();
     }
+
+    final data = json.decode(response.body);
+    print('Data decoded successfully');
+
+    return (data as List<dynamic>?)?.map((e) {
+      return Event.fromJson(e);
+    }).toList() ?? [];
+  } catch (error) {
+    throw ApiException(
+          message: 'Get Events: Error occurred while retrieving users. Error: $error');
   }
+}
 
   static Future<http.Response> addEvent(Event event) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -106,6 +108,7 @@ class EventServices {
         body: json.encode(event.toJson()),
       );
 
+      print(response.statusCode);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw ApiException(
             message: 'Error while updating event with id ${event.id}',

@@ -85,13 +85,13 @@ class TransportationScreen extends StatelessWidget {
                         ),
                       );
 
-                      // Handle the new participant data if needed
-                    },
-                    child: Icon(Icons.add),
-                  ),
-                ],
+                        // Handle the new participant data if needed
+                      },
+                      child: Icon(Icons.add),
+                    ),
+                  ],
+                ),
               ),
-            ),
           );
         },
       ),

@@ -8,11 +8,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ItemServices {
   static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    print(id);
     try {
       final response =
-          await http.get(Uri.parse('http://10.0.2.2:8000/items-event//$id'));
+          await http.get(Uri.parse('http://10.0.2.2:8000/items-event/$id'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': 'Bearer $token', // Include token in headers
+            },);
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
+      print(response.statusCode);
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Error();
@@ -24,7 +32,7 @@ class ItemServices {
           }).toList() ??
           [];
     } catch (error) {
-      log('Error occurred while retrieving users.', error: error);
+      log('Error occurred while retrieving items.', error: error);
       rethrow;
     }
   }
@@ -39,7 +47,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/items'),
+      Uri.parse('http://10.0.2.2:8000/events/${itemEvent.eventId}/items'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -47,7 +55,6 @@ class ItemServices {
       body: jsonEncode(<String, dynamic>{
         'name': itemEvent.name,
         'email': email ?? '',
-        'event_id': itemEvent.eventId,
       }),
     );
 

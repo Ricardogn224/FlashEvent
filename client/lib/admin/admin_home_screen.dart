@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/admin_event_screen.dart';
+import 'package:flutter_flash_event/admin/admin_feature_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
@@ -22,7 +23,7 @@ class AdminHomeDesktop extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('admin Interface'),
+          title: const Text('Admin Interface'),
           centerTitle: true,
         ),
         body: Center(
@@ -30,13 +31,13 @@ class AdminHomeDesktop extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AdminButton(
-                title: 'Gestion des utlisateurs',
+                title: 'Gestion des utilisateurs',
                 onPressed: () {
                   // Navigate to Manage Users screen
                   AdminUserScreen.navigateTo(context);
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               AdminButton(
                 title: 'Gestion des évènements',
                 onPressed: () {
@@ -44,12 +45,12 @@ class AdminHomeDesktop extends StatelessWidget {
                   AdminEventScreen.navigateTo(context);
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               AdminButton(
                 title: 'Fonctionnalités',
                 onPressed: () {
                   // Navigate to Manage Events screen
-                  AdminEventScreen.navigateTo(context);
+                  AdminFeatureScreen.navigateTo(context);
                 },
               ),
             ],

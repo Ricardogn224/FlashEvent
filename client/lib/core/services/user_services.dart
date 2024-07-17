@@ -34,6 +34,29 @@ class UserServices {
     }
   }
 
+  static Future<http.Response> registerUserAdmin(User user) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8000/registerAdmin'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'firstname': user.firstname,
+        'lastname': user.lastname,
+        'username': user.username,
+        'email': user.email,
+        'role': user.role,
+        'password': user.password, // Add password to the User model
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return response;
+    } else {
+      throw Exception('Failed to register user');
+    }
+  }
+
 
   static Future<User> getCurrentUserByEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

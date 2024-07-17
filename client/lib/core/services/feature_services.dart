@@ -18,6 +18,7 @@ class FeatureServices {
         },
       );
 
+      print(response.statusCode);
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Error();
       }

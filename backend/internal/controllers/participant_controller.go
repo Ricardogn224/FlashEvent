@@ -41,12 +41,6 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Only AdminPlatform and AdminEvent can add participants to events
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
-
 		// Create a new Participant instance
 		participant := models.Participant{
 			UserID:  newUser.ID,
@@ -120,7 +114,7 @@ func DeleteParticipantByID(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Only AdminPlatform, AdminEvent, or the participant themselves can delete the participant
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -164,7 +158,7 @@ func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
 		}
 
 		// Only AdminPlatform, AdminEvent, or the participant themselves can update the participant details
-		if user.Role != "AdminPlatform" && user.Role != "AdminEvent" && user.ID != participant.UserID {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
