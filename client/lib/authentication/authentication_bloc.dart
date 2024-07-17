@@ -17,17 +17,18 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    final userRole = prefs.getString('role');
 
-    if (token != null) {
+    if (token != null && userRole != null) {
       bool isTokenExpired = JwtDecoder.isExpired(token);
       if (isTokenExpired) {
-        print(isTokenExpired);
         await prefs.remove('token');
         await prefs.remove('email');
         await prefs.remove('userId');
+        await prefs.remove('role');
         emit(AuthenticationUnauthenticated());
       } else {
-        emit(AuthenticationAuthenticated());
+        emit(AuthenticationAuthenticated(userRole));
       }
     } else {
       emit(AuthenticationUnauthenticated());
@@ -35,7 +36,10 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   Future<void> _onLoggedIn(LoggedIn event, Emitter<AuthenticationState> emit) async {
-    emit(AuthenticationAuthenticated());
+    final prefs = await SharedPreferences.getInstance();
+    final userRole = prefs.getString('role');
+
+    emit(AuthenticationAuthenticated(userRole ?? ''));
   }
 
   Future<void> _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) async {
@@ -43,6 +47,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     await prefs.remove('token');
     await prefs.remove('email');
     await prefs.remove('userId');
+    await prefs.remove('role');
     emit(AuthenticationUnauthenticated());
   }
 }

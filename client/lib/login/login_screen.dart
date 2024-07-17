@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:flutter_flash_event/authentication/authentication_bloc.dart';
 import 'package:flutter_flash_event/authentication/authentication_event.dart';
 import 'package:flutter_flash_event/login/bloc/login_bloc.dart';
@@ -10,6 +9,8 @@ import 'package:flutter_flash_event/widgets/main_screen.dart';
 import '../screens/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
+  static const String routeName = '/login'; // Define the routeName here
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -35,17 +36,12 @@ class LoginScreen extends StatelessWidget {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               context.read<AuthenticationBloc>().add(LoggedIn());
 
-              if (state.userRole == 'AdminPlatform') {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => AdminHomeDesktop()),
-                );
-              } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MainScreen()),
-                );
-              }
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(userRole: state.userRole),
+                ),
+              );
             } else if (state is LoginFailure) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
               ScaffoldMessenger.of(context).showSnackBar(

@@ -24,7 +24,7 @@ class BaseScreen extends StatelessWidget {
               ),
             );
           } else if (state is AuthenticationAuthenticated) {
-            return MainScreen();
+            return MainScreen(userRole: state.userRole);
           } else if (state is AuthenticationUnauthenticated) {
             return LoginScreen();
           } else {

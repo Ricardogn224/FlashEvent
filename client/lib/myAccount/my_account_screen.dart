@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/myAccount/bloc/my_account_bloc.dart';
 import 'package:flutter_flash_event/core/services/auth_services.dart';
+import 'package:flutter_flash_event/login/login_screen.dart';
 
 class MyAccountScreen extends StatelessWidget {
   static const String routeName = '/my-account';
@@ -14,8 +15,8 @@ class MyAccountScreen extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     await AuthServices.logoutUser();
-    // Navigate to login screen or home
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+    // Navigate to LoginScreen
+
   }
 
   @override
@@ -84,10 +85,25 @@ class MyAccountScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-
                         ],
                       ),
-                    )
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6058E9), // Same color as login button
+                          foregroundColor: Colors.white, // White text color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                        ),
+                        onPressed: () => _logout(context),
+                        child: const Text('Déconnexion'),
+                      ),
+                    ),
                   ],
                 ),
               )

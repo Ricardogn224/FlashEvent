@@ -31,11 +31,12 @@ import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_bloc.
 import 'package:flutter_flash_event/login/login_screen.dart';
 import 'package:flutter_flash_event/screens/register_screen.dart';
 import 'package:flutter_flash_event/screens/splash_screen.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart';
 
-Route<dynamic> generateRoute(RouteSettings settings) {
+Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
   final args = settings.arguments;
   switch (settings.name) {
-    case '/login':
+    case LoginScreen.routeName:
       return MaterialPageRoute(builder: (_) => LoginScreen());
     case '/register':
       return MaterialPageRoute(builder: (_) => const RegisterScreen());
@@ -44,15 +45,35 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case MyAccountScreen.routeName:
       return MaterialPageRoute(builder: (_) => const MyAccountScreen());
     case AdminHomeDesktop.routeName:
-      return MaterialPageRoute(builder: (_) => const AdminHomeDesktop());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (_) => const AdminHomeDesktop());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminUserScreen.routeName:
-      return MaterialPageRoute(builder: (_) => const AdminUserScreen());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (_) => const AdminUserScreen());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminEventScreen.routeName:
-      return MaterialPageRoute(builder: (_) => const AdminEventScreen());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (_) => const AdminEventScreen());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminEventNewScreen.routeName:
-      return MaterialPageRoute(builder: (_) => const AdminEventNewScreen());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (_) => const AdminEventNewScreen());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminUserNewScreen.routeName:
-      return MaterialPageRoute(builder: (_) => const AdminUserNewScreen());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (_) => const AdminUserNewScreen());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case InvitationScreen.routeName:
       return MaterialPageRoute(builder: (_) => const InvitationScreen());
     case EventScreen.routeName:
@@ -60,15 +81,31 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => ParticipantScreen(id: args as int));
     case AdminUserEditScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminUserEditScreen(id: args as int));
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (context) => AdminUserEditScreen(id: args as int));
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminEventEditScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminEventEditScreen(event: args as Event));
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (context) => AdminEventEditScreen(event: args as Event));
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case AdminFeatureScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminFeatureScreen());
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (context) => AdminFeatureScreen());
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case FormParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => FormParticipantScreen(eventId: args as int));
     case AdminUserAddParticipantScreen.routeName:
-      return MaterialPageRoute(builder: (context) => AdminUserAddParticipantScreen(event: args as Event));
+      if (userRole == 'AdminPlatform') {
+        return MaterialPageRoute(builder: (context) => AdminUserAddParticipantScreen(event: args as Event));
+      } else {
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      }
     case ChatRoomScreen.routeName:
       return MaterialPageRoute(builder: (context) => ChatRoomScreen(id: args as int));
     case FormChatRoomScreen.routeName:

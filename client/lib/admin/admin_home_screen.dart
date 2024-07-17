@@ -5,7 +5,6 @@ import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
 class AdminHomeDesktop extends StatelessWidget {
-
   static const String routeName = '/admin';
 
   static navigateTo(BuildContext context) {
@@ -16,6 +15,10 @@ class AdminHomeDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RouteSettings settings = ModalRoute.of(context)!.settings;
+    final String? userRole = settings.arguments as String?;
+
+    // Use userRole if needed
     return MaterialApp(
       title: 'Interface admin',
       theme: ThemeData(
