@@ -15,6 +15,10 @@ class AdminHomeDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RouteSettings settings = ModalRoute.of(context)!.settings;
+    final String? userRole = settings.arguments as String?;
+
+    // Use userRole if needed
     return MaterialApp(
       title: 'Interface admin',
       theme: ThemeData(
@@ -48,7 +52,8 @@ class AdminHomeDesktop extends StatelessWidget {
               AdminButton(
                 title: 'Fonctionnalités',
                 onPressed: () {
-                  // Placeholder action for functionalities
+                  // Navigate to Manage Events screen
+                  AdminFeatureScreen.navigateTo(context);
                 },
               ),
             ],

@@ -64,23 +64,25 @@ class MessageChatScreen extends StatelessWidget {
                         Expanded(
                           child: TextField(
                             controller: _controller,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+
                               hintText: 'Enter your message...',
                               border: OutlineInputBorder(),
                             ),
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.send),
+                          icon: Icon(Icons.send),
                           onPressed: () {
                             if (_controller.text.isNotEmpty) {
                               context.read<MessageChatBloc>().add(
-                                    MessageChatAdded(
-                                      content: _controller.text,
-                                      chatRoomId: id,
-                                      email: '',
-                                    ),
-                                  );
+                                MessageChatAdded(
+                                  content: _controller.text,
+                                  chatRoomId: id,
+                                  email: '',
+                                ),
+                              );
+
                               _controller.clear();
                             }
                           },

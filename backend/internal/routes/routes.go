@@ -135,23 +135,6 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 
 		endpoint.New(
-			http.MethodGet, "/users-email/{email}",
-			endpoint.Handler(http.HandlerFunc(controllers.GetUserByEmail(db))),
-			endpoint.Summary("Get user by email"),
-			endpoint.Description("Retrieve a user by the email"),
-			endpoint.Path("email", "string", "Email of the user to retrieve", true),
-			endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(&models.User{})),
-			endpoint.Tags("Users"),
-		),
-		endpoint.New(
-			http.MethodGet, "/events",
-			endpoint.Handler(controllers.GetAllEvents(db)),
-			endpoint.Summary("Get all events"),
-			endpoint.Description("Retrieve all events from the store"),
-			endpoint.Response(http.StatusOK, "Successfully retrieved events", endpoint.SchemaResponseOption(&[]models.Event{})),
-			endpoint.Tags("Events"),
-		),
-		endpoint.New(
 			http.MethodPost, "/events",
 			endpoint.Handler(http.HandlerFunc(controllers.AuthenticatedAddEvent(db))),
 			endpoint.Summary("Add a new event"),
@@ -239,6 +222,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Tags("Invitations"),
 		),
 		endpoint.New(
+
 			http.MethodPost, "/participants",
 			endpoint.Handler(http.HandlerFunc(controllers.AddParticipant(db))),
 			endpoint.Summary("Add a new participant"),
@@ -305,6 +289,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Retrieve participants presence associated with a specific event"),
 			endpoint.Path("eventId", "integer", "ID of the event", true),
 			endpoint.Response(http.StatusOK, "Successfully retrieved participants", endpoint.SchemaResponseOption(&[]models.Participant{})),
+
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Participants"),
 		),
@@ -367,6 +352,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Successfully updated item", endpoint.SchemaResponseOption(&models.ItemEvent{})),
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Items"),
+
 		),
 		endpoint.New(
 			http.MethodGet, "/items-event/{eventId}",
@@ -389,7 +375,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			}{}, "Nourriture à ajouter à l'événement", true),
 			endpoint.Response(http.StatusCreated, "Nourriture ajoutée avec succès à l'événement", endpoint.SchemaResponseOption(&models.Event{})),
 			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Events"),
+			endpoint.Tags("Food"),
 		),
 		endpoint.New(
 			http.MethodPost, "/events/{eventId}/transportations",
@@ -398,15 +384,10 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Description("Permettre à un participant d'ajouter un moyen de transport à un événement"),
 			endpoint.Path("eventId", "integer", "ID de l'événement", true),
 			endpoint.Body(models.Transportation{}, "transportation that needs to be added", true),
-<<<<<<< HEAD
-			endpoint.Response(http.StatusCreated, "Transport ajouté avec succès à l'événement", endpoint.SchemaResponseOption(models.Transportation{})),
-			endpoint.Tags("Transportations"),
-=======
 			endpoint.Response(http.StatusCreated, "Transport ajouté avec succès à l'événement", endpoint.SchemaResponseOption(&models.Transportation{})),
 			endpoint.Tags("Transportation"),
->>>>>>> 88fc1a3 (fix route issue)
-		),
 
+		),
 		endpoint.New(
 			http.MethodGet, "/transportations",
 			endpoint.Handler(http.HandlerFunc(controllers.GetAllTransportations(db))),
@@ -461,12 +442,9 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 				Transportation string `json:"transportation"`
 			}{}, "Moyen de transport à ajouter à l'événement", true),
 			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Transportations"),
+			endpoint.Tags("Transportation"),
 		),
 		endpoint.New(
-<<<<<<< HEAD
-			http.MethodPost, "/event/{eventId}/add-food",
-=======
 			http.MethodPost, "/events/{eventId}/chat-rooms",
 			endpoint.Handler(http.HandlerFunc(controllers.AddChatRoom(db))),
 			endpoint.Summary("Add a new chat room"),
@@ -485,6 +463,30 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "User chat rooms retrieved", endpoint.SchemaResponseOption(&[]models.ChatRoom{})),
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("ChatRoom"),
+
+			endpoint.Handler(http.HandlerFunc(controllers.AddFoodToEvent(db))),
+			endpoint.Summary("Ajouter de la nourriture à un événement"),
+			endpoint.Description("Permettre à un participant d'ajouter de la nourriture à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(struct {
+				Food string `json:"food"`
+			}{}, "Nourriture à ajouter à l'événement", true),
+			endpoint.Response(http.StatusCreated, "Nourriture ajoutée avec succès à l'événement", endpoint.SchemaResponseOption(&models.Event{})),
+			endpoint.Security("BearerAuth"),
+			endpoint.Tags("Events"),
+		),
+		endpoint.New(
+			http.MethodPost, "/events/{eventId}/add-activity",
+			endpoint.Handler(http.HandlerFunc(controllers.AddActivityToEvent(db))),
+			endpoint.Summary("Ajouter une activité à un événement"),
+			endpoint.Description("Permettre à un participant d'ajouter une activité à un événement"),
+			endpoint.Path("eventId", "integer", "ID de l'événement", true),
+			endpoint.Body(struct {
+				Activity string `json:"activity"`
+			}{}, "Activité à ajouter à l'événement", true),
+			endpoint.Response(http.StatusCreated, "Activité ajoutée avec succès à l'événement", endpoint.SchemaResponseOption(&models.Event{})),
+			endpoint.Security("BearerAuth"),
+			endpoint.Tags("Activities"),
 		),
 		endpoint.New(
 			http.MethodGet, "/events/{eventId}/chat-rooms",
@@ -625,6 +627,7 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusOK, "Successfully updated feature", endpoint.SchemaResponseOption(&models.Feature{})),
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Features"),
+
 		),
 		endpoint.New(
 			http.MethodDelete, "/features/{featureId}",
@@ -638,7 +641,6 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 		),
 		endpoint.New(
 			http.MethodPost, "/events/{eventId}/add-food",
->>>>>>> 88fc1a3 (fix route issue)
 			endpoint.Handler(http.HandlerFunc(controllers.AddFoodToEvent(db))),
 			endpoint.Summary("Ajouter de la nourriture à un événement"),
 			endpoint.Description("Permettre à un participant d'ajouter de la nourriture à un événement"),
@@ -662,58 +664,6 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Response(http.StatusCreated, "Activité ajoutée avec succès à l'événement", endpoint.SchemaResponseOption(&models.Event{})),
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Activities"),
-		),
-		endpoint.New(
-			http.MethodPost, "/event/{eventId}/chat",
-			endpoint.Handler(http.HandlerFunc(controllers.AddMessageToChat(db))),
-			endpoint.Summary("Envoyer un message dans la salle de chat de l'événement"),
-			endpoint.Description("Envoyer un message dans la salle de chat de l'événement"),
-			endpoint.Path("eventId", "integer", "ID de l'événement de la salle de chat", true),
-			endpoint.Body(models.MessageAdd{}, "Message object", true),
-			endpoint.Response(http.StatusCreated, "Message sent", endpoint.SchemaResponseOption(models.Message{})),
-			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Chat"),
-		),
-		endpoint.New(
-			http.MethodGet, "/chat-rooms/{chatRoomId}/messages",
-			endpoint.Handler(http.HandlerFunc(controllers.GetMessagesByChatRoom(db))),
-			endpoint.Summary("Get messages"),
-			endpoint.Description("Retrieve messages from the event chat room"),
-			endpoint.Path("chatRoomId", "integer", "ID of the chat room", true),
-			endpoint.Response(http.StatusOK, "Messages retrieved", endpoint.SchemaResponseOption([]models.MessageResponse{})),
-			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Chat"),
-		),
-		endpoint.New(
-			http.MethodGet, "/invitations/{email}",
-			endpoint.Handler(http.HandlerFunc(controllers.GetInvitationsByUser(db))),
-			endpoint.Summary("Get invitations by user"),
-			endpoint.Description("Retrieve participant items where the user ID matches the provided parameter and response is true"),
-			endpoint.Path("email", "string", "Email of the user", true),
-			endpoint.Response(http.StatusOK, "Successfully retrieved participants", endpoint.SchemaResponseOption([]models.Invitation{})),
-			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Invitations"),
-		),
-		endpoint.New(
-			http.MethodPost, "/answer-invitation",
-			endpoint.Handler(http.HandlerFunc(controllers.AnswerInvitation(db))),
-			endpoint.Summary("Response to invitation"),
-			endpoint.Description("Response to an invitation"),
-			endpoint.Body(models.InvitationAnswer{}, "Message object", true),
-			endpoint.Response(http.StatusOK, "Successfully answered invitation", endpoint.SchemaResponseOption(models.Participant{})),
-			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Invitations"),
-		),
-		endpoint.New(
-			http.MethodPatch, "/events/{id}/activate-transport",
-			endpoint.Handler(http.HandlerFunc(controllers.ActivateTransport(db))),
-			endpoint.Summary("Activate transport for an event"),
-			endpoint.Description("Update the transport active status for a given event"),
-			endpoint.Path("id", "string", "ID of the event", true),
-			endpoint.Body(models.EventTransportUpdate{}, "Transport update object", true),
-			endpoint.Response(http.StatusOK, "Successfully updated event", endpoint.SchemaResponseOption(models.Event{})),
-			endpoint.Security("BearerAuth"),
-			endpoint.Tags("Transportation"),
 		),
 
 		endpoint.New(
