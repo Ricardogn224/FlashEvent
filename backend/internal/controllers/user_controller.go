@@ -46,7 +46,6 @@ type Claims struct {
     jwt.StandardClaims
 }
 
-
 var otpStore = make(map[string]string)
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
@@ -274,12 +273,12 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
             return
         }
 
-        expirationTime := time.Now().Add(5 * time.Minute)
+        expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
         claims := &Claims{
             Email: user.Email,
             Role:  user.Role, // Ajouter le rôle de l'utilisateur ici
             StandardClaims: jwt.StandardClaims{
-                ExpiresAt: expirationTime.Unix(),
+            ExpiresAt: expirationTime.Unix(),
             },
         }
 
@@ -290,7 +289,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
             return
         }
 
-        // Au lieu de définir le cookie, on renvoie le token dans la réponse JSON
+
         w.WriteHeader(http.StatusOK)
         json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
     }
