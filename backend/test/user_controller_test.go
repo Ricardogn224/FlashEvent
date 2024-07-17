@@ -1,96 +1,117 @@
-package test
+package controllers_test
 
 import (
-	"backend/internal/controllers"
-	"backend/internal/database"
-	"backend/internal/models"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	_ "github.com/mattn/go-sqlite3" // Import du driver sqlite3
-	"github.com/stretchr/testify/assert"
+	"backend/internal/controllers"
+	"backend/internal/database"
+	"backend/internal/models"
+
+	"github.com/gorilla/mux"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func setupTestDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	database.MigrateAll(db)
 	return db
 }
 
-func getTokenForUser(user models.User) string {
-	// Generate a JWT token for testing (vous devrez peut-être utiliser un générateur de token réel)
-	return "Bearer your_generated_token"
-}
-
-func TestSendMessage(t *testing.T) {
+func TestRegisterUser(t *testing.T) {
 	db := setupTestDB()
+	handler := controllers.RegisterUser(db)
 
 	user := models.User{
-		Email:    "test@example.com",
-		Password: "password123",
-		Role:     "User",
+		Email:     "test@example.com",
+		Firstname: "John",
+		Lastname:  "Doe",
+		Password:  "password",
 	}
-	db.Create(&user)
 
-	chatRoom := models.ChatRoom{
-		Name:    "Test Chat Room",
-		EventID: 1,
-	}
-	db.Create(&chatRoom)
+	jsonUser, _ := json.Marshal(user)
+	req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(jsonUser))
+	req.Header.Set("Content-Type", "application/json")
 
-	message := models.MessageAdd{
-		Email:   "test@example.com",
-		Content: "Hello, this is a test message",
-	}
-	jsonMessage, _ := json.Marshal(message)
-
-	req, _ := http.NewRequest("POST", "/chatrooms/1/messages", bytes.NewBuffer(jsonMessage))
-	req.Header.Set("Authorization", getTokenForUser(user))
 	rr := httptest.NewRecorder()
-	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.SendMessage(db)))
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusCreated, rr.Code)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusCreated)
+	}
+
+	var returnedUser models.User
+	if err := json.NewDecoder(rr.Body).Decode(&returnedUser); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if returnedUser.Email != user.Email {
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			returnedUser.Email, user.Email)
+	}
 }
 
-func TestGetMessagesByChatRoom(t *testing.T) {
+func TestLoginUser(t *testing.T) {
 	db := setupTestDB()
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
-	user := models.User{
+	handler := controllers.LoginUser(db)
+
+	credentials := models.User{
 		Email:    "test@example.com",
-		Password: "password123",
-		Role:     "User",
+		Password: "password",
 	}
-	db.Create(&user)
 
-	chatRoom := models.ChatRoom{
-		Name:    "Test Chat Room",
-		EventID: 1,
-	}
-	db.Create(&chatRoom)
+	jsonCredentials, _ := json.Marshal(credentials)
+	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonCredentials))
+	req.Header.Set("Content-Type", "application/json")
 
-	message := models.Message{
-		UserID:     user.ID,
-		ChatRoomID: chatRoom.ID,
-		Content:    "Hello, this is a test message",
-		Timestamp:  time.Now(),
-	}
-	db.Create(&message)
-
-	req, _ := http.NewRequest("GET", "/chatrooms/1/messages", nil)
-	req.Header.Set("Authorization", getTokenForUser(user))
 	rr := httptest.NewRecorder()
-	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.GetMessagesByChatRoom(db)))
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusOK, rr.Code)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	var responseBody map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&responseBody); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if _, exists := responseBody["token"]; !exists {
+		t.Errorf("handler returned no token")
+	}
+}
+
+func TestGetUserByID(t *testing.T) {
+	db := setupTestDB()
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
+
+	req, _ := http.NewRequest("GET", "/user/1", nil)
+	rr := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	router.HandleFunc("/user/{userId}", controllers.GetUserByID(db)).Methods("GET")
+	router.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	var user models.User
+	if err := json.NewDecoder(rr.Body).Decode(&user); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if user.Email != "test@example.com" {
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			user.Email, "test@example.com")
+	}
 }
