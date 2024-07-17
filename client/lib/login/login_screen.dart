@@ -83,6 +83,8 @@ class LoginScreen extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Veuillez entrer votre email';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return 'Veuillez entrer un email valide';
                         }
                         return null;
                       },
@@ -104,6 +106,8 @@ class LoginScreen extends StatelessWidget {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Veuillez entrer votre mot de passe';
+                        } else if (value.length < 6) {
+                          return 'Le mot de passe doit contenir au moins 6 caractères';
                         }
                         return null;
                       },
