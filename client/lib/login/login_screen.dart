@@ -7,6 +7,8 @@ import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/login/bloc/login_bloc.dart';
 import 'package:flutter_flash_event/login/bloc/login_event.dart';
 import 'package:flutter_flash_event/login/bloc/login_state.dart';
+import 'package:flutter_flash_event/screens/base_screen.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart';
 import '../screens/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -36,7 +38,7 @@ class LoginScreen extends StatelessWidget {
               context.read<AuthenticationBloc>().add(LoggedIn());
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => MainScreen()),
               );
             } else if (state is LoginFailure) {
               Navigator.of(context).pop(); // Fermer l'indicateur de chargement
