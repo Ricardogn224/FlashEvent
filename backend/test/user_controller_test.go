@@ -58,7 +58,7 @@ func TestRegisterUser(t *testing.T) {
 
 func TestLoginUser(t *testing.T) {
 	db := setupTestDB()
-	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"ar@metrooptic.fr","firstname":"John","lastname":"Doe","password":"password"}`))))
 
 	handler := controllers.LoginUser(db)
 
@@ -91,7 +91,7 @@ func TestLoginUser(t *testing.T) {
 
 func TestGetUserByID(t *testing.T) {
 	db := setupTestDB()
-	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"ar@metrooptic.fr","firstname":"John","lastname":"Doe","password":"password"}`))))
 
 	req, _ := http.NewRequest("GET", "/user/1", nil)
 	rr := httptest.NewRecorder()
@@ -110,8 +110,8 @@ func TestGetUserByID(t *testing.T) {
 		t.Errorf("handler returned invalid body: %v", err)
 	}
 
-	if user.Email != "test@example.com" {
+	if user.Email != "ar@metrooptic.fr" {
 		t.Errorf("handler returned unexpected user: got %v want %v",
-			user.Email, "test@example.com")
+			user.Email, "ar@metrooptic.fr")
 	}
 }
