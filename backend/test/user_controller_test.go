@@ -58,12 +58,12 @@ func TestRegisterUser(t *testing.T) {
 
 func TestLoginUser(t *testing.T) {
 	db := setupTestDB()
-	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"ar@metrooptic.fr","firstname":"John","lastname":"Doe","password":"password"}`))))
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"loginuser@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
 	handler := controllers.LoginUser(db)
 
 	credentials := models.User{
-		Email:    "ar@metrooptic.fr",
+		Email:    "loginuser@example.com",
 		Password: "password",
 	}
 
@@ -91,7 +91,7 @@ func TestLoginUser(t *testing.T) {
 
 func TestGetUserByID(t *testing.T) {
 	db := setupTestDB()
-	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"ar@metrooptic.fr","firstname":"John","lastname":"Doe","password":"password"}`))))
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"getuserbyid@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
 	req, _ := http.NewRequest("GET", "/user/1", nil)
 	rr := httptest.NewRecorder()
@@ -110,8 +110,45 @@ func TestGetUserByID(t *testing.T) {
 		t.Errorf("handler returned invalid body: %v", err)
 	}
 
-	if user.Email != "ar@metrooptic.fr" {
+	if user.Email != "getuserbyid@example.com" {
 		t.Errorf("handler returned unexpected user: got %v want %v",
-			user.Email, "ar@metrooptic.fr")
+			user.Email, "getuserbyid@example.com")
+	}
+}
+
+func TestGetAllEvents(t *testing.T) {
+	db := setupTestDB()
+
+	// Create a test event
+	testEvent := models.Event{
+		Name:        "Test Event",
+		Description: "Event for testing",
+	}
+	db.Create(&testEvent)
+
+	handler := controllers.GetAllEvents(db)
+
+	req, _ := http.NewRequest("GET", "/events", nil)
+
+	rr := httptest.NewRecorder()
+	router := mux.NewRouter()
+	router.HandleFunc("/events", handler).Methods("GET")
+	router.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var events []models.Event
+	if err := json.NewDecoder(rr.Body).Decode(&events); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if len(events) != 1 {
+		t.Errorf("handler returned wrong number of events: got %v want %v", len(events), 1)
+	}
+
+	if events[0].Name != testEvent.Name {
+		t.Errorf("handler returned unexpected event: got %v want %v", events[0].Name, testEvent.Name)
 	}
 }
