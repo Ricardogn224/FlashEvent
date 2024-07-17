@@ -1,4 +1,3 @@
-// test/test_utils.go
 package test
 
 import (
@@ -7,6 +6,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	_ "modernc.org/sqlite" // Ajoutez cette ligne pour importer le pilote SQLite de modernc.org/sqlite
 )
 
 func SetupTestDB() *gorm.DB {
