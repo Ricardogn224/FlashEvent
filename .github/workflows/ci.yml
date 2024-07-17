@@ -1,26 +1,4 @@
-Skip to content
-Navigation Menu
-Ricardogn224
-/
-FlashEvent
 
-Type / to search
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-2
-Insights
-Settings
-Go CI
-fix conflit and bottom nav #47
-Jobs
-Run details
-Workflow file for this run
-.github/workflows/ci.yml at 360bdb5
 name: Go CI
 
 on:
