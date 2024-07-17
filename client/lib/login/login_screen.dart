@@ -95,6 +95,9 @@ class LoginScreen extends StatelessWidget {
                         } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
                             .hasMatch(value)) {
                           return 'Veuillez entrer un email valide';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                            .hasMatch(value)) {
+                          return 'Veuillez entrer un email valide';
                         }
                         return null;
                       },
