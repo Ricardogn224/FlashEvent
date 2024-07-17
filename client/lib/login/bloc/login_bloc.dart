@@ -39,6 +39,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         await prefs.setString('token', token);
         await prefs.setString('email', email);
 
+        await prefs.setString('role', userRole);
+
         final user = await UserServices.getCurrentUser();
 
         await prefs.setInt('userId', user.id);
