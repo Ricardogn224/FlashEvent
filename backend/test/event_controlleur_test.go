@@ -9,19 +9,10 @@ import (
 	"testing"
 
 	"backend/internal/controllers"
-	"backend/internal/database"
 	"backend/internal/models"
 
 	"github.com/gorilla/mux"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
-
-func setupTestDB() *gorm.DB {
-	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	database.MigrateAll(db)
-	return db
-}
 
 func mockSendEmail(email string) {
 	// Mock function to replace sendWelcomeEmail during tests
@@ -29,7 +20,6 @@ func mockSendEmail(email string) {
 
 func TestAddItem(t *testing.T) {
 	db := setupTestDB()
-	controllers.sendEmailFunc = mockSendEmail // Replace actual email function with mock
 
 	// Create a test user and event
 	testUser := models.User{
