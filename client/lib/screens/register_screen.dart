@@ -42,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text,
         password: _passwordController.text,
         id: 0,
-        role : '',
+        role: '',
       );
 
       try {
@@ -92,11 +92,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 30),
-                  _buildTextField(_emailController, 'Entrez votre email', 'Email'),
-                  _buildTextField(_firstNameController, 'Entrez votre prénom', 'Prénom'),
-                  _buildTextField(_lastNameController, 'Entrez votre nom', 'Nom'),
-                  _buildTextField(_usernameController, 'Entrez votre nom d’utilisateur', 'Nom d’utilisateur'),
-                  _buildTextField(_passwordController, 'Entrez votre mot de passe', 'Mot de passe', isPassword: true),
+                  _buildTextField(_emailController, 'Entrez votre email', 'Email', validator: _validateEmail),
+                  _buildTextField(_firstNameController, 'Entrez votre prénom', 'Prénom', validator: _validateName),
+                  _buildTextField(_lastNameController, 'Entrez votre nom', 'Nom', validator: _validateName),
+                  _buildTextField(_usernameController, 'Entrez votre nom d’utilisateur', 'Nom d’utilisateur', validator: _validateUsername),
+                  _buildTextField(_passwordController, 'Entrez votre mot de passe', 'Mot de passe', isPassword: true, validator: _validatePassword),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -136,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildTextField(
-      TextEditingController controller, String hintText, String labelText, {bool isPassword = false}) {
+      TextEditingController controller, String hintText, String labelText, {bool isPassword = false, String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
@@ -152,13 +152,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
             borderSide: BorderSide.none,
           ),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Veuillez entrer votre $labelText';
-          }
-          return null;
-        },
+        validator: validator,
       ),
     );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Veuillez entrer votre email';
+    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Veuillez entrer un email valide';
+    }
+    return null;
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Veuillez entrer votre prénom';
+    }
+    return null;
+  }
+
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Veuillez entrer votre nom d’utilisateur';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Veuillez entrer votre mot de passe';
+    } else if (value.length < 6) {
+      return 'Le mot de passe doit contenir au moins 6 caractères';
+    }
+    return null;
   }
 }

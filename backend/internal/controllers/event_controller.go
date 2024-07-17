@@ -4,10 +4,10 @@ import (
 	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"fmt"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -42,7 +42,6 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -65,11 +64,6 @@ func AddEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role == "AdminEvent" {
-			log.Println("User is not authorized to create an event. ", user.Role)
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			return
-		}
 		log.Printf("User %d is authorized to create an event.", user.ID)
 
 		// Créer l'événement
@@ -145,8 +139,6 @@ func FindEventByID(db *gorm.DB) http.HandlerFunc {
 // UpdateEventByID met à jour un événement par son ID
 func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser la table Event si elle n'existe pas
-
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["eventId"])
 		if err != nil {
@@ -174,7 +166,7 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role == "AdminEvent" {
+		if user.Role != "AdminPlatform" && user.ID != event.CreatedBy {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -518,5 +510,58 @@ func AddActivityToEvent(db *gorm.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(event)
+	}
+}
+
+func GetEventsByParticipantID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var participants []models.Participant
+		if err := db.Where("user_id = ?", user.ID).Find(&participants).Error; err != nil {
+			http.Error(w, "Error retrieving participants", http.StatusInternalServerError)
+			return
+		}
+
+		var eventIDs []uint
+		for _, participant := range participants {
+			eventIDs = append(eventIDs, participant.EventID)
+		}
+
+		var events []models.Event
+		if err := db.Where("id IN (?)", eventIDs).Find(&events).Error; err != nil {
+			http.Error(w, "Error retrieving events", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(events); err != nil {
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		}
+	}
+}
+
+func GetEventsCreatedByUserID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var events []models.Event
+		if err := db.Where("created_by = ?", user.ID).Find(&events).Error; err != nil {
+			http.Error(w, "Error retrieving events", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(events); err != nil {
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		}
 	}
 }

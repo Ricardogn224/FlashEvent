@@ -16,6 +16,7 @@ class FormEventCreateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
@@ -51,33 +52,37 @@ class FormEventCreateScreen extends StatelessWidget {
               builder: (context, state) {
                 return SingleChildScrollView(
                   child: Form(
+                    key: _formKey,
                     child: Column(
                       children: [
                         _buildTextField(
                           label: 'Nom de l\'événement',
                           onChanged: (value) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventNameChanged(name: value),
-                                );
+                              EventNameChanged(name: value),
+                            );
                           },
+                          validator: _validateName,
                         ),
                         const SizedBox(height: 20),
                         _buildTextField(
                           label: 'Description',
                           onChanged: (value) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventDescriptionChanged(description: value),
-                                );
+                              EventDescriptionChanged(description: value),
+                            );
                           },
+                          validator: _validateDescription,
                         ),
                         const SizedBox(height: 20),
                         _buildTextField(
                           label: 'Lieu',
                           onChanged: (value) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventPlaceChanged(place: value),
-                                );
+                              EventPlaceChanged(place: value),
+                            );
                           },
+                          validator: _validatePlace,
                         ),
                         const SizedBox(height: 20),
                         _DateTimePicker(
@@ -86,13 +91,13 @@ class FormEventCreateScreen extends StatelessWidget {
                           selectedTime: state.timeStart,
                           onSelectedDate: (date) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventDateStartChanged(dateStart: date),
-                                );
+                              EventDateStartChanged(dateStart: date),
+                            );
                           },
                           onSelectedTime: (time) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventTimeStartChanged(timeStart: time),
-                                );
+                              EventTimeStartChanged(timeStart: time),
+                            );
                           },
                         ),
                         const SizedBox(height: 20),
@@ -102,13 +107,13 @@ class FormEventCreateScreen extends StatelessWidget {
                           selectedTime: state.timeEnd,
                           onSelectedDate: (date) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventDateEndChanged(dateEnd: date),
-                                );
+                              EventDateEndChanged(dateEnd: date),
+                            );
                           },
                           onSelectedTime: (time) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventTimeEndChanged(timeEnd: time),
-                                );
+                              EventTimeEndChanged(timeEnd: time),
+                            );
                           },
                         ),
                         const SizedBox(height: 20),
@@ -117,8 +122,8 @@ class FormEventCreateScreen extends StatelessWidget {
                           value: state.transportActive,
                           onChanged: (value) {
                             context.read<FormEventCreateBloc>().add(
-                                  EventTransportActiveChanged(transportActive: value),
-                                );
+                              EventTransportActiveChanged(transportActive: value),
+                            );
                           },
                         ),
                         const SizedBox(height: 16),
@@ -135,12 +140,28 @@ class FormEventCreateScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                               ),
                               onPressed: () {
-                                final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
-                                final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
-                                context.read<FormEventCreateBloc>().add(EventFormSubmitted(
-                                  dateTimeStart: dateTimeStart,
-                                  dateTimeEnd: dateTimeEnd,
-                                ));
+                                if (_formKey.currentState!.validate()) {
+                                  final validationMessage = _validateDates(
+                                      state.dateStart,
+                                      state.timeStart,
+                                      state.dateEnd,
+                                      state.timeEnd
+                                  );
+
+                                  if (validationMessage != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(validationMessage)),
+                                    );
+                                    return; // Stop the submission process if dates are invalid
+                                  }
+
+                                  final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
+                                  final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
+                                  context.read<FormEventCreateBloc>().add(EventFormSubmitted(
+                                    dateTimeStart: dateTimeStart.toString(),
+                                    dateTimeEnd: dateTimeEnd.toString(),
+                                  ));
+                                }
                               },
                               child: const Text('Créer l\'événement'),
                             ),
@@ -158,7 +179,11 @@ class FormEventCreateScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({required String label, required ValueChanged<String> onChanged}) {
+  Widget _buildTextField({
+    required String label,
+    required ValueChanged<String> onChanged,
+    required String? Function(String?) validator,
+  }) {
     return TextFormField(
       decoration: InputDecoration(
         hintText: 'Entrez $label',
@@ -171,18 +196,48 @@ class FormEventCreateScreen extends StatelessWidget {
         ),
       ),
       onChanged: onChanged,
+      validator: validator,
     );
   }
 
-  String combineDateAndTime(DateTime date, TimeOfDay time) {
-    final dateTime = DateTime(
+  DateTime combineDateAndTime(DateTime date, TimeOfDay time) {
+    return DateTime(
       date.year,
       date.month,
       date.day,
       time.hour,
       time.minute,
     );
-    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Le nom de l\'événement est requis';
+    }
+    return null;
+  }
+
+  String? _validateDescription(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'La description est requise';
+    }
+    return null;
+  }
+
+  String? _validatePlace(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Le lieu est requis';
+    }
+    return null;
+  }
+
+  String? _validateDates(DateTime dateStart, TimeOfDay timeStart, DateTime dateEnd, TimeOfDay timeEnd) {
+    final dateTimeStart = combineDateAndTime(dateStart, timeStart);
+    final dateTimeEnd = combineDateAndTime(dateEnd, timeEnd);
+    if (dateTimeEnd.isBefore(dateTimeStart)) {
+      return 'La date et l\'heure de fin doivent être supérieures à la date et l\'heure de début';
+    }
+    return null;
   }
 }
 

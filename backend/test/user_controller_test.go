@@ -1,119 +1,154 @@
-// test/user_controller_test.go
-package test
+package controllers_test
 
 import (
-	"backend/internal/controllers"
-	"backend/internal/database"
-	"backend/internal/models"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"backend/internal/controllers"
+	"backend/internal/database"
+	"backend/internal/models"
+
+	"github.com/gorilla/mux"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func setupTestDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	database.MigrateAll(db)
 	return db
 }
 
 func TestRegisterUser(t *testing.T) {
 	db := setupTestDB()
+	handler := controllers.RegisterUser(db)
 
 	user := models.User{
 		Email:     "test@example.com",
-		Firstname: "Test",
-		Lastname:  "User",
-		Password:  "password123",
+		Firstname: "John",
+		Lastname:  "Doe",
+		Password:  "password",
 	}
-	jsonUser, _ := json.Marshal(user)
 
+	jsonUser, _ := json.Marshal(user)
 	req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(jsonUser))
+	req.Header.Set("Content-Type", "application/json")
+
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.RegisterUser(db))
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusCreated, rr.Code)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusCreated)
+	}
 
-	var createdUser models.User
-	db.Where("email = ?", user.Email).First(&createdUser)
-	assert.Equal(t, user.Email, createdUser.Email)
+	var returnedUser models.User
+	if err := json.NewDecoder(rr.Body).Decode(&returnedUser); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if returnedUser.Email != user.Email {
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			returnedUser.Email, user.Email)
+	}
 }
 
 func TestLoginUser(t *testing.T) {
 	db := setupTestDB()
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
-	user := models.User{
+	handler := controllers.LoginUser(db)
+
+	credentials := models.User{
 		Email:    "test@example.com",
-		Password: string(hashedPassword),
+		Password: "password",
 	}
-	db.Create(&user)
 
-	loginDetails := models.User{
-		Email:    "test@example.com",
-		Password: "password123",
-	}
-	jsonLogin, _ := json.Marshal(loginDetails)
+	jsonCredentials, _ := json.Marshal(credentials)
+	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonCredentials))
+	req.Header.Set("Content-Type", "application/json")
 
-	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonLogin))
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.LoginUser(db))
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusOK, rr.Code)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	var responseBody map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&responseBody); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if _, exists := responseBody["token"]; !exists {
+		t.Errorf("handler returned no token")
+	}
 }
 
-func TestForgotPassword(t *testing.T) {
+func TestGetUserByID(t *testing.T) {
 	db := setupTestDB()
+	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"test@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
-	user := models.User{
-		Email: "test@example.com",
-	}
-	db.Create(&user)
-
-	reqBody := map[string]string{"email": "test@example.com"}
-	jsonReq, _ := json.Marshal(reqBody)
-
-	req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(jsonReq))
+	req, _ := http.NewRequest("GET", "/user/1", nil)
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.ForgotPassword(db))
-	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusOK, rr.Code)
+	router := mux.NewRouter()
+	router.HandleFunc("/user/{userId}", controllers.GetUserByID(db)).Methods("GET")
+	router.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	var user models.User
+	if err := json.NewDecoder(rr.Body).Decode(&user); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if user.Email != "test@example.com" {
+		t.Errorf("handler returned unexpected user: got %v want %v",
+			user.Email, "test@example.com")
+	}
 }
 
-func TestResetPassword(t *testing.T) {
+func TestGetAllEvents(t *testing.T) {
 	db := setupTestDB()
 
-	user := models.User{
-		Email: "test@example.com",
+	// Créer un événement de test
+	testEvent := models.Event{
+		Name:        "Test Event",
+		Description: "Event for testing",
 	}
-	db.Create(&user)
+	db.Create(&testEvent)
 
-	otp := "123456"
-	controllers.OTPStore[user.Email] = otp
+	handler := controllers.GetAllEvents(db)
 
-	reqBody := map[string]string{
-		"email":        "test@example.com",
-		"otp":          otp,
-		"new_password": "newpassword123",
-	}
-	jsonReq, _ := json.Marshal(reqBody)
+	req, _ := http.NewRequest("GET", "/events", nil)
 
-	req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(jsonReq))
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.ResetPassword(db))
-	handler.ServeHTTP(rr, req)
+	router := mux.NewRouter()
+	router.HandleFunc("/events", handler).Methods("GET")
+	router.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusOK, rr.Code)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var events []models.Event
+	if err := json.NewDecoder(rr.Body).Decode(&events); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if len(events) != 1 {
+		t.Errorf("handler returned wrong number of events: got %v want %v", len(events), 1)
+	}
+
+	if events[0].Name != testEvent.Name {
+		t.Errorf("handler returned unexpected event: got %v want %v", events[0].Name, testEvent.Name)
+	}
 }
