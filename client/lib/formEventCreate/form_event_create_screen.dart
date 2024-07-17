@@ -49,103 +49,105 @@ class FormEventCreateScreen extends StatelessWidget {
             },
             child: BlocBuilder<FormEventCreateBloc, FormEventCreateState>(
               builder: (context, state) {
-                return Form(
-                  child: Column(
-                    children: [
-                      _buildTextField(
-                        label: 'Nom de l\'événement',
-                        onChanged: (value) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventNameChanged(name: value),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        label: 'Description',
-                        onChanged: (value) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventDescriptionChanged(description: value),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        label: 'Lieu',
-                        onChanged: (value) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventPlaceChanged(place: value),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _DateTimePicker(
-                        labelText: 'Date de début',
-                        selectedDate: state.dateStart,
-                        selectedTime: state.timeStart,
-                        onSelectedDate: (date) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventDateStartChanged(dateStart: date),
-                              );
-                        },
-                        onSelectedTime: (time) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventTimeStartChanged(timeStart: time),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _DateTimePicker(
-                        labelText: 'Date de fin',
-                        selectedDate: state.dateEnd,
-                        selectedTime: state.timeEnd,
-                        onSelectedDate: (date) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventDateEndChanged(dateEnd: date),
-                              );
-                        },
-                        onSelectedTime: (time) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventTimeEndChanged(timeEnd: time),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      SwitchListTile(
-                        title: const Text('Transport Actif'),
-                        value: state.transportActive,
-                        onChanged: (value) {
-                          context.read<FormEventCreateBloc>().add(
-                                EventTransportActiveChanged(transportActive: value),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Builder( // Use Builder to get the correct context
-                        builder: (context) => SizedBox(
-                          width: double.infinity, // Make button same width as inputs
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6058E9), // Custom button color
-                              foregroundColor: Colors.white, // Button text color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
+                return SingleChildScrollView(
+                  child: Form(
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                          label: 'Nom de l\'événement',
+                          onChanged: (value) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventNameChanged(name: value),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          label: 'Description',
+                          onChanged: (value) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventDescriptionChanged(description: value),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          label: 'Lieu',
+                          onChanged: (value) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventPlaceChanged(place: value),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _DateTimePicker(
+                          labelText: 'Date de début',
+                          selectedDate: state.dateStart,
+                          selectedTime: state.timeStart,
+                          onSelectedDate: (date) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventDateStartChanged(dateStart: date),
+                                );
+                          },
+                          onSelectedTime: (time) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventTimeStartChanged(timeStart: time),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _DateTimePicker(
+                          labelText: 'Date de fin',
+                          selectedDate: state.dateEnd,
+                          selectedTime: state.timeEnd,
+                          onSelectedDate: (date) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventDateEndChanged(dateEnd: date),
+                                );
+                          },
+                          onSelectedTime: (time) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventTimeEndChanged(timeEnd: time),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        SwitchListTile(
+                          title: const Text('Transport Actif'),
+                          value: state.transportActive,
+                          onChanged: (value) {
+                            context.read<FormEventCreateBloc>().add(
+                                  EventTransportActiveChanged(transportActive: value),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Builder( // Use Builder to get the correct context
+                          builder: (context) => SizedBox(
+                            width: double.infinity, // Make button same width as inputs
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF6058E9), // Custom button color
+                                foregroundColor: Colors.white, // Button text color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                              onPressed: () {
+                                final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
+                                final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
+                                context.read<FormEventCreateBloc>().add(EventFormSubmitted(
+                                  dateTimeStart: dateTimeStart,
+                                  dateTimeEnd: dateTimeEnd,
+                                ));
+                              },
+                              child: const Text('Créer l\'événement'),
                             ),
-                            onPressed: () {
-                              final dateTimeStart = combineDateAndTime(state.dateStart, state.timeStart);
-                              final dateTimeEnd = combineDateAndTime(state.dateEnd, state.timeEnd);
-                              context.read<FormEventCreateBloc>().add(EventFormSubmitted(
-                                dateTimeStart: dateTimeStart,
-                                dateTimeEnd: dateTimeEnd,
-                              ));
-                            },
-                            child: const Text('Créer l\'événement'),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

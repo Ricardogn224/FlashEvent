@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/admin/admin_event_edit_screen.dart';
 import 'package:flutter_flash_event/admin/blocFormEvent/admin_form_bloc.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
-import 'package:flutter_flash_event/participant/participant_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:flutter/services.dart';
 
@@ -52,11 +51,11 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                             .add(EmailChanged(email: BlocFormItem(value: selection)));
                       },
                       fieldViewBuilder: (
-                          BuildContext context,
-                          TextEditingController textEditingController,
-                          FocusNode focusNode,
-                          VoidCallback onFieldSubmitted,
-                          ) {
+                        BuildContext context,
+                        TextEditingController textEditingController,
+                        FocusNode focusNode,
+                        VoidCallback onFieldSubmitted,
+                      ) {
                         return CustomFormField(
                           controller: textEditingController,
                           focusNode: focusNode,
@@ -91,6 +90,14 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                               eventId: event.id,
                             ));
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6058E9), // Couleur personnalisée du bouton
+                            foregroundColor: Colors.white, // Couleur du texte sur le bouton
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                          ),
                           child: const Text('SUBMIT'),
                         ),
                         const SizedBox(width: 20),
@@ -98,6 +105,14 @@ class AdminUserAddParticipantScreen extends StatelessWidget {
                           onPressed: () {
                             BlocProvider.of<AdminFormBloc>(context).add(const FormResetEvent());
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red, // Couleur personnalisée du bouton
+                            foregroundColor: Colors.white, // Couleur du texte sur le bouton
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                          ),
                           child: const Text('RESET'),
                         ),
                       ],

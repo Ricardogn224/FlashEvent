@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/authentication/authentication_bloc.dart';
 import 'package:flutter_flash_event/authentication/authentication_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_flash_event/firebase_options.dart';
-import 'package:flutter_flash_event/routes.dart' as custom_routes;
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter_flash_event/screens/splash_screen.dart';
+import 'package:flutter_flash_event/routes.dart';
+import 'package:flutter_flash_event/widgets/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,8 +39,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: '/splash',
-        onGenerateRoute: custom_routes.generateRoute, // Use the route generation function from routes.dart
+        home: SplashScreen(), // Définissez le SplashScreen comme écran d'accueil
+        onGenerateRoute: generateRoute, // Utilisez votre fonction de routage personnalisée
       ),
     );
   }
