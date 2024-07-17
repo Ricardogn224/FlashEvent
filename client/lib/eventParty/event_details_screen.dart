@@ -4,6 +4,8 @@ import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_flash_event/core/services/participant_services.dart';
+import 'package:flutter_flash_event/formEventParty/form_item.dart';
+import 'package:flutter_flash_event/formParticipant/form_participant_screen.dart';
 import 'package:flutter_flash_event/itemEvent/item_event_screen.dart';
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
@@ -27,49 +29,20 @@ class EventScreen extends StatefulWidget {
 
 class _EventScreenState extends State<EventScreen> {
   bool showParticipants = false;
+  bool showParticipantsPresence = false;
   bool showAddParticipantForm = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  List<String> _emailSuggestions = [];
+  late TextEditingController emailController;
 
-  void _fetchEmailSuggestions(String query) async {
-    final suggestions = await UserServices.getAllUserEmails(id: widget.id);
-    setState(() {
-      _emailSuggestions = suggestions.where((email) => email.contains(query)).toList();
-    });
+  @override
+  void initState() {
+    super.initState();
+    emailController = TextEditingController();
   }
 
-  void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      ParticipantAdd newParticipant = ParticipantAdd(
-        id: 0,
-        email: _emailController.text,
-        eventId: widget.id,
-      );
-
-      try {
-        final response = await ParticipantServices.addParticipant(newParticipant);
-        if (response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Participant ajouté avec succès')),
-          );
-          setState(() {
-            showAddParticipantForm = false;
-            _emailController.clear();
-          });
-          // Reload participants
-          context.read<EventPartyBloc>().add(EventPartyDataLoaded(id: widget.id));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erreur lors de l\'ajout du participant')),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
-      }
-    }
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,6 +52,7 @@ class _EventScreenState extends State<EventScreen> {
       child: BlocBuilder<EventPartyBloc, EventPartyState>(
         builder: (context, state) {
           final eventParty = state.eventParty;
+
           return SafeArea(
             child: Scaffold(
               backgroundColor: const Color(0xFFF9F9F9),
@@ -144,14 +118,12 @@ class _EventScreenState extends State<EventScreen> {
                                 Text(
                                     eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
                                         ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateStart))
-                                        : 'Undefined'
-                                ),
+                                        : 'Undefined'),
                                 const SizedBox(width: 8),
                                 Text(
                                     eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
                                         ? DateFormat.Hm().format(DateTime.parse(eventParty.dateStart))
-                                        : ''
-                                ),
+                                        : ''),
                               ],
                             ),
                             const Divider(),
@@ -162,14 +134,12 @@ class _EventScreenState extends State<EventScreen> {
                                 Text(
                                     eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
                                         ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateEnd))
-                                        : 'Undefined'
-                                ),
+                                        : 'Undefined'),
                                 const SizedBox(width: 8),
                                 Text(
                                     eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
                                         ? DateFormat.Hm().format(DateTime.parse(eventParty.dateEnd))
-                                        : ''
-                                ),
+                                        : ''),
                               ],
                             ),
                             const Divider(),
@@ -190,60 +160,19 @@ class _EventScreenState extends State<EventScreen> {
                                     ],
                                   ),
                                 ),
-
                                 IconButton(
                                   icon: Icon(
-                                    showAddParticipantForm ? Icons.remove : Icons.add,
+                                    /*showAddParticipantForm ? Icons.remove :*/ Icons.add,
                                     color: Color(0xFF6058E9),
                                   ),
                                   onPressed: () {
-                                    setState(() {
+                                    /*setState(() {
                                       showAddParticipantForm = !showAddParticipantForm;
-                                    });
+                                    });*/
+                                    FormParticipantScreen.navigateTo(context, id: widget.id);
                                   },
                                 ),
                               ],
-                            ),
-                            const SizedBox(height: 16),
-                            TextButton(
-                              onPressed: () {
-                                // Navigate to ChatRoomScreen with event ID or relevant data
-                                ChatRoomScreen.navigateTo(context, id: widget.id);
-                              },
-                              child: const Text(
-                                'Accéder aux salles de discussions',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Navigate to ChatRoomScreen with event ID or relevant data
-                                ItemEventScreen.navigateTo(context, id: widget.id);
-                              },
-                              child: const Text(
-                                'Les choses à ramener',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Navigate to ChatRoomScreen with event ID or relevant data
-                                TransportationScreen.navigateTo(context, id: widget.id);
-                              },
-                              child: const Text(
-                                'Le transport',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Navigate to ChatRoomScreen with event ID or relevant data
-                                ChatRoomScreen.navigateTo(context, id: widget.id);
-                              },
-                              child: const Text(
-                                'Accéder aux salles de discussions',
-                                style: TextStyle(color: Colors.blue),
-                              ),
                             ),
                             if (showParticipants)
                               Column(
@@ -251,7 +180,9 @@ class _EventScreenState extends State<EventScreen> {
                                 children: [
                                   const Divider(),
                                   if (state.participants != null && state.participants!.isNotEmpty)
-                                    ...state.participants!.map((participant) => Text('Participant: ${participant.firstname} ${participant.lastname}')).toList()
+                                    ...state.participants!
+                                        .map((participant) => Text('Participant: ${participant.firstname} ${participant.lastname}'))
+                                        .toList()
                                   else
                                     const Text('Aucun participant à afficher'),
                                 ],
@@ -260,7 +191,7 @@ class _EventScreenState extends State<EventScreen> {
                               Container(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Form(
-                                  key: _formKey,
+                                  key: state.formKey,
                                   child: Column(
                                     children: [
                                       Autocomplete<String>(
@@ -268,13 +199,15 @@ class _EventScreenState extends State<EventScreen> {
                                           if (textEditingValue.text.isEmpty) {
                                             return const Iterable<String>.empty();
                                           }
-                                          _fetchEmailSuggestions(textEditingValue.text);
-                                          return _emailSuggestions.where((String option) {
+                                          BlocProvider.of<EventPartyBloc>(context)
+                                              .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: state.userParticipant!.eventId));
+                                          return state.emailSuggestions.where((String option) {
                                             return option.contains(textEditingValue.text.toLowerCase());
                                           });
                                         },
                                         onSelected: (String selection) {
-                                          _emailController.text = selection;
+                                          BlocProvider.of<EventPartyBloc>(context)
+                                              .add(EmailChanged(email: BlocFormItem(value: selection)));
                                         },
                                         fieldViewBuilder: (
                                             BuildContext context,
@@ -283,17 +216,18 @@ class _EventScreenState extends State<EventScreen> {
                                             VoidCallback onFieldSubmitted,
                                             ) {
                                           return CustomFormField(
-                                            controller: textEditingController,
+                                            controller: emailController,
                                             focusNode: focusNode,
                                             hintText: 'Email',
-                                            onChange: (val) {},
+                                            onChange: (val) {
+                                              BlocProvider.of<EventPartyBloc>(context)
+                                                  .add(EmailChanged(email: BlocFormItem(value: val!)));
+                                            },
                                             validator: (val) {
-                                              if (val == null || val.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(val)) {
-                                                return 'Enter a valid email';
-                                              }
-                                              return null;
+                                              return state.email.error;
                                             },
                                           );
+
                                         },
                                       ),
                                       const SizedBox(height: 30),
@@ -301,14 +235,30 @@ class _EventScreenState extends State<EventScreen> {
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
                                           ElevatedButton(
-                                            onPressed: _submitForm,
+                                            onPressed: () {
+                                              context.read<EventPartyBloc>().add(
+                                                FormSubmitEvent(
+                                                  participant: state.userParticipant!,
+                                                  onSuccess: () {
+                                                    Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EventScreen(id: state.userParticipant!.eventId)),
+                                                    );
+                                                  },
+                                                  onError: (errorMessage) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text(errorMessage)),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
                                             child: const Text('AJOUTER'),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {
-                                              _formKey.currentState!.reset();
-                                              _emailController.clear();
-                                            },
+                                            onPressed: () {},
                                             child: const Text('RÉINITIALISER'),
                                           ),
                                         ],
@@ -317,7 +267,85 @@ class _EventScreenState extends State<EventScreen> {
                                   ),
                                 ),
                               ),
+                            SwitchListTile(
+                              title: Text("Ma présence"),
+                              value: state.userParticipant?.present ?? false,
+                              onChanged: (bool value) {
+                                if (state.userParticipant != null) {
+                                  // Dispatch the UpdateParticipant event
+                                  context.read<EventPartyBloc>().add(
+                                    UpdateParticipant(
+                                      participant: state.userParticipant!,
+                                      newVal: value,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      showParticipantsPresence = !showParticipantsPresence;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.people, color: Color(0xFF6058E9)),
+                                      SizedBox(width: 8),
+                                      Text('Participants avec présence confirmé'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (showParticipantsPresence)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Divider(),
+                                  if (state.participantsPresence != null && state.participantsPresence!.isNotEmpty)
+                                    ...state.participantsPresence!
+                                        .map((participantPresence) => Text('Participant: ${participantPresence.firstname} ${participantPresence.lastname}'))
+                                        .toList()
+                                  else
+                                    const Text('Aucun participant à afficher'),
+                                ],
+                              ),
                           ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to ChatRoomScreen with event ID or relevant data
+                          ChatRoomScreen.navigateTo(context, id: widget.id);
+                        },
+                        child: const Text(
+                          'Accéder aux salles de discussions',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to ItemEventScreen with event ID or relevant data
+                          ItemEventScreen.navigateTo(context, id: widget.id);
+                        },
+                        child: const Text(
+                          'Les choses à ramener',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to TransportationScreen with event ID or relevant data
+                          TransportationScreen.navigateTo(context, id: widget.id);
+                        },
+                        child: const Text(
+                          'Le transport',
+                          style: TextStyle(color: Colors.blue),
                         ),
                       ),
                     ],
