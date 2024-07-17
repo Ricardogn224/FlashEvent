@@ -4,10 +4,10 @@ import (
 	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"fmt"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -41,7 +41,6 @@ func GetAllEvents(db *gorm.DB) http.HandlerFunc {
 		fmt.Println("Events encoded and sent successfully")
 	}
 }
-
 
 // AddEvent gère l'ajout d'un nouvel événement
 func AddEvent(db *gorm.DB) http.HandlerFunc {
@@ -183,7 +182,6 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(event)
 	}
 }
-
 
 // DeleteEventByID supprime un événement par son ID
 func DeleteEventByID(db *gorm.DB) http.HandlerFunc {
@@ -547,7 +545,6 @@ func GetEventsByParticipantID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-
 func GetEventsCreatedByUserID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := GetUserFromToken(r, db)
@@ -568,5 +565,3 @@ func GetEventsCreatedByUserID(db *gorm.DB) http.HandlerFunc {
 		}
 	}
 }
-
-
