@@ -27,7 +27,7 @@ func TestRegisterUser(t *testing.T) {
 	handler := controllers.RegisterUser(db)
 
 	user := models.User{
-		Email:     "loginuser@example.comm",
+		Email:     "unique@example.com",
 		Firstname: "John",
 		Lastname:  "Doe",
 		Password:  "password",
@@ -41,8 +41,7 @@ func TestRegisterUser(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusCreated)
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusCreated)
 	}
 
 	var returnedUser models.User
@@ -51,8 +50,7 @@ func TestRegisterUser(t *testing.T) {
 	}
 
 	if returnedUser.Email != user.Email {
-		t.Errorf("handler returned unexpected user: got %v want %v",
-			returnedUser.Email, user.Email)
+		t.Errorf("handler returned unexpected user: got %v want %v", returnedUser.Email, user.Email)
 	}
 }
 
@@ -75,8 +73,7 @@ func TestLoginUser(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
 	var responseBody map[string]string
@@ -91,6 +88,8 @@ func TestLoginUser(t *testing.T) {
 
 func TestGetUserByID(t *testing.T) {
 	db := setupTestDB()
+
+	// Enregistrer un utilisateur
 	controllers.RegisterUser(db).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("POST", "/register", bytes.NewBuffer([]byte(`{"email":"getuserbyid@example.com","firstname":"John","lastname":"Doe","password":"password"}`))))
 
 	req, _ := http.NewRequest("GET", "/user/1", nil)
@@ -101,8 +100,7 @@ func TestGetUserByID(t *testing.T) {
 	router.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
 	var user models.User
@@ -111,15 +109,14 @@ func TestGetUserByID(t *testing.T) {
 	}
 
 	if user.Email != "getuserbyid@example.com" {
-		t.Errorf("handler returned unexpected user: got %v want %v",
-			user.Email, "getuserbyid@example.com")
+		t.Errorf("handler returned unexpected user: got %v want %v", user.Email, "getuserbyid@example.com")
 	}
 }
 
 func TestGetAllEvents(t *testing.T) {
 	db := setupTestDB()
 
-	// Create a test event
+	// Créer un événement de test
 	testEvent := models.Event{
 		Name:        "Test Event",
 		Description: "Event for testing",
