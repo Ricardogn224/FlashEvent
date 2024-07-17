@@ -27,9 +27,9 @@ import 'package:flutter_flash_event/transportation/transport_start_edit_screen.d
 import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart';
 import 'package:flutter_flash_event/formEventCreate/bloc/form_event_create_bloc.dart';
-import 'login/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/splash_screen.dart';
+import 'package:flutter_flash_event/login/login_screen.dart';
+import 'package:flutter_flash_event/screens/register_screen.dart';
+import 'package:flutter_flash_event/screens/splash_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   final args = settings.arguments;
@@ -40,6 +40,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const RegisterScreen());
     case '/home':
       return MaterialPageRoute(builder: (_) => const HomeScreen());
+    case MyAccountScreen.routeName:
+      return MaterialPageRoute(builder: (_) => const MyAccountScreen());
     case AdminHomeDesktop.routeName:
       return MaterialPageRoute(builder: (_) => const AdminHomeDesktop());
     case AdminUserScreen.routeName:
@@ -89,8 +91,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           child: const FormEventCreateScreen(),
         ),
       );
-    case '/my-account':
-      return MaterialPageRoute(builder: (_) => const MyAccountScreen());
     default:
       return MaterialPageRoute(builder: (_) => SplashScreen());
   }
