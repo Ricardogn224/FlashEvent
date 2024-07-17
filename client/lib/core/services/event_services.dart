@@ -145,4 +145,42 @@ class EventServices {
           message: 'Unknown error while deleting event with id $id');
     }
   }
+
+  static Future<List<Event>> getMyEvents() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      try {
+        final response = await http.get(Uri.parse('http://10.0.2.2:8000/my-events'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $token', // Include token in headers
+          },);
+        if (response.statusCode < 200 || response.statusCode >= 400) {
+          throw ApiException(message: 'Error: Server responded with status code ${response.statusCode}');
+        }
+        final data = json.decode(response.body);
+        return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ?? [];
+      } catch (error) {
+        throw ApiException(message: 'Get My Events: Error occurred while retrieving events. Error: $error');
+      }
+    }
+
+    static Future<List<Event>> getCreatedEvents() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      try {
+        final response = await http.get(Uri.parse('http://10.0.2.2:8000/created-events'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $token', // Include token in headers
+          },);
+        if (response.statusCode < 200 || response.statusCode >= 400) {
+          throw ApiException(message: 'Error: Server responded with status code ${response.statusCode}');
+        }
+        final data = json.decode(response.body);
+        return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ?? [];
+      } catch (error) {
+        throw ApiException(message: 'Get Created Events: Error occurred while retrieving events. Error: $error');
+      }
+    }
 }
