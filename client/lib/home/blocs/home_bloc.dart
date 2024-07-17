@@ -23,11 +23,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _loadEvents(Emitter<HomeState> emit) async {
     emit(HomeLoading());
     try {
-      final events = await EventServices.getEvents();
-      emit(HomeDataLoadSuccess(events: events));
+      final myEvents = await EventServices.getMyEvents();
+      final createdEvents = await EventServices.getCreatedEvents();
+      emit(HomeDataLoadSuccess(myEvents: myEvents, createdEvents: createdEvents));
     } on ApiException catch (error) {
       emit(HomeDataLoadError(errorMessage: 'An error occurred.'));
     }
   }
 }
+
 
