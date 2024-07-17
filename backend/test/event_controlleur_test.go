@@ -14,10 +14,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func mockSendEmail(email string) {
-	// Mock function to replace sendWelcomeEmail during tests
-}
-
 func TestAddItem(t *testing.T) {
 	db := setupTestDB()
 
@@ -88,7 +84,6 @@ func generateTestToken(email string) string {
 
 func TestAddEvent(t *testing.T) {
 	db := setupTestDB()
-	controllers.sendEmailFunc = mockSendEmail // Replace actual email function with mock
 
 	// Create a test user
 	testUser := models.User{
@@ -136,7 +131,6 @@ func TestAddEvent(t *testing.T) {
 
 func TestGetAllEvents(t *testing.T) {
 	db := setupTestDB()
-	controllers.sendEmailFunc = mockSendEmail // Replace actual email function with mock
 
 	// Create a test event
 	testEvent := models.Event{
