@@ -27,7 +27,7 @@ func TestRegisterUser(t *testing.T) {
 	handler := controllers.RegisterUser(db)
 
 	user := models.User{
-		Email:     "test@example.com",
+		Email:     "ar@metrooptic.fr",
 		Firstname: "John",
 		Lastname:  "Doe",
 		Password:  "password",
@@ -63,7 +63,7 @@ func TestLoginUser(t *testing.T) {
 	handler := controllers.LoginUser(db)
 
 	credentials := models.User{
-		Email:    "test@example.com",
+		Email:    "ar@metrooptic.fr",
 		Password: "password",
 	}
 
