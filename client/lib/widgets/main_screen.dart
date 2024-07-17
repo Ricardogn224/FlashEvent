@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
-import 'package:flutter_flash_event/connections/connections_screen.dart';
+import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/explore/explore_screen.dart';
 import 'package:flutter_flash_event/notifications/notifications_screen.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
@@ -15,7 +15,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const ConnectionsScreen(),
+    const InvitationScreen(),
     const ExploreScreen(),
     const NotificationsScreen(),
     const MessageChatScreen(id: 1),
@@ -25,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    print('Selected index: $index'); // Log pour vérifier que la fonction est appelée
   }
 
   @override
@@ -32,7 +33,15 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages,
+        children: _pages.map((page) {
+          return Navigator(
+            onGenerateRoute: (routeSettings) {
+              return MaterialPageRoute(
+                builder: (context) => page,
+              );
+            },
+          );
+        }).toList(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -46,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            label: 'Connections',
+            label: 'Invitations',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flash_event/Invitation/bloc/invitation_bloc.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
@@ -8,7 +7,7 @@ import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dar
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,26 +16,75 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => HomeBloc()..add(HomeDataLoaded()),
         ),
-        BlocProvider(
-          create: (context) => InvitationBloc()..add(InvitationDataLoaded()),
-        ),
       ],
-      child: SafeArea(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, homeState) {
-            return BlocBuilder<InvitationBloc, InvitationState>(
-              builder: (context, invitationState) {
-                if (homeState is HomeLoading || invitationState.status == InvitationStatus.loading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F9F9),
+        body: SafeArea(
+          child: Navigator(
+            onGenerateRoute: (RouteSettings settings) {
+              WidgetBuilder builder;
+              switch (settings.name) {
+                case '/':
+                  builder = (BuildContext context) => HomeContent();
+                  break;
+                case EventScreen.routeName:
+                  builder = (BuildContext context) => EventScreen(id: settings.arguments as int);
+                  break;
+                case MyAccountScreen.routeName:
+                  builder = (BuildContext context) => const MyAccountScreen();
+                  break;
+                default:
+                  throw Exception('Invalid route: ${settings.name}');
+              }
+              return MaterialPageRoute(builder: builder, settings: settings);
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FormEventCreateScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFF6058E9),
+          child: const Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+}
 
-                  if (homeState is HomeDataLoadError) {
-                    return Center(
-                      child: Text(homeState.errorMessage),
-                    );
-                  }
+class HomeContent extends StatefulWidget {
+  @override
+  _HomeContentState createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  int _currentPage = 0;
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, homeState) {
+        if (homeState is HomeLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+          if (homeState is HomeDataLoadError) {
+            return Center(
+              child: Text(homeState.errorMessage),
+            );
+          }
 
                   if (invitationState.status == InvitationStatus.error) {
                     return Center(
