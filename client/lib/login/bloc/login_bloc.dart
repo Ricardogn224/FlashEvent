@@ -20,8 +20,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     emit(LoginLoading());
 
     try {
-      final response =
-          await AuthServices.loginUser(event.email, event.password);
+      final response = await AuthServices.loginUser(event.email, event.password);
       if (response.statusCode == 200) {
         // Extract token from response body
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -34,6 +33,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         String email = decodedToken['email'];
         String userRole =
             decodedToken['role']; // Assuming the role is stored in the token
+        String userRole = decodedToken['role']; // Assuming the role is stored in the token
 
         // Store token in session
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -44,7 +44,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         await prefs.setInt('userId', user.id);
 
-        emit(LoginSuccess(userRole: userRole));
+        emit(LoginSuccess(userRole: userRoleuserRole: userRole));
 
         //await FirebaseApi().initNotifications();
       } else {
