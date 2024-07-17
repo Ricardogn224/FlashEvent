@@ -266,26 +266,7 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 
 		// Fetch all participants with the given event ID
 		var participants []models.Participant
-		if err := db.Where("event_id = ?", eventID).Find(&participants).Error; err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		// Respond with the retrieved participants
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(participants)
-	}
-}
-
-// GetParticipantsByEventID retrieves all participants associated with the provided event ID
-func GetParticipantsByPresence(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
-		eventID := params["eventId"]
-
-		// Fetch all participants with the given event ID
-		var participants []models.Participant
-		if err := db.Where("event_id = ? AND active = ? AND response = ? AND present = ?", eventID, true, true, true).Find(&participants).Error; err != nil {
+		if err := db.Where("event_id = ? AND active = ? AND response = ?", eventID, true, true).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}

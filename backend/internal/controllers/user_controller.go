@@ -41,9 +41,9 @@ func HasRole(user *models.User, roles ...string) bool {
 var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
-    Email string `json:"email"`
-    Role  string `json:"role"` // Ajouter ce champ
-    jwt.StandardClaims
+	Email string `json:"email"`
+	Role  string `json:"role"`
+	jwt.StandardClaims
 }
 
 var otpStore = make(map[string]string)
@@ -96,7 +96,7 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// RegisterUser gère l'enregistrement d'un nouvel utilisateur
+// RegisterUserAdmin gère l'enregistrement d'un nouvel utilisateur par un administrateur
 func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Initialiser les tables nécessaires si elles n'existent pas
@@ -251,48 +251,44 @@ func ResetPassword(db *gorm.DB) http.HandlerFunc {
 
 // LoginUser gère la connexion d'un utilisateur
 func LoginUser(db *gorm.DB) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-        // Initialiser les tables nécessaires si elles n'existent pas
-        database.MigrateAll(db)
+	return func(w http.ResponseWriter, r *http.Request) {
+		var credentials models.User
+		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-        var credentials models.User
-        if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
-            http.Error(w, err.Error(), http.StatusBadRequest)
-            return
-        }
+		var user models.User
+		result := db.Where("email = ?", credentials.Email).First(&user)
+		if result.Error != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
-        var user models.User
-        result := db.Where("email = ?", credentials.Email).First(&user)
-        if result.Error != nil {
-            http.Error(w, "Unauthorized", http.StatusUnauthorized)
-            return
-        }
+		if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)) != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
-        if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)) != nil {
-            http.Error(w, "Unauthorized", http.StatusUnauthorized)
-            return
-        }
+		expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
+		claims := &Claims{
+			Email: user.Email,
+			Role:  user.Role, // Ajouter le rôle de l'utilisateur ici
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
+		}
 
-        expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
-        claims := &Claims{
-            Email: user.Email,
-            Role:  user.Role, // Ajouter le rôle de l'utilisateur ici
-            StandardClaims: jwt.StandardClaims{
-            ExpiresAt: expirationTime.Unix(),
-            },
-        }
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString(jwtKey)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 
-        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-        tokenString, err := token.SignedString(jwtKey)
-        if err != nil {
-            http.Error(w, "Internal server error", http.StatusInternalServerError)
-            return
-        }
-
-
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
-    }
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+	}
 }
 
 func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
