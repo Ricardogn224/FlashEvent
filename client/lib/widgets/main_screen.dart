@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    print('Selected index: $index'); // Log pour vérifier que la fonction est appelée
+    print('Selected index: $index');
   }
 
   @override

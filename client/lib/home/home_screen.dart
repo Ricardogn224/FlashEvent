@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
-import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart'; // Import screen
+import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -26,6 +27,9 @@ class HomeScreen extends StatelessWidget {
               switch (settings.name) {
                 case '/':
                   builder = (BuildContext context) => HomeContent();
+                  break;
+                case ChatRoomScreen.routeName:
+                  builder = (BuildContext context) => ChatRoomScreen(id: settings.arguments as int);
                   break;
                 case EventScreen.routeName:
                   builder = (BuildContext context) => EventScreen(id: settings.arguments as int);

@@ -39,8 +39,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: SplashScreen(), // Définissez le SplashScreen comme écran d'accueil
-        onGenerateRoute: generateRoute, // Utilisez votre fonction de routage personnalisée
+        home: SplashScreen(),
+        onGenerateRoute: generateRoute,
       ),
     );
   }
