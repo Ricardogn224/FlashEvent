@@ -334,6 +334,22 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 }
 
 // GetUserByID returns a user by their ID
+func MyUser(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		// Vérifier les rôles de l'utilisateur
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(user)
+	}
+}
+
+// GetUserByID returns a user by their ID
 func GetUserByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

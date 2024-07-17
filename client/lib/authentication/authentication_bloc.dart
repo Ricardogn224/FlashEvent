@@ -22,6 +22,9 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       bool isTokenExpired = JwtDecoder.isExpired(token);
       if (isTokenExpired) {
         print(isTokenExpired);
+        await prefs.remove('token');
+        await prefs.remove('email');
+        await prefs.remove('userId');
         emit(AuthenticationUnauthenticated());
       } else {
         emit(AuthenticationAuthenticated());
@@ -39,6 +42,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('email');
+    await prefs.remove('userId');
     emit(AuthenticationUnauthenticated());
   }
 }
