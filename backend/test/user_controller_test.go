@@ -115,3 +115,40 @@ func TestGetUserByID(t *testing.T) {
 			user.Email, "test@example.com")
 	}
 }
+
+func TestGetAllEvents(t *testing.T) {
+	db := setupTestDB()
+
+	// Créer un événement de test
+	testEvent := models.Event{
+		Name:        "Test Event",
+		Description: "Event for testing",
+	}
+	db.Create(&testEvent)
+
+	handler := controllers.GetAllEvents(db)
+
+	req, _ := http.NewRequest("GET", "/events", nil)
+
+	rr := httptest.NewRecorder()
+	router := mux.NewRouter()
+	router.HandleFunc("/events", handler).Methods("GET")
+	router.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var events []models.Event
+	if err := json.NewDecoder(rr.Body).Decode(&events); err != nil {
+		t.Errorf("handler returned invalid body: %v", err)
+	}
+
+	if len(events) != 1 {
+		t.Errorf("handler returned wrong number of events: got %v want %v", len(events), 1)
+	}
+
+	if events[0].Name != testEvent.Name {
+		t.Errorf("handler returned unexpected event: got %v want %v", events[0].Name, testEvent.Name)
+	}
+}
