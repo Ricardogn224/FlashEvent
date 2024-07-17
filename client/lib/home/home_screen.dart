@@ -5,6 +5,7 @@ import 'package:flutter_flash_event/home/blocs/home_bloc.dart';
 import 'package:flutter_flash_event/myAccount/my_account_screen.dart';
 import 'package:flutter_flash_event/formEventCreate/form_event_create_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
+import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -65,12 +66,15 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  int _currentPage = 0;
-  final PageController _pageController = PageController();
+  int _currentMyEventsPage = 0;
+  int _currentCreatedEventsPage = 0;
+  final PageController _myEventsPageController = PageController();
+  final PageController _createdEventsPageController = PageController();
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _myEventsPageController.dispose();
+    _createdEventsPageController.dispose();
     super.dispose();
   }
 

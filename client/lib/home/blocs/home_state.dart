@@ -8,10 +8,12 @@ final class HomeInitial extends HomeState {}
 final class HomeLoading extends HomeState {}
 
 final class HomeDataLoadSuccess extends HomeState {
-  final List<Event> events;
+  final List<Event> myEvents;
+  final List<Event> createdEvents;
 
-  HomeDataLoadSuccess({required this.events});
+  HomeDataLoadSuccess({required this.myEvents, required this.createdEvents});
 }
+
 
 final class HomeDataLoadError extends HomeState {
   final String errorMessage;
