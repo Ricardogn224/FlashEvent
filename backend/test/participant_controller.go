@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,60 +31,29 @@ func getTokenForUser(user models.User) string {
 	return "Bearer your_generated_token"
 }
 
-func TestAnswerInvitation(t *testing.T) {
-	db := setupTestDB()
-
-	user := models.User{
-		Email:    "test@example.com",
-		Password: "password123",
-		Role:     "user",
-	}
-	db.Create(&user)
-
-	participant := models.Participant{
-		UserID:  user.ID,
-		EventID: 1,
-	}
-	db.Create(&participant)
-
-	invitationAnswer := models.InvitationAnswer{
-		ParticipantID: participant.ID,
-		Active:        true,
-	}
-	jsonInvitation, _ := json.Marshal(invitationAnswer)
-
-	req, _ := http.NewRequest("POST", "/answer-invitation", bytes.NewBuffer(jsonInvitation))
-	req.Header.Set("Authorization", getTokenForUser(user))
-	rr := httptest.NewRecorder()
-	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.AnswerInvitation(db)))
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-}
-
 func TestAddParticipant(t *testing.T) {
 	db := setupTestDB()
 
-	admin := models.User{
+	adminUser := models.User{
 		Email:    "admin@example.com",
 		Password: "password123",
-		Role:     "AdminEvent",
+		Role:     "AdminPlatform",
 	}
-	db.Create(&admin)
+	db.Create(&adminUser)
 
 	event := models.Event{
-		Name: "Test Event",
+		Name:      "Test Event",
+		CreatedBy: adminUser.ID,
 	}
 	db.Create(&event)
 
 	participantAdd := models.ParticipantAdd{
-		Email:   "test@example.com",
 		EventID: event.ID,
 	}
 	jsonParticipant, _ := json.Marshal(participantAdd)
 
-	req, _ := http.NewRequest("POST", "/participant", bytes.NewBuffer(jsonParticipant))
-	req.Header.Set("Authorization", getTokenForUser(admin))
+	req, _ := http.NewRequest("POST", "/participants", bytes.NewBuffer(jsonParticipant))
+	req.Header.Set("Authorization", getTokenForUser(adminUser))
 	rr := httptest.NewRecorder()
 	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.AddParticipant(db)))
 	handler.ServeHTTP(rr, req)
@@ -91,41 +61,37 @@ func TestAddParticipant(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rr.Code)
 }
 
-func TestGetParticipantByID(t *testing.T) {
+func TestDeleteParticipant(t *testing.T) {
 	db := setupTestDB()
 
-	participant := models.Participant{
-		UserID:  1,
-		EventID: 1,
-	}
-	db.Create(&participant)
-
-	req, _ := http.NewRequest("GET", "/participant/1", nil)
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.GetParticipantByID(db))
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-}
-
-func TestDeleteParticipantByID(t *testing.T) {
-	db := setupTestDB()
-
-	admin := models.User{
+	adminUser := models.User{
 		Email:    "admin@example.com",
 		Password: "password123",
-		Role:     "AdminEvent",
+		Role:     "AdminPlatform",
 	}
-	db.Create(&admin)
+	db.Create(&adminUser)
+
+	user := models.User{
+		Email:    "test@example.com",
+		Password: "password123",
+		Role:     "User",
+	}
+	db.Create(&user)
+
+	event := models.Event{
+		Name:      "Test Event",
+		CreatedBy: adminUser.ID,
+	}
+	db.Create(&event)
 
 	participant := models.Participant{
-		UserID:  admin.ID,
-		EventID: 1,
+		UserID:  user.ID,
+		EventID: event.ID,
 	}
 	db.Create(&participant)
 
-	req, _ := http.NewRequest("DELETE", "/participant/1", nil)
-	req.Header.Set("Authorization", getTokenForUser(admin))
+	req, _ := http.NewRequest("DELETE", "/participants/"+strconv.Itoa(int(participant.ID)), nil)
+	req.Header.Set("Authorization", getTokenForUser(adminUser))
 	rr := httptest.NewRecorder()
 	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.DeleteParticipantByID(db)))
 	handler.ServeHTTP(rr, req)
@@ -136,27 +102,39 @@ func TestDeleteParticipantByID(t *testing.T) {
 func TestUpdateParticipant(t *testing.T) {
 	db := setupTestDB()
 
-	admin := models.User{
+	adminUser := models.User{
 		Email:    "admin@example.com",
 		Password: "password123",
-		Role:     "AdminEvent",
+		Role:     "AdminPlatform",
 	}
-	db.Create(&admin)
+	db.Create(&adminUser)
+
+	user := models.User{
+		Email:    "test@example.com",
+		Password: "password123",
+		Role:     "User",
+	}
+	db.Create(&user)
+
+	event := models.Event{
+		Name:      "Test Event",
+		CreatedBy: adminUser.ID,
+	}
+	db.Create(&event)
 
 	participant := models.Participant{
-		UserID:  admin.ID,
-		EventID: 1,
+		UserID:  user.ID,
+		EventID: event.ID,
 	}
 	db.Create(&participant)
 
-	updateData := models.Participant{
-		TransportationID: 2,
-		Active:           true,
+	updatedParticipant := models.Participant{
+		Active: true,
 	}
-	jsonUpdate, _ := json.Marshal(updateData)
+	jsonParticipant, _ := json.Marshal(updatedParticipant)
 
-	req, _ := http.NewRequest("PATCH", "/participants/1", bytes.NewBuffer(jsonUpdate))
-	req.Header.Set("Authorization", getTokenForUser(admin))
+	req, _ := http.NewRequest("PATCH", "/participants/"+strconv.Itoa(int(participant.ID)), bytes.NewBuffer(jsonParticipant))
+	req.Header.Set("Authorization", getTokenForUser(adminUser))
 	rr := httptest.NewRecorder()
 	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.UpdateParticipant(db)))
 	handler.ServeHTTP(rr, req)
@@ -164,86 +142,13 @@ func TestUpdateParticipant(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func TestGetParticipantsByEventID(t *testing.T) {
-	db := setupTestDB()
-
-	participant := models.Participant{
-		UserID:   1,
-		EventID:  1,
-		Active:   true,
-		Response: true,
-	}
-	db.Create(&participant)
-
-	req, _ := http.NewRequest("GET", "/participants-event/1", nil)
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.GetParticipantsByEventID(db))
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-}
-
-func TestGetParticipantsByTransportationID(t *testing.T) {
-	db := setupTestDB()
-
-	participant := models.Participant{
-		UserID:           1,
-		TransportationID: 1,
-	}
-	db.Create(&participant)
-
-	req, _ := http.NewRequest("GET", "/participants-transportation/1", nil)
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.GetParticipantsByTransportationID(db))
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-}
-
-func TestGetParticipantsWithUserByTransportationID(t *testing.T) {
+func TestGetParticipantByEventId(t *testing.T) {
 	db := setupTestDB()
 
 	user := models.User{
 		Email:    "test@example.com",
 		Password: "password123",
-		Role:     "user",
-	}
-	db.Create(&user)
-
-	event := models.Event{
-		Name:            "Test Event",
-		TransportActive: true,
-	}
-	db.Create(&event)
-
-	transportation := models.Transportation{
-		EventID: event.ID,
-		UserID:  user.ID,
-	}
-	db.Create(&transportation)
-
-	participant := models.Participant{
-		UserID:           user.ID,
-		EventID:          event.ID,
-		TransportationID: transportation.ID,
-	}
-	db.Create(&participant)
-
-	req, _ := http.NewRequest("GET", "/participants-transportation-user/1", nil)
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.GetParticipantsWithUserByTransportationID(db))
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-}
-
-func TestGetInvitationsByUser(t *testing.T) {
-	db := setupTestDB()
-
-	user := models.User{
-		Email:    "test@example.com",
-		Password: "password123",
-		Role:     "user",
+		Role:     "User",
 	}
 	db.Create(&user)
 
@@ -253,16 +158,59 @@ func TestGetInvitationsByUser(t *testing.T) {
 	db.Create(&event)
 
 	participant := models.Participant{
-		UserID:   user.ID,
-		EventID:  event.ID,
-		Response: false,
+		UserID:  user.ID,
+		EventID: event.ID,
 	}
 	db.Create(&participant)
 
-	req, _ := http.NewRequest("GET", "/invitations/test@example.com", nil)
+	req, _ := http.NewRequest("GET", "/get-participant/"+strconv.Itoa(int(event.ID)), nil)
+	req.Header.Set("Authorization", getTokenForUser(user))
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.GetInvitationsByUser(db))
+	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.GetParticipantByEventId(db)))
 	handler.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestGetParticipantsByEventID(t *testing.T) {
+	db := setupTestDB()
+
+	event := models.Event{
+		Name: "Test Event",
+	}
+	db.Create(&event)
+
+	user1 := models.User{
+		Email:    "user1@example.com",
+		Password: "password123",
+	}
+	db.Create(&user1)
+
+	user2 := models.User{
+		Email:    "user2@example.com",
+		Password: "password123",
+	}
+	db.Create(&user2)
+
+	participant1 := models.Participant{
+		UserID:  user1.ID,
+		EventID: event.ID,
+	}
+	db.Create(&participant1)
+
+	participant2 := models.Participant{
+		UserID:  user2.ID,
+		EventID: event.ID,
+	}
+	db.Create(&participant2)
+
+	req, _ := http.NewRequest("GET", "/participants-event/"+strconv.Itoa(int(event.ID)), nil)
+	rr := httptest.NewRecorder()
+	handler := controllers.AuthMiddleware(http.HandlerFunc(controllers.GetParticipantsByEventID(db)))
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	var participants []models.Participant
+	json.Unmarshal(rr.Body.Bytes(), &participants)
+	assert.Equal(t, 2, len(participants))
 }
