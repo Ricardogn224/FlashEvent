@@ -3,12 +3,15 @@ class Participant {
   final int userId;
   final int eventId;
   final int transportationId;
+  final bool present;
+
 
   Participant({
     required this.id,
     required this.userId,
     required this.eventId,
     required this.transportationId,
+    required this.present,
   });
 
   factory Participant.fromJson(Map<String, dynamic> json) {
@@ -17,7 +20,18 @@ class Participant {
       userId: json['user_id'],
       eventId: json['event_id'],
       transportationId: json['transportation_id'],
+      present: json['present'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'eventId': eventId,
+      'transportationId': transportationId,
+      'present': present,
+    };
   }
 }
 

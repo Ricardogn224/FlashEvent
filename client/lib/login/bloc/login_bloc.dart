@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_flash_event/api/firebase_api.dart';
 import 'package:flutter_flash_event/core/services/auth_services.dart';
+import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_flash_event/login/bloc/login_event.dart';
 import 'package:flutter_flash_event/login/bloc/login_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +36,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
         await prefs.setString('email', email);
+        
+        await prefs.setString('role', userRole);
 
+        final user = await UserServices.getCurrentUser();
+
+        await prefs.setInt('userId', user.id);
+        
         emit(LoginSuccess(userRole: userRole));
 
         //await FirebaseApi().initNotifications();

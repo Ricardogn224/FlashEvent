@@ -11,10 +11,10 @@ type Cagnotte struct {
 
 // Contribution représente une contribution à une cagnotte
 type Contribution struct {
-	ID         uint    `gorm:"primaryKey" json:"id"`
-	CagnotteID uint    `json:"cagnotte_id"`
-	UserID     uint    `json:"user_id"`
-	Amount     float64 `json:"amount"`
+	ID            uint    `gorm:"primaryKey" json:"id"`
+	CagnotteID    uint    `json:"cagnotte_id"`
+	ParticipantID uint    `json:"participant_id"`
+	Amount        float64 `json:"amount"`
 }
 
 // MigrateCagnotte initialise la table Cagnotte
