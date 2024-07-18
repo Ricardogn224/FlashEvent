@@ -43,3 +43,15 @@ services:
     depends_on:
       - backend
     restart: always
+
+  flutter:
+    container_name: flutter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./apk:/usr/share/nginx/html/apk
+      - ./web:/usr/share/nginx/html
+    depends_on:
+      - backend
+    restart: always
