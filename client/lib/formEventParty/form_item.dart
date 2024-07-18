@@ -1,5 +1,3 @@
-
-
 class BlocFormItem {
   final String? error;
   final String value;
