@@ -108,11 +108,13 @@ class _EventScreenState extends State<EventScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.location_on, color: Color(0xFF6058E9)),
+                                const Icon(Icons.location_on,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(eventParty.place ?? 'Undefined'),
                               ],
@@ -120,21 +122,26 @@ class _EventScreenState extends State<EventScreen> {
                             const Divider(),
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
+                                const Icon(Icons.calendar_today,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
                                   eventParty.dateStart != null &&
-                                      eventParty.dateStart.isNotEmpty
+                                      eventParty.dateStart
+                                          .isNotEmpty
                                       ? DateFormat.yMMMd().format(
-                                      DateTime.parse(eventParty.dateStart))
+                                      DateTime.parse(
+                                          eventParty.dateStart))
                                       : 'Undefined',
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   eventParty.dateStart != null &&
-                                      eventParty.dateStart.isNotEmpty
+                                      eventParty.dateStart
+                                          .isNotEmpty
                                       ? DateFormat.Hm().format(
-                                      DateTime.parse(eventParty.dateStart))
+                                      DateTime.parse(
+                                          eventParty.dateStart))
                                       : '',
                                 ),
                               ],
@@ -142,40 +149,48 @@ class _EventScreenState extends State<EventScreen> {
                             const Divider(),
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
+                                const Icon(Icons.calendar_today,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
                                   eventParty.dateEnd != null &&
-                                      eventParty.dateEnd.isNotEmpty
+                                      eventParty.dateEnd
+                                          .isNotEmpty
                                       ? DateFormat.yMMMd().format(
-                                      DateTime.parse(eventParty.dateEnd))
+                                      DateTime.parse(
+                                          eventParty.dateEnd))
                                       : 'Undefined',
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   eventParty.dateEnd != null &&
-                                      eventParty.dateEnd.isNotEmpty
+                                      eventParty.dateEnd
+                                          .isNotEmpty
                                       ? DateFormat.Hm().format(
-                                      DateTime.parse(eventParty.dateEnd))
+                                      DateTime.parse(
+                                          eventParty.dateEnd))
                                       : '',
                                 ),
                               ],
                             ),
                             const Divider(),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      showParticipants = !showParticipants;
+                                      showParticipants =
+                                      !showParticipants;
                                     });
                                   },
                                   child: Row(
                                     children: [
-                                      Icon(Icons.people, color: Color(0xFF6058E9)),
-                                      SizedBox(width: 8),
-                                      Text('Participants'),
+                                      const Icon(Icons.people,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text('Participants'),
                                       Icon(
                                         showParticipants
                                             ? Icons.arrow_drop_up
@@ -186,43 +201,52 @@ class _EventScreenState extends State<EventScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.add,
                                     color: Color(0xFF6058E9),
                                   ),
                                   onPressed: () {
                                     FormParticipantScreen.navigateTo(
-                                        context, id: widget.id);
+                                        context,
+                                        id: widget.id);
                                   },
                                 ),
                               ],
                             ),
                             if (showParticipants)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   const Divider(),
                                   if (state.participants != null &&
                                       state.participants!.isNotEmpty)
-                                    ...state.participants!.map((participant) {
-                                      return ListTile(
-                                        leading: Icon(Icons.person),
-                                        title: Text(
-                                            '${participant.firstname} ${participant.lastname}'),
-                                      );
-                                    }).toList()
+                                    ...state.participants!.map(
+                                            (participant) {
+                                          return ListTile(
+                                            leading:
+                                            Icon(Icons.person),
+                                            title: Text(
+                                                '${participant.firstname} ${participant.lastname}'),
+                                          );
+                                        }).toList()
                                   else
-                                    const Text('Aucun participant à afficher'),
+                                    const Text(
+                                        'Aucun participant à afficher'),
                                 ],
                               ),
                             SwitchListTile(
                               title: const Text("Ma présence"),
-                              value: state.userParticipant?.present ?? false,
+                              value: state.userParticipant?.present ??
+                                  false,
                               onChanged: (bool value) {
                                 if (state.userParticipant != null) {
-                                  context.read<EventPartyBloc>().add(
+                                  context
+                                      .read<EventPartyBloc>()
+                                      .add(
                                     UpdateParticipant(
-                                      participant: state.userParticipant!,
+                                      participant:
+                                      state.userParticipant!,
                                       newVal: value,
                                     ),
                                   );
@@ -230,7 +254,8 @@ class _EventScreenState extends State<EventScreen> {
                               },
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
                                   onTap: () {
@@ -241,9 +266,11 @@ class _EventScreenState extends State<EventScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      Icon(Icons.people, color: Color(0xFF6058E9)),
-                                      SizedBox(width: 8),
-                                      Text('Participants avec présence confirmée'),
+                                      const Icon(Icons.people,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                          'Participants avec présence confirmée'),
                                       Icon(
                                         showParticipantsPresence
                                             ? Icons.arrow_drop_up
@@ -257,25 +284,32 @@ class _EventScreenState extends State<EventScreen> {
                             ),
                             if (showParticipantsPresence)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   const Divider(),
-                                  if (state.participantsPresence != null &&
-                                      state.participantsPresence!.isNotEmpty)
-                                    ...state.participantsPresence!.map(
+                                  if (state.participantsPresence !=
+                                      null &&
+                                      state.participantsPresence!
+                                          .isNotEmpty)
+                                    ...state.participantsPresence!
+                                        .map(
                                             (participantPresence) {
                                           return ListTile(
-                                            leading: Icon(Icons.person),
+                                            leading:
+                                            Icon(Icons.person),
                                             title: Text(
                                                 '${participantPresence.firstname} ${participantPresence.lastname}'),
                                           );
                                         }).toList()
                                   else
-                                    const Text('Aucun participant à afficher'),
+                                    const Text(
+                                        'Aucun participant à afficher'),
                                 ],
                               ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
                                   onTap: () {
@@ -285,9 +319,10 @@ class _EventScreenState extends State<EventScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      Icon(Icons.list, color: Color(0xFF6058E9)),
-                                      SizedBox(width: 8),
-                                      Text('Choses à ramener'),
+                                      const Icon(Icons.list,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text('Choses à ramener'),
                                       Icon(
                                         showItems
                                             ? Icons.arrow_drop_up
@@ -299,12 +334,15 @@ class _EventScreenState extends State<EventScreen> {
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    showAddItemForm ? Icons.remove : Icons.add,
+                                    showAddItemForm
+                                        ? Icons.remove
+                                        : Icons.add,
                                     color: Color(0xFF6058E9),
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      showAddItemForm = !showAddItemForm;
+                                      showAddItemForm =
+                                      !showAddItemForm;
                                     });
                                   },
                                 ),
@@ -312,34 +350,40 @@ class _EventScreenState extends State<EventScreen> {
                             ),
                             if (showItems)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   const Divider(),
                                   if (state.itemEvents != null &&
                                       state.itemEvents!.isNotEmpty)
-                                    ...state.itemEvents!.map((itemEvent) {
-                                      return ListTile(
-                                        leading: Icon(Icons.person),
-                                        title: Text(itemEvent.name),
-                                        subtitle: Text(
-                                            '${itemEvent.firstname} ${itemEvent.lastname}'),
-                                      );
-                                    }).toList()
+                                    ...state.itemEvents!.map(
+                                            (itemEvent) {
+                                          return ListTile(
+                                            leading:
+                                            Icon(Icons.person),
+                                            title: Text(itemEvent.name),
+                                            subtitle: Text(
+                                                '${itemEvent.firstname} ${itemEvent.lastname}'),
+                                          );
+                                        }).toList()
                                   else
-                                    const Text('Aucun item à afficher'),
+                                    const Text(
+                                        'Aucun item à afficher'),
                                 ],
                               ),
                             if (showAddItemForm)
                               Padding(
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: TextFormField(
                                         controller: itemController,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Nom de l\'item',
+                                        decoration:
+                                        const InputDecoration(
+                                          hintText:
+                                          'Nom de l\'item',
                                         ),
                                       ),
                                     ),
@@ -347,11 +391,14 @@ class _EventScreenState extends State<EventScreen> {
                                       icon: const Icon(Icons.check,
                                           color: Colors.green),
                                       onPressed: () {
-                                        if (itemController.text.isNotEmpty) {
+                                        if (itemController
+                                            .text.isNotEmpty) {
                                           final newItem = ItemEvent(
                                             id: 0,
-                                            name: itemController.text,
-                                            userId: state.userParticipant
+                                            name: itemController
+                                                .text,
+                                            userId: state
+                                                .userParticipant
                                                 ?.userId ??
                                                 0,
                                             eventId: widget.id,
@@ -361,7 +408,9 @@ class _EventScreenState extends State<EventScreen> {
 
                                           context
                                               .read<EventPartyBloc>()
-                                              .add(AddItem(itemEvent: newItem));
+                                              .add(AddItem(
+                                              itemEvent:
+                                              newItem));
                                           setState(() {
                                             itemController.clear();
                                             showAddItemForm = false;
@@ -372,50 +421,52 @@ class _EventScreenState extends State<EventScreen> {
                                   ],
                                 ),
                               ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                TransportationScreen.navigateTo(
+                                    context, id: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.directions_car,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('Le transport'),
+                                ],
+                              ),
+                            ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                CagnotteScreen.navigateTo(context,
+                                    eventId: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.attach_money,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('La cagnotte'),
+                                ],
+                              ),
+                            ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                ChatRoomScreen.navigateTo(context,
+                                    id: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.chat,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('Accéder aux salles de discussions'),
+                                ],
+                              ),
+                            ),
                           ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to ChatRoomScreen with event ID or relevant data
-                          ChatRoomScreen.navigateTo(context, id: widget.id);
-                        },
-                        child: const Text(
-                          'Accéder aux salles de discussions',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to ItemEventScreen with event ID or relevant data
-                          ItemEventScreen.navigateTo(context, id: widget.id);
-                        },
-                        child: const Text(
-                          'Les choses à ramener',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                      if (eventParty.transportActive)
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to TransportationScreen with event ID or relevant data
-                            TransportationScreen.navigateTo(
-                                context, id: widget.id);
-                          },
-                          child: const Text(
-                            'Le transport',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to CagnotteScreen with event ID or relevant data
-                          CagnotteScreen.navigateTo(context, eventId: widget.id);
-                        },
-                        child: const Text(
-                          'La cagnotte',
-                          style: TextStyle(color: Colors.blue),
                         ),
                       ),
                     ],
