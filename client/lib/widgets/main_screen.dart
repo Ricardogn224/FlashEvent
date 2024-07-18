@@ -36,6 +36,7 @@ class _MainScreenState extends State<MainScreen> {
 
     // Check if the current route is the login screen
     if (ModalRoute.of(context)?.settings.name == LoginScreen.routeName) {
+      _timer?.cancel(); // Cancel the timer if on login screen
       return;
     }
 
@@ -49,7 +50,6 @@ class _MainScreenState extends State<MainScreen> {
       await _checkTokenValidity();
     });
   }
-
 
   void _onItemTapped(int index) {
     // Si l'utilisateur essaie d'accéder à la page admin sans le rôle approprié, ne rien faire

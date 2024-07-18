@@ -12,6 +12,7 @@ import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
+import 'package:flutter_flash_event/core/models/itemEvent.dart';
 
 class EventScreen extends StatefulWidget {
   static const String routeName = '/event';
@@ -32,17 +33,22 @@ class _EventScreenState extends State<EventScreen> {
   bool showParticipants = false;
   bool showParticipantsPresence = false;
   bool showAddParticipantForm = false;
+  bool showItems = false;
+  bool showAddItemForm = false;
   late TextEditingController emailController;
+  late TextEditingController itemController;
 
   @override
   void initState() {
     super.initState();
     emailController = TextEditingController();
+    itemController = TextEditingController();
   }
 
   @override
   void dispose() {
     emailController.dispose();
+    itemController.dispose();
     super.dispose();
   }
 
@@ -102,11 +108,13 @@ class _EventScreenState extends State<EventScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.location_on, color: Color(0xFF6058E9)),
+                                const Icon(Icons.location_on,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(eventParty.place ?? 'Undefined'),
                               ],
@@ -114,169 +122,131 @@ class _EventScreenState extends State<EventScreen> {
                             const Divider(),
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
+                                const Icon(Icons.calendar_today,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
-                                        ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateStart))
-                                        : 'Undefined'),
+                                  eventParty.dateStart != null &&
+                                      eventParty.dateStart
+                                          .isNotEmpty
+                                      ? DateFormat.yMMMd().format(
+                                      DateTime.parse(
+                                          eventParty.dateStart))
+                                      : 'Undefined',
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
-                                        ? DateFormat.Hm().format(DateTime.parse(eventParty.dateStart))
-                                        : ''),
+                                  eventParty.dateStart != null &&
+                                      eventParty.dateStart
+                                          .isNotEmpty
+                                      ? DateFormat.Hm().format(
+                                      DateTime.parse(
+                                          eventParty.dateStart))
+                                      : '',
+                                ),
                               ],
                             ),
                             const Divider(),
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
+                                const Icon(Icons.calendar_today,
+                                    color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
-                                        ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateEnd))
-                                        : 'Undefined'),
+                                  eventParty.dateEnd != null &&
+                                      eventParty.dateEnd
+                                          .isNotEmpty
+                                      ? DateFormat.yMMMd().format(
+                                      DateTime.parse(
+                                          eventParty.dateEnd))
+                                      : 'Undefined',
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
-                                        ? DateFormat.Hm().format(DateTime.parse(eventParty.dateEnd))
-                                        : ''),
+                                  eventParty.dateEnd != null &&
+                                      eventParty.dateEnd
+                                          .isNotEmpty
+                                      ? DateFormat.Hm().format(
+                                      DateTime.parse(
+                                          eventParty.dateEnd))
+                                      : '',
+                                ),
                               ],
                             ),
                             const Divider(),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      showParticipants = !showParticipants;
+                                      showParticipants =
+                                      !showParticipants;
                                     });
                                   },
                                   child: Row(
-                                    children: const [
-                                      Icon(Icons.people, color: Color(0xFF6058E9)),
-                                      SizedBox(width: 8),
-                                      Text('Participants'),
+                                    children: [
+                                      const Icon(Icons.people,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text('Participants'),
+                                      Icon(
+                                        showParticipants
+                                            ? Icons.arrow_drop_up
+                                            : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(
-                                    /*showAddParticipantForm ? Icons.remove :*/ Icons.add,
+                                  icon: const Icon(
+                                    Icons.add,
                                     color: Color(0xFF6058E9),
                                   ),
                                   onPressed: () {
-                                    /*setState(() {
-                                      showAddParticipantForm = !showAddParticipantForm;
-                                    });*/
-                                    FormParticipantScreen.navigateTo(context, id: widget.id);
+                                    FormParticipantScreen.navigateTo(
+                                        context,
+                                        id: widget.id);
                                   },
                                 ),
                               ],
                             ),
                             if (showParticipants)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   const Divider(),
-                                  if (state.participants != null && state.participants!.isNotEmpty)
-                                    ...state.participants!
-                                        .map((participant) => Text('Participant: ${participant.firstname} ${participant.lastname}'))
-                                        .toList()
+                                  if (state.participants != null &&
+                                      state.participants!.isNotEmpty)
+                                    ...state.participants!.map(
+                                            (participant) {
+                                          return ListTile(
+                                            leading:
+                                            Icon(Icons.person),
+                                            title: Text(
+                                                '${participant.firstname} ${participant.lastname}'),
+                                          );
+                                        }).toList()
                                   else
-                                    const Text('Aucun participant à afficher'),
+                                    const Text(
+                                        'Aucun participant à afficher'),
                                 ],
                               ),
-                            if (showAddParticipantForm)
-                              Container(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Form(
-                                  key: state.formKey,
-                                  child: Column(
-                                    children: [
-                                      Autocomplete<String>(
-                                        optionsBuilder: (TextEditingValue textEditingValue) {
-                                          if (textEditingValue.text.isEmpty) {
-                                            return const Iterable<String>.empty();
-                                          }
-                                          BlocProvider.of<EventPartyBloc>(context)
-                                              .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: state.userParticipant!.eventId));
-                                          return state.emailSuggestions.where((String option) {
-                                            return option.contains(textEditingValue.text.toLowerCase());
-                                          });
-                                        },
-                                        onSelected: (String selection) {
-                                          BlocProvider.of<EventPartyBloc>(context)
-                                              .add(EmailChanged(email: BlocFormItem(value: selection)));
-                                        },
-                                        fieldViewBuilder: (
-                                            BuildContext context,
-                                            TextEditingController textEditingController,
-                                            FocusNode focusNode,
-                                            VoidCallback onFieldSubmitted,
-                                            ) {
-                                          return CustomFormField(
-                                            controller: emailController,
-                                            focusNode: focusNode,
-                                            hintText: 'Email',
-                                            onChange: (val) {
-                                              BlocProvider.of<EventPartyBloc>(context)
-                                                  .add(EmailChanged(email: BlocFormItem(value: val!)));
-                                            },
-                                            validator: (val) {
-                                              return state.email.error;
-                                            },
-                                          );
-
-                                        },
-                                      ),
-                                      const SizedBox(height: 30),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              context.read<EventPartyBloc>().add(
-                                                FormSubmitEvent(
-                                                  participant: state.userParticipant!,
-                                                  onSuccess: () {
-                                                    Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EventScreen(id: state.userParticipant!.eventId)),
-                                                    );
-                                                  },
-                                                  onError: (errorMessage) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text(errorMessage)),
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: const Text('AJOUTER'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            child: const Text('RÉINITIALISER'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
                             SwitchListTile(
-                              title: Text("Ma présence"),
-                              value: state.userParticipant?.present ?? false,
+                              title: const Text("Ma présence"),
+                              value: state.userParticipant?.present ??
+                                  false,
                               onChanged: (bool value) {
                                 if (state.userParticipant != null) {
-                                  // Dispatch the UpdateParticipant event
-                                  context.read<EventPartyBloc>().add(
+                                  context
+                                      .read<EventPartyBloc>()
+                                      .add(
                                     UpdateParticipant(
-                                      participant: state.userParticipant!,
+                                      participant:
+                                      state.userParticipant!,
                                       newVal: value,
                                     ),
                                   );
@@ -284,19 +254,29 @@ class _EventScreenState extends State<EventScreen> {
                               },
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      showParticipantsPresence = !showParticipantsPresence;
+                                      showParticipantsPresence =
+                                      !showParticipantsPresence;
                                     });
                                   },
                                   child: Row(
-                                    children: const [
-                                      Icon(Icons.people, color: Color(0xFF6058E9)),
-                                      SizedBox(width: 8),
-                                      Text('Participants avec présence confirmé'),
+                                    children: [
+                                      const Icon(Icons.people,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                          'Participants avec présence confirmée'),
+                                      Icon(
+                                        showParticipantsPresence
+                                            ? Icons.arrow_drop_up
+                                            : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -304,61 +284,189 @@ class _EventScreenState extends State<EventScreen> {
                             ),
                             if (showParticipantsPresence)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   const Divider(),
-                                  if (state.participantsPresence != null && state.participantsPresence!.isNotEmpty)
+                                  if (state.participantsPresence !=
+                                      null &&
+                                      state.participantsPresence!
+                                          .isNotEmpty)
                                     ...state.participantsPresence!
-                                        .map((participantPresence) => Text('Participant: ${participantPresence.firstname} ${participantPresence.lastname}'))
-                                        .toList()
+                                        .map(
+                                            (participantPresence) {
+                                          return ListTile(
+                                            leading:
+                                            Icon(Icons.person),
+                                            title: Text(
+                                                '${participantPresence.firstname} ${participantPresence.lastname}'),
+                                          );
+                                        }).toList()
                                   else
-                                    const Text('Aucun participant à afficher'),
+                                    const Text(
+                                        'Aucun participant à afficher'),
                                 ],
                               ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to ChatRoomScreen with event ID or relevant data
-                          ChatRoomScreen.navigateTo(context, id: widget.id);
-                        },
-                        child: const Text(
-                          'Accéder aux salles de discussions',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to ItemEventScreen with event ID or relevant data
-                          ItemEventScreen.navigateTo(context, id: widget.id);
-                        },
-                        child: const Text(
-                          'Les choses à ramener',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      showItems = !showItems;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.list,
+                                          color: Color(0xFF6058E9)),
+                                      const SizedBox(width: 8),
+                                      const Text('Choses à ramener'),
+                                      Icon(
+                                        showItems
+                                            ? Icons.arrow_drop_up
+                                            : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    showAddItemForm
+                                        ? Icons.remove
+                                        : Icons.add,
+                                    color: Color(0xFF6058E9),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      showAddItemForm =
+                                      !showAddItemForm;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            if (showItems)
+                              Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  const Divider(),
+                                  if (state.itemEvents != null &&
+                                      state.itemEvents!.isNotEmpty)
+                                    ...state.itemEvents!.map(
+                                            (itemEvent) {
+                                          return ListTile(
+                                            leading:
+                                            Icon(Icons.person),
+                                            title: Text(itemEvent.name),
+                                            subtitle: Text(
+                                                '${itemEvent.firstname} ${itemEvent.lastname}'),
+                                          );
+                                        }).toList()
+                                  else
+                                    const Text(
+                                        'Aucun item à afficher'),
+                                ],
+                              ),
+                            if (showAddItemForm)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: itemController,
+                                        decoration:
+                                        const InputDecoration(
+                                          hintText:
+                                          'Nom de l\'item',
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.check,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        if (itemController
+                                            .text.isNotEmpty) {
+                                          final newItem = ItemEvent(
+                                            id: 0,
+                                            name: itemController
+                                                .text,
+                                            userId: state
+                                                .userParticipant
+                                                ?.userId ??
+                                                0,
+                                            eventId: widget.id,
+                                            firstname: 'John',
+                                            lastname: 'Doe',
+                                          );
 
-                      if (state.feature?.active == true || state.feature?.name == '')
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to TransportationScreen with event ID or relevant data
-                            TransportationScreen.navigateTo(context, id: widget.id);
-                          },
-                          child: const Text(
-                            'Le transport',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to TransportationScreen with event ID or relevant data
-                          CagnotteScreen.navigateTo(context, eventId: widget.id);
-                        },
-                        child: const Text(
-                          'La cagnotte',
-                          style: TextStyle(color: Colors.blue),
+                                          context
+                                              .read<EventPartyBloc>()
+                                              .add(AddItem(
+                                              itemEvent:
+                                              newItem));
+                                          setState(() {
+                                            itemController.clear();
+                                            showAddItemForm = false;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                TransportationScreen.navigateTo(
+                                    context, id: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.directions_car,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('Le transport'),
+                                ],
+                              ),
+                            ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                CagnotteScreen.navigateTo(context,
+                                    eventId: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.attach_money,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('La cagnotte'),
+                                ],
+                              ),
+                            ),
+                            const Divider(),
+                            GestureDetector(
+                              onTap: () {
+                                ChatRoomScreen.navigateTo(context,
+                                    id: widget.id);
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.chat,
+                                      color: Color(0xFF6058E9)),
+                                  SizedBox(width: 8),
+                                  Text('Accéder aux salles de discussions'),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

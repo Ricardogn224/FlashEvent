@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"errors"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -320,10 +321,22 @@ func GetParticipantByEventId(db *gorm.DB) http.HandlerFunc {
 		params := mux.Vars(r)
 		eventID := params["eventId"]
 
+		// Logging user and eventID
+		log.Printf("Fetching participant for user ID: %d and event ID: %s", user.ID, eventID)
+
 		var participant models.Participant
 		if err := db.Where("user_id = ? AND event_id = ? AND active = ? AND response = ?", user.ID, eventID, true, true).First(&participant).Error; err != nil {
-			http.Error(w, "Participant not found", http.StatusNotFound)
-			return
+			// More detailed error logging
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				log.Printf("Participant not found for user ID: %d and event ID: %s", user.ID, eventID)
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(models.Participant{})
+				return
+			} else {
+				log.Printf("Database error: %v", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -339,7 +352,7 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 
 		// Fetch all participants with the given event ID
 		var participants []models.Participant
-		if err := db.Where("event_id = ? AND active = ? AND response = ?", eventID, true, true).Find(&participants).Error; err != nil {
+		if err := db.Where("event_id = ?", eventID).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
