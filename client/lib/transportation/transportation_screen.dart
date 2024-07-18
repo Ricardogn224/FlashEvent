@@ -91,18 +91,9 @@ class TransportationScreen extends StatelessWidget {
                       ),
                     ),
                   FloatingActionButton(
-                    onPressed: () async {
-                      final newParticipant = await Navigator.of(context)
-                          .push<Map<String, String>>(
-                        MaterialPageRoute(
-                          builder: (context) => FormTransportationScreen
-                              .navigateTo(context, id: id),
-                        ),
-                      );
-
-                      if (newParticipant != null) {
-                        // Handle the new participant data if needed
-                      }
+                    onPressed: () {
+                      FormTransportationScreen
+                          .navigateTo(context, id: id);
                     },
                     child: Icon(Icons.add),
                   ),

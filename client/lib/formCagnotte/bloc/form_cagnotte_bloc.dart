@@ -81,7 +81,7 @@ class FormCagnotteBloc extends Bloc<FormCagnotteEvent, FormCagnotteState> {
       try {
         final response = await ParticipantServices.updateParticipantContributionById(
             updatedParticipant);
-        if (response.statusCode == 201) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           event.onSuccess();
         } else {
           event.onError('Event creation failed');
