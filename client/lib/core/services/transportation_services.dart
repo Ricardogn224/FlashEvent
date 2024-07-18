@@ -12,12 +12,13 @@ class TransportationServices {
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
     try {
-      final response = await http
-          .get(Uri.parse('${ApiEndpoints.baseUrl}/event/$id/transportations'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/event/$id/transportations'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -30,8 +31,8 @@ class TransportationServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-            return Transportation.fromJson(e);
-          }).toList() ??
+        return Transportation.fromJson(e);
+      }).toList() ??
           [];
     } catch (error) {
       log('Error occurred while retrieving transportations.', error: error);
@@ -50,8 +51,8 @@ class TransportationServices {
     }
 
     final response = await http.post(
-      Uri.parse(
-          '${ApiEndpoints.baseUrl}/events/${transportation.eventId}/transportations'),
+      Uri.https(
+          ApiEndpoints.baseUrl, '/events/${transportation.eventId}/transportations'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

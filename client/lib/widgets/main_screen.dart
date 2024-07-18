@@ -33,6 +33,13 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _checkTokenValidity() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+
+    // Check if the current route is the login screen
+    if (ModalRoute.of(context)?.settings.name == LoginScreen.routeName) {
+      _timer?.cancel(); // Cancel the timer if on login screen
+      return;
+    }
+
     if (token == null) {
       Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
     }

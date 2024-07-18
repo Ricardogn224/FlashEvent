@@ -7,6 +7,7 @@ import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class ItemServices {
   static Future<List<ItemEvent>> getItemsByEvent({required int id}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -14,11 +15,11 @@ class ItemServices {
     print(id);
     try {
       final response =
-          await http.get(Uri.parse('${ApiEndpoints.baseUrl}/items-event/$id'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': 'Bearer $token', // Include token in headers
-            },);
+      await http.get(Uri.https(ApiEndpoints.baseUrl, '/items-event/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
       print(response.statusCode);
@@ -29,8 +30,8 @@ class ItemServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-            return ItemEvent.fromJson(e);
-          }).toList() ??
+        return ItemEvent.fromJson(e);
+      }).toList() ??
           [];
     } catch (error) {
       log('Error occurred while retrieving items.', error: error);
@@ -48,7 +49,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/events/${itemEvent.eventId}/items'),
+      Uri.https(ApiEndpoints.baseUrl, '/events/${itemEvent.eventId}/items'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
