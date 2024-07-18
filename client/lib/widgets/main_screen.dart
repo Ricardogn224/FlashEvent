@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flash_event/home/home_screen.dart';
 import 'package:flutter_flash_event/Invitation/invitation_screen.dart';
 import 'package:flutter_flash_event/notifications/notifications_screen.dart';
-import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
 import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/login/login_screen.dart';
@@ -45,7 +44,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    // Si l'utilisateur essaie d'accéder à la page admin sans le rôle approprié, ne rien faire
     if (index == 2 && widget.userRole != 'AdminPlatform') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Accès refusé: réservé aux administrateurs')),
@@ -53,9 +51,47 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
 
+    if (index == 4) {
+      _showLogoutConfirmationDialog();
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Déconnexion'),
+          content: Text('Voulez-vous vraiment vous déconnecter ?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Déconnexion'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
   }
 
   @override
@@ -74,7 +110,7 @@ class _MainScreenState extends State<MainScreen> {
           InvitationScreen(),
           if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(),
           NotificationsScreen(),
-          MessageChatScreen(id: 1),
+          Container(), // Placeholder for the logout option
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -101,8 +137,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Notifications',
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
+            icon: Icon(Icons.logout),
+            label: 'Déconnexion',
           ),
         ],
       ),
