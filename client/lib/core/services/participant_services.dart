@@ -210,6 +210,37 @@ class ParticipantServices {
     }
   }
 
+  static Future<http.Response> updateParticipantContributionById(Participant participant) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final participantId = participant.id;
+
+    print(json.encode(participant.toJson()));
+
+    final response = await http.patch(
+      Uri.parse('http://10.0.2.2:8000/participant-contribution/$participantId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token', // Include token in headers
+      },
+      body: participant.contribution,
+    );
+
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      print('Error: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception('Failed to update participant');
+    }
+  }
+
   static Future<http.Response> updateParticipantPresentById(Participant participant) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -223,7 +254,7 @@ class ParticipantServices {
     print(json.encode(participant.toJson()));
 
     final response = await http.patch(
-      Uri.parse('http://10.0.2.2:8000/participants-present/$participantId'),
+      Uri.parse('http://10.0.2.2:8000/participant-present/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

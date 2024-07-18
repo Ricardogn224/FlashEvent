@@ -235,6 +235,75 @@ func UpdateParticipantPresent(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
+// UpdateParticipantContribution updates a participant's details
+func UpdateParticipantContribution(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		params := mux.Vars(r)
+		participantID := params["participantId"]
+
+		var updatedParticipant models.Participant
+		if err := json.NewDecoder(r.Body).Decode(&updatedParticipant); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Find the participant by ID
+		var participant models.Participant
+		if err := db.First(&participant, participantID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Participant not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Only AdminPlatform, AdminEvent, or the participant themselves can update the participant details
+		if user.Role == "AdminEvent" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
+		// Retrieve the event associated with the participant
+		var event models.Event
+		if err := db.First(&event, participant.EventID).Error; err != nil {
+			http.Error(w, "Event not found", http.StatusNotFound)
+			return
+		}
+
+		// Update the cagnotte based on the participant's contribution
+		if participant.Contribution != 0 {
+			event.Cagnotte = event.Cagnotte - participant.Contribution + updatedParticipant.Contribution
+		} else {
+			event.Cagnotte = event.Cagnotte + updatedParticipant.Contribution
+		}
+
+		log.Printf("Event cagnotte updated successfully: %+v", event.Cagnotte)
+
+		// Update the participant fields
+		participant.Contribution = updatedParticipant.Contribution
+
+		// Save the updated participant and event to the database
+		if err := db.Save(&participant).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if err := db.Save(&event).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(participant)
+	}
+}
+
 // GetParticipantByEventId récupère un participant par ID d'événement
 func GetParticipantByEventId(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -266,7 +335,7 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 
 		// Fetch all participants with the given event ID
 		var participants []models.Participant
-		if err := db.Where("event_id = ?", eventID).Find(&participants).Error; err != nil {
+		if err := db.Where("event_id = ? AND active = ? AND response = ?", eventID, true, true).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -277,7 +346,24 @@ func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// GetParticipantsByEventID retrieves all participants associated with the provided event ID
+func GetParticipantsByEventIDWithContribution(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		eventID := params["eventId"]
+
+		// Fetch all participants with the given event ID, who are active, have responded, and have a contribution greater than 0
+		var participants []models.Participant
+		if err := db.Where("event_id = ? AND active = ? AND response = ? AND contribution > ?", eventID, true, true, 0).Find(&participants).Error; err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// Respond with the retrieved participants
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(participants)
+	}
+}
+
 func GetParticipantsByPresence(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)

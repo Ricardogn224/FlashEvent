@@ -50,7 +50,8 @@ class FormEventCreateBloc extends Bloc<FormEventCreateEvent, FormEventCreateStat
           dateStart: dateTimeStart,
           dateEnd: dateTimeEnd,
           transportActive: state.transportActive,
-          transportStart: '', // Assuming transportStart will be assigned later
+          transportStart: '',
+          cagnotte: 0, // Assuming transportStart will be assigned later
         );
 
         // Call the API to add the event

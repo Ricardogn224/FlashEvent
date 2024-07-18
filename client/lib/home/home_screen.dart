@@ -9,6 +9,8 @@ import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const String routeName = '/home';
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,35 +24,11 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
         body: SafeArea(
-          child: Navigator(
-            onGenerateRoute: (RouteSettings settings) {
-              WidgetBuilder builder;
-              switch (settings.name) {
-                case '/':
-                  builder = (BuildContext context) => HomeContent();
-                  break;
-                case ChatRoomScreen.routeName:
-                  builder = (BuildContext context) => ChatRoomScreen(id: settings.arguments as int);
-                  break;
-                case EventScreen.routeName:
-                  builder = (BuildContext context) => EventScreen(id: settings.arguments as int);
-                  break;
-                case MyAccountScreen.routeName:
-                  builder = (BuildContext context) => const MyAccountScreen();
-                  break;
-                default:
-                  throw Exception('Invalid route: ${settings.name}');
-              }
-              return MaterialPageRoute(builder: builder, settings: settings);
-            },
-          ),
+          child: HomeContent(), // Remplacer le Navigator local par HomeContent
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const FormEventCreateScreen()),
-            );
+            Navigator.pushNamed(context, FormEventCreateScreen.routeName);
           },
           backgroundColor: const Color(0xFF6058E9),
           child: const Icon(Icons.add),
@@ -122,7 +100,7 @@ class _HomeContentState extends State<HomeContent> {
                         backgroundColor: Colors.grey.shade300,
                         child: IconButton(
                           icon: const Icon(Icons.person),
-                          onPressed: () => MyAccountScreen.navigateTo(context),
+                          onPressed: () => Navigator.pushNamed(context, MyAccountScreen.routeName),
                         ),
                       ),
                     ],
@@ -196,7 +174,7 @@ class _HomeContentState extends State<HomeContent> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
                             (myEventCount / 3).ceil(),
-                            (index) => buildDot(index, _currentMyEventsPage),
+                                (index) => buildDot(index, _currentMyEventsPage),
                           ),
                         ),
                       ],
@@ -238,7 +216,7 @@ class _HomeContentState extends State<HomeContent> {
                               final startIndex = index * 3;
                               final endIndex = startIndex + 3;
                               final eventsToShow =
-                                  homeState.createdEvents.sublist(
+                              homeState.createdEvents.sublist(
                                 startIndex,
                                 endIndex > createdEventCount
                                     ? createdEventCount
@@ -257,7 +235,7 @@ class _HomeContentState extends State<HomeContent> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
                             (createdEventCount / 3).ceil(),
-                            (index) => buildDot(index, _currentCreatedEventsPage),
+                                (index) => buildDot(index, _currentCreatedEventsPage),
                           ),
                         ),
                       ],

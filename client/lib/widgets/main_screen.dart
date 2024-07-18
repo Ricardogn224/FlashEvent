@@ -21,7 +21,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  late final List<Widget> _pages;
   Timer? _timer;
 
   @override
@@ -29,14 +28,6 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     _checkTokenValidity();
     _startTokenCheckTimer();
-    // Initialize pages based on userRole
-    _pages = [
-      const HomeScreen(),
-      const InvitationScreen(),
-      if (widget.userRole == 'AdminPlatform') const AdminHomeDesktop(),
-      const NotificationsScreen(),
-      const MessageChatScreen(id: 1),
-    ];
   }
 
   Future<void> _checkTokenValidity() async {
@@ -54,11 +45,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    // If the user is trying to access the admin page without the role, do nothing
+    // Si l'utilisateur essaie d'accéder à la page admin sans le rôle approprié, ne rien faire
     if (index == 2 && widget.userRole != 'AdminPlatform') {
-      // Optionally, show a message or alert
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Access denied: Admins only')),
+        SnackBar(content: Text('Accès refusé: réservé aux administrateurs')),
       );
       return;
     }
@@ -66,7 +56,6 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    print('Selected index: $index');
   }
 
   @override
@@ -80,15 +69,13 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages.map((page) {
-          return Navigator(
-            onGenerateRoute: (routeSettings) {
-              return MaterialPageRoute(
-                builder: (context) => page,
-              );
-            },
-          );
-        }).toList(),
+        children: [
+          HomeScreen(),
+          InvitationScreen(),
+          if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(),
+          NotificationsScreen(),
+          MessageChatScreen(id: 1),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
