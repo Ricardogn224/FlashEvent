@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_flash_event/core/models/feature.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
@@ -11,7 +12,7 @@ class FeatureServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/features'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/features'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -43,7 +44,7 @@ class FeatureServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/features'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/features'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -66,7 +67,7 @@ class FeatureServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/features/$id'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/features/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -92,7 +93,7 @@ class FeatureServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('http://10.0.2.2:8000/features/${feature.id}'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/features/${feature.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -119,7 +120,7 @@ class FeatureServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:8000/features/$id'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/features/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -134,6 +135,32 @@ class FeatureServices {
     } catch (error) {
       throw ApiException(
           message: 'Unknown error while deleting feature with id $id');
+    }
+  }
+
+  static Future<Feature> findTransportFeature() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    try {
+      final response = await http.get(
+        Uri.parse('http://${ApiEndpoints.baseUrl}/features/transport'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error while retrieving transport feature',
+            statusCode: response.statusCode);
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      return Feature.fromJson(data);
+    } catch (error) {
+      log('Error occurred while retrieving transport feature.', error: error);
+      throw ApiException(message: 'Unknown error while retrieving transport feature');
     }
   }
 }

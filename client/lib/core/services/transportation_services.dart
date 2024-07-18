@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_flash_event/core/models/transportation.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +13,7 @@ class TransportationServices {
     String? email = prefs.getString('email');
     try {
       final response = await http
-          .get(Uri.parse('http://10.0.2.2:8000/event/$id/transportations'),
+          .get(Uri.parse('http://${ApiEndpoints.baseUrl}/event/$id/transportations'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -50,7 +51,7 @@ class TransportationServices {
 
     final response = await http.post(
       Uri.parse(
-          'http://10.0.2.2:8000/events/${transportation.eventId}/transportations'),
+          'http://${ApiEndpoints.baseUrl}/events/${transportation.eventId}/transportations'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

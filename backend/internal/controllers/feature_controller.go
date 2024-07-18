@@ -145,3 +145,30 @@ func IsTransportFeatureActive(db *gorm.DB) (bool, error) {
 
 	return feature.Active, nil // Return the active status of the found feature
 }
+
+// FindFeatureByName searches for a feature by name and returns it if it exists.
+func FindFeatureByName(db *gorm.DB, name string) (*models.Feature, error) {
+	var feature models.Feature
+	if err := db.Where("name = ?", name).First(&feature).Error; err != nil {
+		return nil, err
+	}
+	return &feature, nil
+}
+
+// HTTP handler to find the feature by name 'transport' and return it if it exists
+func FindTransportFeatureHandler(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		feature, err := FindFeatureByName(db, "transport")
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Feature not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(feature)
+	}
+}

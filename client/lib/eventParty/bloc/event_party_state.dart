@@ -10,6 +10,7 @@ class EventPartyState {
   final Participant? userParticipant;
   final List<String> emailSuggestions;
   final BlocFormItem email;
+  final Feature? feature;
   final GlobalKey<FormState>? formKey;
   final String? errorMessage;
   final List<ItemEvent>? itemEvents;
@@ -21,6 +22,7 @@ class EventPartyState {
     this.participants,
     this.participantsPresence,
     this.userParticipant,
+    this.feature,
     this.emailSuggestions = const [],
     this.email = const BlocFormItem(error: 'Enter email'),
     this.formKey,
@@ -37,6 +39,7 @@ class EventPartyState {
     Participant? userParticipant,
     List<String>? emailSuggestions,
     BlocFormItem? email,
+    Feature? feature,
     GlobalKey<FormState>? formKey,
     String? errorMessage,
     List<ItemEvent>? itemEvents,
@@ -49,6 +52,7 @@ class EventPartyState {
       participantsPresence: participantsPresence ?? this.participantsPresence,
       userParticipant: userParticipant ?? this.userParticipant,
       emailSuggestions: emailSuggestions ?? this.emailSuggestions,
+      feature: feature ?? this.feature,
       email: email ?? this.email,
       formKey: formKey,
       errorMessage: errorMessage ?? this.errorMessage,

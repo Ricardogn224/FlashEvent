@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_flash_event/core/models/invitation.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
 import 'package:flutter_flash_event/core/models/user.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
@@ -18,7 +19,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/participants'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/participants'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -49,7 +50,7 @@ class ParticipantServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/invitations/${email}'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/invitations/${email}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -81,7 +82,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/answer-invitation'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/answer-invitation'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -109,7 +110,7 @@ class ParticipantServices {
 
     try {
       final responseParticipant = await http.get(
-        Uri.parse('http://10.0.2.2:8000/get-participant/$eventId'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/get-participant/$eventId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -137,7 +138,7 @@ class ParticipantServices {
     try {
       // Fetch participants for the given event ID
       final response = await http
-          .get(Uri.parse('http://10.0.2.2:8000/participants-presence/$id'),
+          .get(Uri.parse('http://${ApiEndpoints.baseUrl}/participants-presence/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -157,7 +158,7 @@ class ParticipantServices {
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
         final userResponse =
-        await http.get(Uri.parse('http://10.0.2.2:8000/users/$userId'),
+        await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/users/$userId'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
@@ -192,12 +193,43 @@ class ParticipantServices {
     print(json.encode(participant.toJson()));
 
     final response = await http.patch(
-      Uri.parse('http://10.0.2.2:8000/participants/$participantId'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/participants/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
       },
       body: json.encode(participant.toJson()),
+    );
+
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      print('Error: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception('Failed to update participant');
+    }
+  }
+
+  static Future<http.Response> updateParticipantContributionById(Participant participant) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    final participantId = participant.id;
+
+    print(json.encode(participant.toJson()));
+
+    final response = await http.patch(
+      Uri.parse('http://${ApiEndpoints.baseUrl}/participant-contribution/$participantId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token', // Include token in headers
+      },
+      body: participant.contribution,
     );
 
     print(response.statusCode);
@@ -223,7 +255,7 @@ class ParticipantServices {
     print(json.encode(participant.toJson()));
 
     final response = await http.patch(
-      Uri.parse('http://10.0.2.2:8000/participants-present/$participantId'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/participant-present/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -258,7 +290,7 @@ class ParticipantServices {
     if (participant.id == 0) {
       try {
         final responseParticipant = await http.get(
-          Uri.parse('http://10.0.2.2:8000/get-participant/${participant.eventId}'),
+          Uri.parse('http://${ApiEndpoints.baseUrl}/get-participant/${participant.eventId}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
@@ -285,9 +317,9 @@ class ParticipantServices {
     String url = '';
 
     if (newIdParticipant != 0) {
-      url = 'http://10.0.2.2:8000/participants/${newIdParticipant}';
+      url = 'http://${ApiEndpoints.baseUrl}/participants/${newIdParticipant}';
     } else {
-      url = 'http://10.0.2.2:8000/participants/${participant.id}';
+      url = 'http://${ApiEndpoints.baseUrl}/participants/${participant.id}';
     }
 
 

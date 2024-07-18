@@ -4,7 +4,7 @@ class Participant {
   final int eventId;
   final int transportationId;
   final bool present;
-
+  final double contribution; // New field
 
   Participant({
     required this.id,
@@ -12,6 +12,7 @@ class Participant {
     required this.eventId,
     required this.transportationId,
     required this.present,
+    required this.contribution, // Initialize new field
   });
 
   factory Participant.fromJson(Map<String, dynamic> json) {
@@ -21,6 +22,7 @@ class Participant {
       eventId: json['event_id'],
       transportationId: json['transportation_id'],
       present: json['present'],
+      contribution: (json['contribution'] as num).toDouble(), // Initialize new field
     );
   }
 
@@ -31,9 +33,11 @@ class Participant {
       'eventId': eventId,
       'transportationId': transportationId,
       'present': present,
+      'contribution': contribution, // Add new field
     };
   }
 }
+
 
 class ParticipantAdd {
   final int id;
