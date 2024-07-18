@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
@@ -13,7 +14,7 @@ class CagnotteServices {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/events/$eventId/cagnottes'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/cagnottes'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -44,7 +45,7 @@ class CagnotteServices {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/cagnottes/${contribution.cagnotteId}/contribution'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/cagnottes/${contribution.cagnotteId}/contribution'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -79,7 +80,7 @@ class CagnotteServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/events/$eventId/cagnotte'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/cagnotte'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -106,7 +107,7 @@ class CagnotteServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/cagnottes/$cagnotteId/contributors'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/cagnottes/$cagnotteId/contributors'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',

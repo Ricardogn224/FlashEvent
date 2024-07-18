@@ -11,10 +11,13 @@ import 'package:flutter_flash_event/admin/admin_user_add_oarticipant.dart';
 import 'package:flutter_flash_event/admin/admin_user_new_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_edit_screen.dart';
+import 'package:flutter_flash_event/cagnotte/cagnotte_screen.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_participant_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/core/models/chatRoom.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
+import 'package:flutter_flash_event/formCagnotte/form_cagnotte_screen.dart';
 import 'package:flutter_flash_event/formChatRoom/chat_room_add_participant.dart';
 import 'package:flutter_flash_event/formChatRoom/form_chat_room_screen.dart';
 import 'package:flutter_flash_event/formItemEvent/form_item_event_screen.dart';
@@ -112,6 +115,8 @@ Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
       return MaterialPageRoute(builder: (context) => FormChatRoomScreen(eventId: args as int));
     case ChatRoomAddParticipantScreen.routeName:
       return MaterialPageRoute(builder: (context) => ChatRoomAddParticipantScreen(chatRoom: args as ChatRoom));
+    case ChatRoomParticipantScreen.routeName:
+      return MaterialPageRoute(builder: (context) => ChatRoomParticipantScreen(id: args as int));
     case MessageChatScreen.routeName:
       return MaterialPageRoute(builder: (context) => MessageChatScreen(id: args as int));
     case ItemEventScreen.routeName:
@@ -124,6 +129,11 @@ Route<dynamic> generateRoute(RouteSettings settings, {String? userRole}) {
       return MaterialPageRoute(builder: (context) => FormTransportationScreen(eventId: args as int));
     case TransportStartEditScreen.routeName:
       return MaterialPageRoute(builder: (context) => TransportStartEditScreen(event: args as Event));
+    case CagnotteScreen.routeName:
+      return MaterialPageRoute(builder: (context) => CagnotteScreen(eventId: args as int));
+    case FormCagnotteScreen.routeName:
+      return MaterialPageRoute(builder: (context) => FormCagnotteScreen(eventId: args as int));
+
     case FormEventCreateScreen.routeName:
       return MaterialPageRoute(
         builder: (_) => BlocProvider(

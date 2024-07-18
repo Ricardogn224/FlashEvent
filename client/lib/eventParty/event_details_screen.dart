@@ -357,7 +357,7 @@ class _EventScreenState extends State<EventScreen> {
                           CagnotteScreen.navigateTo(context, eventId: widget.id);
                         },
                         child: const Text(
-                          'Le transport',
+                          'La cagnotte',
                           style: TextStyle(color: Colors.blue),
                         ),
                       ),

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/chatRoom/bloc/chat_room_bloc.dart';
-import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
-import 'package:flutter_flash_event/formChatRoom/chat_room_add_participant.dart';
-import 'package:flutter_flash_event/formChatRoom/form_chat_room_screen.dart';
 
 class ChatRoomParticipantScreen extends StatelessWidget {
   static const String routeName = '/chat-room-participant';
@@ -26,7 +23,7 @@ class ChatRoomParticipantScreen extends StatelessWidget {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Ajouter participant la discussion'),
+                title: Text('Ajouter participant à la discussion'),
               ),
               backgroundColor: Colors.white,
               body: Column(
@@ -42,27 +39,39 @@ class ChatRoomParticipantScreen extends StatelessWidget {
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final email = state.emails?[index];
-                          return ListTile(
-                            leading: Icon(Icons.person),
-                            subtitle: Text('Nom: ${email}'),
-                            trailing: IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                BlocProvider.of<ChatRoomBloc>(context).add(
-                                  ParticipantSubmitEvent(
-                                    chatRoomId: id,
-                                    email: email!,
-                                    onSuccess: () {
-                                      ChatRoomParticipantScreen.navigateTo(context, id: id);
-                                    },
-                                    onError: (errorMessage) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(errorMessage)),
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.person),
+                                    SizedBox(width: 16.0),
+                                    Text(email ?? ''),
+                                  ],
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    BlocProvider.of<ChatRoomBloc>(context).add(
+                                      ParticipantSubmitEvent(
+                                        chatRoomId: id,
+                                        email: email!,
+                                        onSuccess: () {
+                                          BlocProvider.of<ChatRoomBloc>(context)
+                                              .add(ChatRoomParticipantDataLoaded(id: id));
+                                        },
+                                        onError: (errorMessage) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text(errorMessage)),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           );
                         },
