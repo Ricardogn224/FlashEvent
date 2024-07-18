@@ -49,11 +49,17 @@ class AuthServices {
 
     final response = await http.post(uri, headers: headers, body: body);
 
-    if (response.statusCode == 200) {
+    log('Received response with status code: ${response.statusCode}');
+    log('Response body: ${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', jsonDecode(response.body)['token']);
+      String token = jsonDecode(response.body)['token'];
+      log('Token received: $token');
+      await prefs.setString('token', token);
       return response;
     } else {
+      log('Failed to login, status code: ${response.statusCode}');
       throw Exception('Failed to login');
     }
   }

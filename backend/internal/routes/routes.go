@@ -83,6 +83,15 @@ func RegisterAuthRoutes(router *mux.Router, api *swag.API, db *gorm.DB) {
 			endpoint.Security("BearerAuth"),
 			endpoint.Tags("Users"),
 		),
+        endpoint.New(
+            http.MethodGet, "/my-user",
+            endpoint.Handler(http.HandlerFunc(controllers.MyUser(db))),
+            endpoint.Summary("Get my user info"),
+            endpoint.Description("My user information"),
+            endpoint.Response(http.StatusOK, "Successfully retrieved user", endpoint.SchemaResponseOption(&models.User{})),
+            endpoint.Security("BearerAuth"),
+            endpoint.Tags("Users"),
+        ),
 		endpoint.New(
 			http.MethodGet, "/users/{userId}",
 			endpoint.Handler(http.HandlerFunc(controllers.GetUserByID(db))),
