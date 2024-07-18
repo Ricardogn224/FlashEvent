@@ -50,7 +50,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-
   void _onItemTapped(int index) {
     // Si l'utilisateur essaie d'accéder à la page admin sans le rôle approprié, ne rien faire
     if (index == 2 && widget.userRole != 'AdminPlatform') {
@@ -117,7 +116,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           HomeScreen(),
           InvitationScreen(),
-          if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(),
+          if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(userRole: widget.userRole),
           NotificationsScreen(),
           Container(), // Placeholder for the logout option
         ],
@@ -154,3 +153,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+

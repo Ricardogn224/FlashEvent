@@ -4,21 +4,30 @@ import 'package:flutter_flash_event/admin/admin_feature_screen.dart';
 import 'package:flutter_flash_event/admin/admin_user_screen.dart';
 import 'package:flutter_flash_event/widgets/admin_button.dart';
 
+import '../login/login_screen.dart';
+import '../widgets/main_screen.dart';
+
 class AdminHomeDesktop extends StatelessWidget {
   static const String routeName = '/admin';
 
-  static navigateTo(BuildContext context) {
-    Navigator.of(context).pushNamed(routeName);
-  }
+  final String userRole;
 
-  const AdminHomeDesktop({Key? key}) : super(key: key);
+  AdminHomeDesktop({required this.userRole});
+
+  static navigateTo(BuildContext context, String userRole) {
+    Navigator.of(context).pushNamed(routeName, arguments: userRole);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final RouteSettings settings = ModalRoute.of(context)!.settings;
-    final String? userRole = settings.arguments as String?;
+    if (userRole != 'AdminPlatform') {
+      return Scaffold(
+        body: Center(
+          child: Text('Accès refusé: réservé aux administrateurs'),
+        ),
+      );
+    }
 
-    // Use userRole if needed
     return MaterialApp(
       title: 'Interface admin',
       theme: ThemeData(
@@ -52,7 +61,7 @@ class AdminHomeDesktop extends StatelessWidget {
               AdminButton(
                 title: 'Fonctionnalités',
                 onPressed: () {
-                  // Navigate to Manage Events screen
+                  // Navigate to Manage Features screen
                   AdminFeatureScreen.navigateTo(context);
                 },
               ),
@@ -62,4 +71,27 @@ class AdminHomeDesktop extends StatelessWidget {
       ),
     );
   }
+}
+
+// Add this to handle the named route with userRole
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      initialRoute: MainScreen.routeName,
+      routes: {
+        MainScreen.routeName: (context) => MainScreen(userRole: 'User'), // Default user role for testing
+        LoginScreen.routeName: (context) => LoginScreen(),
+        AdminHomeDesktop.routeName: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as String;
+          return AdminHomeDesktop(userRole: args);
+        },
+        // Add other routes as necessary
+      },
+    );
+  }
+}
+
+void main() {
+  runApp(MyApp());
 }
