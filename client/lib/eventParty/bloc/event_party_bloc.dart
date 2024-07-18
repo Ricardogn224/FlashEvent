@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:flutter_flash_event/core/models/feature.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
 import 'package:flutter_flash_event/core/models/user.dart';
 import 'package:flutter_flash_event/core/services/event_services.dart';
+import 'package:flutter_flash_event/core/services/feature_services.dart';
 import 'package:flutter_flash_event/core/services/participant_services.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,13 +33,21 @@ class EventPartyBloc extends Bloc<EventPartyEvent, EventPartyState> {
         final userParticipant = await ParticipantServices
             .getParticipantByEventId(event.id);
 
+        // Check for the transport feature
+        Feature transportFeature;
+        try {
+          transportFeature = await FeatureServices.findTransportFeature();
+        } catch (e) {
+          transportFeature = Feature(id: 0, name: '', active: false);
+        }
 
         emit(state.copyWith(
             status: EventPartyStatus.success,
             eventParty: eventParty,
             participants: participants,
             participantsPresence: participantsPresence,
-            userParticipant: userParticipant
+            userParticipant: userParticipant,
+            feature: transportFeature
         ));
       } on ApiException catch (error) {
         emit(state.copyWith(status: EventPartyStatus.error,
@@ -46,13 +56,13 @@ class EventPartyBloc extends Bloc<EventPartyEvent, EventPartyState> {
     });
 
     on<UpdateParticipant>((event, emit) async {
-      print(event.newVal);
       Participant updatedParticipant = Participant(
         id: event.participant.id,
         eventId: event.participant.eventId,
         userId: event.participant.userId,
         transportationId: event.participant.transportationId,
         present: event.newVal,
+        contribution: event.participant.contribution,
       );
 
       try {

@@ -115,6 +115,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         dateStart:  event.event.dateStart, // Fournir une valeur par défaut ou récupérer de l'état
         dateEnd:  event.event.dateEnd, // Fournir une valeur par défaut ou récupérer de l'état
         transportStart:  event.event.transportStart,
+        cagnotte: event.event.cagnotte,
       );
 
       try {
@@ -143,6 +144,7 @@ class AdminFormBloc extends Bloc<AdminFormEvent, AdminFormState> {
         dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         transportActive: state.transportActive.value,
         transportStart: '',
+        cagnotte: 0,
       );
 
       try {

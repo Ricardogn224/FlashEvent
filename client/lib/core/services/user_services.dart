@@ -160,6 +160,54 @@ class UserServices {
     }
   }
 
+  static Future<List<User>> getUsersParticipantsContribution({required int id}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    try {
+      // Fetch participants for the given event ID
+      final response = await http
+          .get(Uri.parse('http://10.0.2.2:8000/participants-contribution/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },);
+
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw Exception('Failed to load participants');
+      }
+
+      // Decode the participants data
+      final List<dynamic> participantsData = json.decode(response.body);
+
+      // Initialize a list to hold User objects
+      List<User> users = [];
+
+      // Fetch user data for each participant
+      for (var participantData in participantsData) {
+        final int userId = participantData['user_id'];
+        final userResponse =
+        await http.get(Uri.parse('http://10.0.2.2:8000/users/$userId'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $token', // Include token in headers
+          },);
+        if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
+          throw Exception('Failed to load user with ID $userId');
+        }
+
+        // Decode the user data and add to the users list
+        final userData = json.decode(userResponse.body);
+        users.add(User.fromJson(userData));
+      }
+      // Simulate call length for loader display
+      await Future.delayed(const Duration(seconds: 1));
+      return users;
+    } catch (error) {
+      log('Error occurred while retrieving users.', error: error);
+      rethrow;
+    }
+  }
+
   static Future<List<UserTransport>> getParticipantsByTransportation(
       {required int id}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

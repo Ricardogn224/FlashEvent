@@ -42,7 +42,8 @@ class _TransportationListItemState extends State<TransportationListItem> {
       userId: participant.userId,
       eventId: participant.eventId,
       transportationId: 0,
-      present: true, // Setting transportationId to 0 to indicate removal
+      present: true,
+      contribution: 0, // Setting transportationId to 0 to indicate removal
     );
 
     context.read<TransportationBloc>().add(UpdateParticipant(participant: participantUpdate));
@@ -54,7 +55,8 @@ class _TransportationListItemState extends State<TransportationListItem> {
       userId: widget.currentUser!.id,
       eventId: transportation.eventId,
       transportationId: transportation.id,
-      present: true, // Setting transportationId to 0 to indicate removal
+      present: true,
+      contribution: 0, // Setting transportationId to 0 to indicate removal
     );
 
     context.read<TransportationBloc>().add(UpdateParticipant(participant: participantUpdate));

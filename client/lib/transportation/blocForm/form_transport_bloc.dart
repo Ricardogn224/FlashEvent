@@ -80,6 +80,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
         dateEnd: "2024-02-02 00:00:00", // Fournir une valeur par défaut ou récupérer de l'état
         transportActive: false,
         transportStart: state.transportStart.value,
+        cagnotte: 0,
       );
 
       try {
@@ -109,7 +110,8 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
         dateStart: currentEvent.dateStart,
         dateEnd: currentEvent.dateEnd,
         transportActive: currentEvent.transportActive,
-        transportStart: state.transportStart.value, // Update only transportStart
+        transportStart: state.transportStart.value,
+        cagnotte: currentEvent.cagnotte, // Update only transportStart
       );
 
       try {

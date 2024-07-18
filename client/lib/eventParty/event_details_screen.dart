@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flash_event/cagnotte/cagnotte_screen.dart';
 import 'package:flutter_flash_event/chatRoom/chat_room_screen.dart';
 import 'package:flutter_flash_event/eventParty/bloc/event_party_bloc.dart';
 import 'package:flutter_flash_event/core/services/user_services.dart';
@@ -338,10 +339,22 @@ class _EventScreenState extends State<EventScreen> {
                           style: TextStyle(color: Colors.blue),
                         ),
                       ),
+
+                      if (state.feature?.active == true || state.feature?.name == '')
+                        TextButton(
+                          onPressed: () {
+                            // Navigate to TransportationScreen with event ID or relevant data
+                            TransportationScreen.navigateTo(context, id: widget.id);
+                          },
+                          child: const Text(
+                            'Le transport',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
                       TextButton(
                         onPressed: () {
                           // Navigate to TransportationScreen with event ID or relevant data
-                          TransportationScreen.navigateTo(context, id: widget.id);
+                          CagnotteScreen.navigateTo(context, eventId: widget.id);
                         },
                         child: const Text(
                           'Le transport',
