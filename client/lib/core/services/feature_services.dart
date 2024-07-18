@@ -12,7 +12,7 @@ class FeatureServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/features'),
+        Uri.https(ApiEndpoints.baseUrl, '/features'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -44,7 +44,7 @@ class FeatureServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/features'),
+      Uri.https(ApiEndpoints.baseUrl, '/features'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -67,7 +67,7 @@ class FeatureServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/features/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/features/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -93,7 +93,7 @@ class FeatureServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('${ApiEndpoints.baseUrl}/features/${feature.id}'),
+        Uri.https(ApiEndpoints.baseUrl, '/features/${feature.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -120,7 +120,7 @@ class FeatureServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('${ApiEndpoints.baseUrl}/features/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/features/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -143,7 +143,7 @@ class FeatureServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/features/transport'),
+        Uri.https(ApiEndpoints.baseUrl, '/features/transport'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers

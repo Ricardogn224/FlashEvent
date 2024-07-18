@@ -10,19 +10,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthServices {
   static Future<http.Response> registerUser(User user) async {
-    final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'username': user.username,
-        'email': user.email,
-        'password': user.password, // Add password to the User model
-      }),
-    );
+    final uri = Uri.https(ApiEndpoints.baseUrl, '/register');
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': '*/*'
+    };
+    final body = jsonEncode(<String, String>{
+      'firstname': user.firstname,
+      'lastname': user.lastname,
+      'username': user.username,
+      'email': user.email,
+      'password': user.password,
+    });
+
+    log('Registering user at $uri with body: $body');
+
+    final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 201) {
       return response;
@@ -32,16 +35,19 @@ class AuthServices {
   }
 
   static Future<http.Response> loginUser(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'password': password,
-      }),
-    );
+    final uri = Uri.https(ApiEndpoints.baseUrl, '/login');
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': '*/*'
+    };
+    final body = jsonEncode(<String, String>{
+      'email': email,
+      'password': password,
+    });
+
+    log('Logging in user at $uri with body: $body');
+
+    final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
