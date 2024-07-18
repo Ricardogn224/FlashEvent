@@ -13,7 +13,7 @@ class ChatRoomServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/chat-rooms'),
+        Uri.parse('${ApiEndpoints.baseUrl}/events/$eventId/chat-rooms'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -45,7 +45,7 @@ class ChatRoomServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/events/${chatRoom.eventId}/chat-rooms'),
+      Uri.parse('${ApiEndpoints.baseUrl}/events/${chatRoom.eventId}/chat-rooms'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -66,7 +66,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
+        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -92,7 +92,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/${chatRoom.id}'),
+        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/${chatRoom.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -119,7 +119,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
+        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -143,7 +143,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/user-chat-rooms'),
+        Uri.parse('${ApiEndpoints.baseUrl}/events/$eventId/user-chat-rooms'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -169,7 +169,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/unassociated-emails'),
+        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/unassociated-emails'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -204,7 +204,7 @@ class ChatRoomServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/participants'),
+      Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/participants'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',

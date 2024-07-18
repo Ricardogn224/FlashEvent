@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthServices {
   static Future<http.Response> registerUser(User user) async {
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/register'),
+      Uri.parse('${ApiEndpoints.baseUrl}/register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -33,7 +33,7 @@ class AuthServices {
 
   static Future<http.Response> loginUser(String email, String password) async {
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/login'),
+      Uri.parse('${ApiEndpoints.baseUrl}/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
