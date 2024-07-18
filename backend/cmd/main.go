@@ -52,6 +52,7 @@ func main() {
 	// Middleware d'authentification
 	authRouter := router.PathPrefix("/").Subrouter()
 	authRouter.Use(controllers.AuthMiddleware)
+	authRouter.Use(corsMiddleware)
 
 	// Enregistrement des routes authentifiées
 	routes.RegisterAuthRoutes(authRouter, api, db)
@@ -66,6 +67,7 @@ func main() {
 // corsMiddleware ajoute les en-têtes CORS aux réponses HTTP
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("CORS middleware triggered for:", r.Method, r.URL.Path)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -80,4 +82,3 @@ func corsMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
