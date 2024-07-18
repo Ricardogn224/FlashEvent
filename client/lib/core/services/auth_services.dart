@@ -13,7 +13,6 @@ class AuthServices {
     final response = await http.post(
       Uri.https(ApiEndpoints.baseUrl, '/register'),
       headers: <String, String>{
-        "Access-Control-Allow-Origin": "*",
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': '*/*'
       },
@@ -37,7 +36,6 @@ class AuthServices {
     final response = await http.post(
       Uri.https(ApiEndpoints.baseUrl, '/login'),
       headers: <String, String>{
-        "Access-Control-Allow-Origin": "*",
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': '*/*'
       },
