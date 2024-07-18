@@ -17,10 +17,7 @@ fi
 
 echo "Building Flutter web..."
 flutter build web
-if [ $? -ne 0 ]; then
-  echo "Failed to build web client"
-  exit 1
-fi
+cp -r client/build/web/* web/
 
 # Copier et remplacer les fichiers existants
 echo "Copying APK to destination..."
