@@ -35,7 +35,7 @@ class ChatRoomBloc extends Bloc<ChatRoomEvent, ChatRoomState> {
         try {
           final response = await ChatRoomServices.addChatRoomParticipant(event.chatRoomId, event.email);
           if (response.statusCode == 201) {
-            event.onSuccess;
+            add(ChatRoomParticipantDataLoaded(id: event.chatRoomId));
           } else {
             event.onError;
           }

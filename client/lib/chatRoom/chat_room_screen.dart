@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flash_event/chatRoom/bloc/chat_room_bloc.dart';
 import 'package:flutter_flash_event/MessageChat/message_chat_screen.dart';
+import 'package:flutter_flash_event/chatRoom/chat_room_participant_screen.dart';
 import 'package:flutter_flash_event/formChatRoom/chat_room_add_participant.dart';
 import 'package:flutter_flash_event/formChatRoom/form_chat_room_screen.dart';
 
@@ -49,9 +50,9 @@ class ChatRoomScreen extends StatelessWidget {
                             onTap: () => MessageChatScreen.navigateTo(context, id: chatRoom.id),
                             trailing: IconButton(
                               icon: Icon(Icons.person_add),
-                              onPressed: () => ChatRoomAddParticipantScreen.navigateTo(
+                              onPressed: () => ChatRoomParticipantScreen.navigateTo(
                                 context,
-                                chatRoom: chatRoom,
+                                id: chatRoom.id,
                               ),
                             ),
                           );

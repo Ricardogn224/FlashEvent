@@ -176,9 +176,15 @@ class ChatRoomServices {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        List<String> unassociatedEmails = List<String>.from(responseData);
-        return unassociatedEmails;
+        if (response.body.isEmpty) {
+          return [];
+        }
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          return List<String>.from(responseData);
+        } else {
+          throw ApiException(message: 'Unexpected response format', statusCode: response.statusCode);
+        }
       } else {
         throw ApiException(message: 'Failed to fetch unassociated emails', statusCode: response.statusCode);
       }
