@@ -19,7 +19,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/participants'),
+      Uri.https(ApiEndpoints.baseUrl, '/participants'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -50,7 +50,7 @@ class ParticipantServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/invitations/${email}'),
+        Uri.https(ApiEndpoints.baseUrl, '/invitations/${email}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -64,8 +64,8 @@ class ParticipantServices {
       }
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-            return Invitation.fromJson(e);
-          }).toList() ??
+        return Invitation.fromJson(e);
+      }).toList() ??
           [];
     } catch (error) {
       throw ApiException(
@@ -82,7 +82,7 @@ class ParticipantServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/answer-invitation'),
+      Uri.https(ApiEndpoints.baseUrl, '/answer-invitation'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -110,7 +110,7 @@ class ParticipantServices {
 
     try {
       final responseParticipant = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/get-participant/$eventId'),
+        Uri.https(ApiEndpoints.baseUrl, '/get-participant/$eventId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -137,12 +137,13 @@ class ParticipantServices {
     String? token = prefs.getString('token');
     try {
       // Fetch participants for the given event ID
-      final response = await http
-          .get(Uri.parse('${ApiEndpoints.baseUrl}/participants-presence/$id'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/participants-presence/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -157,12 +158,13 @@ class ParticipantServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse =
-        await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users/$userId'),
+        final userResponse = await http.get(
+          Uri.https(ApiEndpoints.baseUrl, '/users/$userId'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
-          },);
+          },
+        );
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }
@@ -193,7 +195,7 @@ class ParticipantServices {
     print(json.encode(participant.toJson()));
 
     final response = await http.patch(
-      Uri.parse('${ApiEndpoints.baseUrl}/participants/$participantId'),
+      Uri.https(ApiEndpoints.baseUrl, '/participants/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -221,15 +223,18 @@ class ParticipantServices {
 
     final participantId = participant.id;
 
-    print(json.encode(participant.toJson()));
+    // Create a JSON object for the contribution field
+    final body = jsonEncode({'contribution': participant.contribution});
+
+    print(body);
 
     final response = await http.patch(
-      Uri.parse('${ApiEndpoints.baseUrl}/participant-contribution/$participantId'),
+      Uri.https(ApiEndpoints.baseUrl, '/participant-contribution/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token', // Include token in headers
+        'Authorization': 'Bearer $token',
       },
-      body: participant.contribution,
+      body: body, // Send the JSON-encoded string
     );
 
     print(response.statusCode);
@@ -255,7 +260,7 @@ class ParticipantServices {
     print(json.encode(participant.toJson()));
 
     final response = await http.patch(
-      Uri.parse('${ApiEndpoints.baseUrl}/participant-present/$participantId'),
+      Uri.https(ApiEndpoints.baseUrl, '/participant-present/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -273,7 +278,6 @@ class ParticipantServices {
     }
   }
 
-
   static Future<http.Response> updateParticipant(
       Participant participant) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -285,12 +289,10 @@ class ParticipantServices {
 
     int newIdParticipant = 0;
 
-
-
     if (participant.id == 0) {
       try {
         final responseParticipant = await http.get(
-          Uri.parse('${ApiEndpoints.baseUrl}/get-participant/${participant.eventId}'),
+          Uri.https(ApiEndpoints.baseUrl, '/get-participant/${participant.eventId}'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
@@ -305,7 +307,7 @@ class ParticipantServices {
         }
 
         final data =
-            json.decode(responseParticipant.body) as Map<String, dynamic>;
+        json.decode(responseParticipant.body) as Map<String, dynamic>;
         final participantReq = Participant.fromJson(data);
         newIdParticipant = participantReq.id;
       } catch (error) {
@@ -317,14 +319,13 @@ class ParticipantServices {
     String url = '';
 
     if (newIdParticipant != 0) {
-      url = '${ApiEndpoints.baseUrl}/participants/${newIdParticipant}';
+      url = '/participants/$newIdParticipant';
     } else {
-      url = '${ApiEndpoints.baseUrl}/participants/${participant.id}';
+      url = '/participants/${participant.id}';
     }
 
-
     final response = await http.patch(
-      Uri.parse(url),
+      Uri.https(ApiEndpoints.baseUrl, url),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -333,7 +334,6 @@ class ParticipantServices {
         'transportation_id': participant.transportationId,
       }),
     );
-
 
     if (response.statusCode == 200) {
       return response;

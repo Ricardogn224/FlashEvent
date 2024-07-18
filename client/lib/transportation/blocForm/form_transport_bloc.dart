@@ -97,9 +97,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
   }
 
   Future<void> _onFormUpdateSubmitted(FormUpdateSubmitEvent event, Emitter<FormTransportState> emit) async {
-    print(event.event);
     if (state.formKey!.currentState!.validate()) {
-      print(event.event);
       final currentEvent = event.event; // You need to pass the current event in the event or have it in the state
 
       Event updatedEvent = Event(
@@ -119,7 +117,7 @@ class FormTransportBloc extends Bloc<FormTransportEvent, FormTransportState> {
         if (response.statusCode == 200) {
           event.onSuccess();
         } else {
-          event.onError('Event creation failed');
+          event.onError('Event update failed');
         }
       } catch (e) {
         event.onError('Error: $e');

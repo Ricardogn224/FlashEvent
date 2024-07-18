@@ -15,7 +15,7 @@ class MessageServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$id/messages'),
+        Uri.https(ApiEndpoints.baseUrl, '/chat-rooms/$id/messages'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -29,8 +29,8 @@ class MessageServices {
       }
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-            return Message.fromJson(e);
-          }).toList() ??
+        return Message.fromJson(e);
+      }).toList() ??
           [];
     } catch (error) {
       throw ApiException(
@@ -48,7 +48,7 @@ class MessageServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/${message.chatRoomId}/messages'),
+      Uri.https(ApiEndpoints.baseUrl, '/chat-rooms/${message.chatRoomId}/messages'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

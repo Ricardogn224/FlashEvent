@@ -24,7 +24,7 @@ class CagnotteScreen extends StatelessWidget {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Cagnotte'),
+                title: const Text('Cagnotte'),
               ),
               backgroundColor: Colors.white,
               body: Center(
@@ -32,30 +32,59 @@ class CagnotteScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (cagnotteState.status == CagnotteStatus.loading)
-                      CircularProgressIndicator(),
-                    if (cagnotteState.status == CagnotteStatus.success && cagnotteState.cagnotte != null)
+                      const CircularProgressIndicator(),
+                    if (cagnotteState.status == CagnotteStatus.success) ...[
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'Contributeurs:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      if (cagnotteState.participants != null && cagnotteState.participants!.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: cagnotteState.participants!.length,
+                            itemBuilder: (context, index) {
+                              final participant = cagnotteState.participants![index];
+                              return ListTile(
+                                title: Text('${participant.firstname} ${participant.lastname}'),
+                              );
+                            },
+                          ),
+                        ),
+                      if (cagnotteState.participants == null || cagnotteState.participants!.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            'Aucun contributeurs.',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        ),
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           'Total Cagnotte: ${cagnotteState.cagnotte} €',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
+                      ElevatedButton(
+                        onPressed: () {
+                          FormCagnotteScreen.navigateTo(context, eventId: eventId);
+                        },
+                        child: const Text('Contribuer à la cagnotte'),
+                      ),
+                    ],
                     if (cagnotteState.status == CagnotteStatus.error)
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'Failed to load cagnotte',
-                          style: TextStyle(color: Colors.red, fontSize: 16),
+                          cagnotteState.errorMessage ?? 'Failed to load cagnotte',
+                          style: const TextStyle(color: Colors.red, fontSize: 16),
                         ),
                       ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        FormCagnotteScreen.navigateTo(context, eventId: eventId);
-                      },
-                      child: Text('Contribuer à la cagnotte'),
-                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

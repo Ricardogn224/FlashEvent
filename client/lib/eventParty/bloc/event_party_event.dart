@@ -43,3 +43,28 @@ class FormSubmitEvent extends EventPartyEvent {
   @override
   List<Object> get props => [onSuccess, onError];
 }
+
+class LoadItems extends EventPartyEvent {
+  final int eventId;
+
+  LoadItems({required this.eventId});
+}
+
+class AddItem extends EventPartyEvent {
+  final ItemEvent itemEvent;
+
+  AddItem({required this.itemEvent});
+}
+
+// Ajoutez ces événements pour les transportations
+class LoadTransportations extends EventPartyEvent {
+  final int eventId;
+
+  LoadTransportations({required this.eventId});
+}
+
+class AddTransportation extends EventPartyEvent {
+  final Transportation transportation;
+
+  AddTransportation({required this.transportation});
+}

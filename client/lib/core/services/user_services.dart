@@ -12,11 +12,13 @@ class UserServices {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/users'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
@@ -26,8 +28,8 @@ class UserServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-            return User.fromJson(e);
-          }).toList() ??
+        return User.fromJson(e);
+      }).toList() ??
           [];
     } catch (error) {
       log('Error occurred while retrieving users.', error: error);
@@ -35,13 +37,12 @@ class UserServices {
     }
   }
 
-
   static Future<User> getCurrentUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/my-user'),
+        Uri.https(ApiEndpoints.baseUrl, '/my-user'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -64,7 +65,7 @@ class UserServices {
 
   static Future<http.Response> registerUserAdmin(User user) async {
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/registerAdmin'),
+      Uri.https(ApiEndpoints.baseUrl, '/registerAdmin'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -85,7 +86,6 @@ class UserServices {
     }
   }
 
-
   static Future<User> getCurrentUserByEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -93,7 +93,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/users-email/$email'),
+        Uri.https(ApiEndpoints.baseUrl, '/users-email/$email'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -118,12 +118,13 @@ class UserServices {
     String? token = prefs.getString('token');
     try {
       // Fetch participants for the given event ID
-      final response = await http
-          .get(Uri.parse('${ApiEndpoints.baseUrl}/participants-event/$id'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/participants-event/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -138,12 +139,13 @@ class UserServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse =
-            await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users/$userId'),
-              headers: <String, String>{
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Authorization': 'Bearer $token', // Include token in headers
-              },);
+        final userResponse = await http.get(
+          Uri.https(ApiEndpoints.baseUrl, '/users/$userId'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $token', // Include token in headers
+          },
+        );
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }
@@ -166,12 +168,13 @@ class UserServices {
     String? token = prefs.getString('token');
     try {
       // Fetch participants for the given event ID
-      final response = await http
-          .get(Uri.parse('${ApiEndpoints.baseUrl}/participants-contribution/$id'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/participants-contribution/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -186,12 +189,13 @@ class UserServices {
       // Fetch user data for each participant
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
-        final userResponse =
-        await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users/$userId'),
+        final userResponse = await http.get(
+          Uri.https(ApiEndpoints.baseUrl, '/users/$userId'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
-          },);
+          },
+        );
         if (userResponse.statusCode < 200 || userResponse.statusCode >= 400) {
           throw Exception('Failed to load user with ID $userId');
         }
@@ -215,11 +219,12 @@ class UserServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-          Uri.parse('${ApiEndpoints.baseUrl}/transportation/$id/participants'),
+        Uri.https(ApiEndpoints.baseUrl, '/transportation/$id/participants'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 400) {
         throw Exception('Failed to load participants');
@@ -241,7 +246,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/users-emails/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/users-emails/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -268,7 +273,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/users/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/users/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -294,7 +299,7 @@ class UserServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('${ApiEndpoints.baseUrl}/users/${user.id}'),
+        Uri.https(ApiEndpoints.baseUrl, '/users/${user.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -321,7 +326,7 @@ class UserServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('${ApiEndpoints.baseUrl}/users/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/users/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
