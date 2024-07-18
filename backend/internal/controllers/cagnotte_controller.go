@@ -105,3 +105,31 @@ func GetContributorsByCagnotteID(db *gorm.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(contributions)
 	}
 }
+
+// GetCagnotteByEventID returns the cagnotte for a given event ID
+func GetCagnotteByEventID(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		models.MigrateCagnotte(db)
+		models.MigrateContribution(db)
+
+		vars := mux.Vars(r)
+		eventID, err := strconv.Atoi(vars["eventId"])
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+
+		var cagnotte models.Cagnotte
+		if err := db.Where("event_id = ?", eventID).First(&cagnotte).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				http.Error(w, "Cagnotte not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to retrieve cagnotte", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(cagnotte)
+	}
+}
