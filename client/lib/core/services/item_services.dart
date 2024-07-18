@@ -14,7 +14,7 @@ class ItemServices {
     print(id);
     try {
       final response =
-          await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/items-event/$id'),
+          await http.get(Uri.parse('${ApiEndpoints.baseUrl}/items-event/$id'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
               'Authorization': 'Bearer $token', // Include token in headers
@@ -48,7 +48,7 @@ class ItemServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/events/${itemEvent.eventId}/items'),
+      Uri.parse('${ApiEndpoints.baseUrl}/events/${itemEvent.eventId}/items'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

@@ -13,7 +13,7 @@ class TransportationServices {
     String? email = prefs.getString('email');
     try {
       final response = await http
-          .get(Uri.parse('http://${ApiEndpoints.baseUrl}/event/$id/transportations'),
+          .get(Uri.parse('${ApiEndpoints.baseUrl}/event/$id/transportations'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -51,7 +51,7 @@ class TransportationServices {
 
     final response = await http.post(
       Uri.parse(
-          'http://${ApiEndpoints.baseUrl}/events/${transportation.eventId}/transportations'),
+          '${ApiEndpoints.baseUrl}/events/${transportation.eventId}/transportations'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
