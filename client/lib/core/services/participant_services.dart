@@ -221,15 +221,18 @@ class ParticipantServices {
 
     final participantId = participant.id;
 
-    print(json.encode(participant.toJson()));
+    // Create a JSON object for the contribution field
+    final body = jsonEncode({'contribution': participant.contribution});
+
+    print(body);
 
     final response = await http.patch(
       Uri.parse('${ApiEndpoints.baseUrl}/participant-contribution/$participantId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token', // Include token in headers
+        'Authorization': 'Bearer $token',
       },
-      body: participant.contribution,
+      body: body, // Send the JSON-encoded string
     );
 
     print(response.statusCode);

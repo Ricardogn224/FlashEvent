@@ -166,7 +166,7 @@ func UpdateEventByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		if user.Role != "AdminPlatform" && user.ID != event.CreatedBy {
+		if user.Role == "AdminEvent" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
