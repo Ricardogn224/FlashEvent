@@ -74,7 +74,7 @@ class FormCagnotteBloc extends Bloc<FormCagnotteEvent, FormCagnotteState> {
           userId: 0,
           transportationId: 0,
           present: false,
-        contribution: parseContribution(state.contribution.value),
+          contribution: double.parse(state.contribution.value),
       );
 
 

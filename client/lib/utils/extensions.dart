@@ -18,4 +18,9 @@ extension StringExtension on String {
     final integerRegExp = RegExp(r"^-?[0-9]+$");
     return integerRegExp.hasMatch(this);
   }
+
+  bool get isValidDouble {
+    final doubleRegExp = RegExp(r"^-?\d+(\.\d+)?$");
+    return doubleRegExp.hasMatch(this);
+  }
 }

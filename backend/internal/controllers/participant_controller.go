@@ -170,7 +170,6 @@ func UpdateParticipant(db *gorm.DB) http.HandlerFunc {
 
 		// Update the participant fields
 		participant.TransportationID = updatedParticipant.TransportationID
-		participant.Active = updatedParticipant.Active
 
 		if updatedParticipant.TransportationID == 0 {
 			participant.TransportationID = 0
