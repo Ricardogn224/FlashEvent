@@ -3,10 +3,10 @@ name: PROD CD
 on:
   push:
     branches:
-      - main
+      - production
   pull_request:
     branches:
-      - main
+      - production
 
 jobs:
   run_back_end:
@@ -15,12 +15,42 @@ jobs:
     env:
       SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-      
       SSH_IP: ${{ secrets.SSH_IP }}
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '2.10.5'
+
+      - name: Install Docker Compose
+        run: sudo apt-get install -y docker-compose
+
+      - name: Install rsync
+        run: sudo apt-get install -y rsync
+
+      - name: Build Flutter APK
+        run: |
+          cd client
+          flutter build apk --release
+
+      - name: Build Flutter web client
+        run: |
+          cd client
+          flutter build web
+
+      - name: Deploy code to server
+        run: |
+          rsync -avz --exclude='.git' -e "sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }}:/home/${{ secrets.SSH_USERNAME }}/FlashEvent/
+
       - name: Connect to server and deploy backend
         run: |
-          sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }}  "cd ~/FlashEvent/backend/ && git pull && docker-compose build --no-cache && docker-compose up -d "
+          sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} "
+            cd ~/FlashEvent/ &&
+            docker-compose build --no-cache &&
+            docker-compose up -d &&
+            cp client/build/app/outputs/flutter-apk/app-release.apk ~/FlashEvent/apk/ &&
+            cp -r client/build/web/* ~/FlashEvent/web/
+          "
