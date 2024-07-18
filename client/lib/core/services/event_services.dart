@@ -12,30 +12,33 @@ class EventServices {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/events'),
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/events'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
-        },);
+        },
+      );
       // Simulate call length for loader display
       await Future.delayed(const Duration(seconds: 1));
 
-    if (response.statusCode < 200 || response.statusCode >= 400) {
-      print('Error: Server responded with status code ${response.statusCode}');
-      throw Error();
-    }
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        print('Error: Server responded with status code ${response.statusCode}');
+        throw Error();
+      }
 
-    final data = json.decode(response.body);
-    print('Data decoded successfully');
+      final data = json.decode(response.body);
+      print('Data decoded successfully');
 
-    return (data as List<dynamic>?)?.map((e) {
-      return Event.fromJson(e);
-    }).toList() ?? [];
-  } catch (error) {
-    throw ApiException(
+      return (data as List<dynamic>?)?.map((e) {
+        return Event.fromJson(e);
+      }).toList() ??
+          [];
+    } catch (error) {
+      throw ApiException(
           message: 'Get Events: Error occurred while retrieving users. Error: $error');
+    }
   }
-}
 
   static Future<http.Response> addEvent(Event event) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -47,7 +50,7 @@ class EventServices {
     }
 
     final response = await http.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/events'),
+      Uri.https(ApiEndpoints.baseUrl, '/events'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -55,11 +58,10 @@ class EventServices {
       body: json.encode(event.toJson()),
     );
 
-        print('Token : ${token}');
-
+    print('Token : ${token}');
 
     if (response.statusCode == 201) {
-      print('Succes: ${response.statusCode}');
+      print('Success: ${response.statusCode}');
       print('Response body: ${response.body}');
       return response;
     } else {
@@ -75,7 +77,7 @@ class EventServices {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.baseUrl}/events/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/events/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -101,7 +103,7 @@ class EventServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('${ApiEndpoints.baseUrl}/events/${event.id}'),
+        Uri.https(ApiEndpoints.baseUrl, '/events/${event.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -129,7 +131,7 @@ class EventServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('${ApiEndpoints.baseUrl}/events/$id'),
+        Uri.https(ApiEndpoints.baseUrl, '/events/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -148,40 +150,50 @@ class EventServices {
   }
 
   static Future<List<Event>> getMyEvents() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
-      try {
-        final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/my-events'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $token', // Include token in headers
-          },);
-        if (response.statusCode < 200 || response.statusCode >= 400) {
-          throw ApiException(message: 'Error: Server responded with status code ${response.statusCode}');
-        }
-        final data = json.decode(response.body);
-        return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ?? [];
-      } catch (error) {
-        throw ApiException(message: 'Get My Events: Error occurred while retrieving events. Error: $error');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    try {
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/my-events'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error: Server responded with status code ${response.statusCode}');
       }
+      final data = json.decode(response.body);
+      return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ??
+          [];
+    } catch (error) {
+      throw ApiException(
+          message: 'Get My Events: Error occurred while retrieving events. Error: $error');
     }
+  }
 
-    static Future<List<Event>> getCreatedEvents() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
-      try {
-        final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/created-events'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $token', // Include token in headers
-          },);
-        if (response.statusCode < 200 || response.statusCode >= 400) {
-          throw ApiException(message: 'Error: Server responded with status code ${response.statusCode}');
-        }
-        final data = json.decode(response.body);
-        return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ?? [];
-      } catch (error) {
-        throw ApiException(message: 'Get Created Events: Error occurred while retrieving events. Error: $error');
+  static Future<List<Event>> getCreatedEvents() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    try {
+      final response = await http.get(
+        Uri.https(ApiEndpoints.baseUrl, '/created-events'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        throw ApiException(
+            message: 'Error: Server responded with status code ${response.statusCode}');
       }
+      final data = json.decode(response.body);
+      return (data as List<dynamic>?)?.map((e) => Event.fromJson(e)).toList() ??
+          [];
+    } catch (error) {
+      throw ApiException(
+          message: 'Get Created Events: Error occurred while retrieving events. Error: $error');
     }
+  }
 }
