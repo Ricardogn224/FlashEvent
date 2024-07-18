@@ -27812,7 +27812,7 @@ s=3
 return A.l(A.c8(),$async$ME)
 case 3:m=l.ay(c.a.h(0,"token"))
 if(m==null)throw A.e(A.bb("Token not found"))
-p=A.bC("http://eventpresta.fr/events/"+a.c+"/chat-rooms")
+p=A.bC("https://eventpresta.fr/events/"+a.c+"/chat-rooms")
 o=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+m],o,o)
 s=4
@@ -27833,7 +27833,7 @@ case 3:h=f.ay(c.a.h(0,"token"))
 p=5
 j=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/events/"+a+"/user-chat-rooms"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],j,j)),$async$MF)
+return A.l(A.ec(A.bC("https://eventpresta.fr/events/"+a+"/user-chat-rooms"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],j,j)),$async$MF)
 case 8:n=c
 A.bl(n.b)
 if(n.b===200){j=n
@@ -27868,7 +27868,7 @@ case 3:h=f.ay(c.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/chat-rooms/"+a+"/unassociated-emails"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],k,k)),$async$AQ)
+return A.l(A.ec(A.bC("https://eventpresta.fr/chat-rooms/"+a+"/unassociated-emails"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],k,k)),$async$AQ)
 case 8:n=c
 if(n.b===200){j=n
 if(A.ck(A.cj(j.e).c.a.h(0,"charset")).aL(j.w).length===0){k=A.a([],t.s)
@@ -27903,7 +27903,7 @@ s=3
 return A.l(A.c8(),$async$AP)
 case 3:l=k.ay(d.a.h(0,"token"))
 if(l==null)throw A.e(A.bb("Token not found"))
-p=A.bC("http://eventpresta.fr/chat-rooms/"+a+"/participants")
+p=A.bC("https://eventpresta.fr/chat-rooms/"+a+"/participants")
 o=t.N
 n=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+l],o,o)
 s=4
@@ -27923,7 +27923,7 @@ case 3:l=c.a
 k=A.ay(l.h(0,"token"))
 A.ay(l.h(0,"email"))
 if(k==null)throw A.e(A.bb("Token not found"))
-l=A.bC("http://eventpresta.fr/events")
+l=A.bC("https://eventpresta.fr/events")
 p=t.N
 p=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+k],p,p)
 s=4
@@ -27953,7 +27953,7 @@ p=5
 l=""+a
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/events/"+l),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$vM)
+return A.l(A.ec(A.bC("https://eventpresta.fr/events/"+l),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$vM)
 case 8:n=c
 if(n.b<200||n.b>=400){l=A.d8("Error while requesting event with id "+l,n.b)
 throw A.e(l)}l=n
@@ -27985,7 +27985,7 @@ return A.l(A.c8(),$async$O8)
 case 3:i=g.ay(c.a.h(0,"token"))
 p=5
 m=""+a.a
-l=A.bC("http://eventpresta.fr/events/"+m)
+l=A.bC("https://eventpresta.fr/events/"+m)
 k=t.N
 k=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)
 s=8
@@ -28019,7 +28019,7 @@ case 3:i=g.ay(b.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/my-events"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$O7)
+return A.l(A.ec(A.bC("https://eventpresta.fr/my-events"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$O7)
 case 8:n=b
 if(n.b<200||n.b>=400){k=A.d8(u.m+n.b,null)
 throw A.e(k)}k=n
@@ -28055,7 +28055,7 @@ case 3:i=g.ay(b.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/created-events"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$O6)
+return A.l(A.ec(A.bC("https://eventpresta.fr/created-events"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$O6)
 case 8:n=b
 if(n.b<200||n.b>=400){k=A.d8(u.m+n.b,null)
 throw A.e(k)}k=n
@@ -28095,7 +28095,7 @@ A.bl(a)
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/items-event/"+a),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$CI)
+return A.l(A.ec(A.bC("https://eventpresta.fr/items-event/"+a),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$CI)
 case 8:n=c
 s=9
 return A.l(A.iy(B.bY,null,t.z),$async$CI)
@@ -28133,7 +28133,7 @@ case 3:l=c.a
 k=A.ay(l.h(0,"token"))
 j=A.ay(l.h(0,"email"))
 if(k==null)throw A.e(A.bb("Token not found"))
-l=A.bC("http://eventpresta.fr/events/"+a.d+"/items")
+l=A.bC("https://eventpresta.fr/events/"+a.d+"/items")
 p=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+k],p,p)
 n=j==null?"":j
@@ -28159,7 +28159,7 @@ p=5
 l=""+a
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/chat-rooms/"+l+"/messages"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Dj)
+return A.l(A.ec(A.bC("https://eventpresta.fr/chat-rooms/"+l+"/messages"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Dj)
 case 8:n=c
 k=n
 A.bl(A.ck(A.cj(k.e).c.a.h(0,"charset")).aL(k.w))
@@ -28195,7 +28195,7 @@ case 3:m=c.a
 l=A.ay(m.h(0,"token"))
 k=A.ay(m.h(0,"email"))
 if(l==null)throw A.e(A.bb("Token not found"))
-m=A.bC("http://eventpresta.fr/chat-rooms/"+a.c+"/messages")
+m=A.bC("https://eventpresta.fr/chat-rooms/"+a.c+"/messages")
 p=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+l],p,p)
 s=4
@@ -28216,7 +28216,7 @@ s=3
 return A.l(A.c8(),$async$DT)
 case 3:l=k.ay(c.a.h(0,"token"))
 if(l==null)throw A.e(A.bb("Token not found"))
-p=A.bC("http://eventpresta.fr/participants")
+p=A.bC("https://eventpresta.fr/participants")
 o=t.N
 n=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+l],o,o)
 s=4
@@ -28240,7 +28240,7 @@ if(j==null)throw A.e(A.bb("Token not found"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/invitations/"+A.h(i)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(j)],k,k)),$async$Qv)
+return A.l(A.ec(A.bC("https://eventpresta.fr/invitations/"+A.h(i)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(j)],k,k)),$async$Qv)
 case 8:n=b
 k=n
 A.bl("Response body: "+A.ck(A.cj(k.e).c.a.h(0,"charset")).aL(k.w))
@@ -28275,7 +28275,7 @@ s=2
 return A.l(A.c8(),$async$Qu)
 case 2:n=m.ay(c.a.h(0,"token"))
 if(n==null)throw A.e(A.bb("Token not found"))
-q=A.bC("http://eventpresta.fr/answer-invitation")
+q=A.bC("https://eventpresta.fr/answer-invitation")
 p=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+n],p,p)
 s=3
@@ -28296,7 +28296,7 @@ p=5
 l=""+a
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/get-participant/"+l),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$DU)
+return A.l(A.ec(A.bC("https://eventpresta.fr/get-participant/"+l),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$DU)
 case 8:n=c
 if(n.b<200||n.b>=400){l=A.d8("Error while requesting participant for event ID "+l,n.b)
 throw A.e(l)}l=n
@@ -28329,7 +28329,7 @@ case 3:b=a0.ay(a3.a.h(0,"token"))
 p=5
 f=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/participants-presence/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$wO)
+return A.l(A.ec(A.bC("https://eventpresta.fr/participants-presence/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$wO)
 case 8:n=a3
 if(n.b<200||n.b>=400){f=A.bb("Failed to load participants")
 throw A.e(f)}e=n
@@ -28340,7 +28340,7 @@ case 9:if(!e.v()){s=10
 break}k=e.gM()
 j=J.dF(k,"user_id")
 s=11
-return A.l(A.ec(A.bC("http://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$wO)
+return A.l(A.ec(A.bC("https://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$wO)
 case 11:i=a3
 if(i.b<200||i.b>=400){f=A.bb("Failed to load user with ID "+A.h(j))
 throw A.e(f)}d=i
@@ -28378,7 +28378,7 @@ if(n==null)throw A.e(A.bb("Token not found"))
 A.bl(B.E.hk(a.eM()))
 p=t.N
 s=4
-return A.l(A.azE(A.bC("http://eventpresta.fr/participant-contribution/"+a.a),a.f,A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+n],p,p)),$async$Qw)
+return A.l(A.azE(A.bC("https://eventpresta.fr/participant-contribution/"+a.a),a.f,A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+n],p,p)),$async$Qw)
 case 4:o=c
 p=o.b
 A.bl(p)
@@ -28396,7 +28396,7 @@ return A.l(A.c8(),$async$Qx)
 case 3:m=l.ay(c.a.h(0,"token"))
 if(m==null)throw A.e(A.bb("Token not found"))
 A.bl(B.E.hk(a.eM()))
-p=A.bC("http://eventpresta.fr/participant-present/"+a.a)
+p=A.bC("https://eventpresta.fr/participant-present/"+a.a)
 o=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+m],o,o)
 s=4
@@ -28425,7 +28425,7 @@ break
 case 4:p=7
 i=t.N
 s=10
-return A.l(A.ec(A.bC("http://eventpresta.fr/get-participant/"+a.c),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(e)],i,i)),$async$DV)
+return A.l(A.ec(A.bC("https://eventpresta.fr/get-participant/"+a.c),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(e)],i,i)),$async$DV)
 case 10:m=a0
 A.bl(m.b)
 if(m.b<200||m.b>=400){j=A.d8("Error while requesting ",m.b)
@@ -28444,7 +28444,7 @@ s=9
 break
 case 6:s=2
 break
-case 9:case 5:j=A.bC(!J.c(n,0)?"http://eventpresta.fr/participants/"+A.h(n):"http://eventpresta.fr/participants/"+j)
+case 9:case 5:j=A.bC(!J.c(n,0)?"https://eventpresta.fr/participants/"+A.h(n):"https://eventpresta.fr/participants/"+j)
 i=t.N
 g=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(e)],i,i)
 s=11
@@ -28470,7 +28470,7 @@ A.ay(j.h(0,"email"))
 p=5
 j=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/event/"+a+"/transportations"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],j,j)),$async$yb)
+return A.l(A.ec(A.bC("https://eventpresta.fr/event/"+a+"/transportations"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],j,j)),$async$yb)
 case 8:n=c
 s=9
 return A.l(A.iy(B.bY,null,t.z),$async$yb)
@@ -28510,7 +28510,7 @@ case 3:l=c.a
 k=A.ay(l.h(0,"token"))
 j=A.ay(l.h(0,"email"))
 if(k==null)throw A.e(A.bb("Token not found"))
-l=A.bC("http://eventpresta.fr/events/"+a.c+"/transportations")
+l=A.bC("https://eventpresta.fr/events/"+a.c+"/transportations")
 p=t.N
 o=A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+k],p,p)
 n=j==null?"":j
@@ -28535,7 +28535,7 @@ case 3:i=g.ay(b.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/my-user"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Tn)
+return A.l(A.ec(A.bC("https://eventpresta.fr/my-user"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Tn)
 case 8:n=b
 if(n.b<200||n.b>=400){k=A.d8("Error while retrieving current user",n.b)
 throw A.e(k)}k=n
@@ -28570,7 +28570,7 @@ i=A.ay(k.h(0,"email"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/users-email/"+A.h(i)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(j)],k,k)),$async$Gp)
+return A.l(A.ec(A.bC("https://eventpresta.fr/users-email/"+A.h(i)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(j)],k,k)),$async$Gp)
 case 8:n=b
 if(n.b<200||n.b>=400){k=A.d8("Error while requesting event with email "+A.h(i),n.b)
 throw A.e(k)}k=n
@@ -28603,7 +28603,7 @@ case 3:b=a0.ay(a3.a.h(0,"token"))
 p=5
 f=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/participants-event/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$ua)
+return A.l(A.ec(A.bC("https://eventpresta.fr/participants-event/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$ua)
 case 8:n=a3
 if(n.b<200||n.b>=400){f=A.bb("Failed to load participants")
 throw A.e(f)}e=n
@@ -28614,7 +28614,7 @@ case 9:if(!e.v()){s=10
 break}k=e.gM()
 j=J.dF(k,"user_id")
 s=11
-return A.l(A.ec(A.bC("http://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$ua)
+return A.l(A.ec(A.bC("https://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$ua)
 case 11:i=a3
 if(i.b<200||i.b>=400){f=A.bb("Failed to load user with ID "+A.h(j))
 throw A.e(f)}d=i
@@ -28652,7 +28652,7 @@ case 3:b=a0.ay(a3.a.h(0,"token"))
 p=5
 f=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/participants-contribution/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$yl)
+return A.l(A.ec(A.bC("https://eventpresta.fr/participants-contribution/"+a1),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$yl)
 case 8:n=a3
 if(n.b<200||n.b>=400){f=A.bb("Failed to load participants")
 throw A.e(f)}e=n
@@ -28663,7 +28663,7 @@ case 9:if(!e.v()){s=10
 break}k=e.gM()
 j=J.dF(k,"user_id")
 s=11
-return A.l(A.ec(A.bC("http://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$yl)
+return A.l(A.ec(A.bC("https://eventpresta.fr/users/"+A.h(j)),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(b)],f,f)),$async$yl)
 case 11:i=a3
 if(i.b<200||i.b>=400){f=A.bb("Failed to load user with ID "+A.h(j))
 throw A.e(f)}d=i
@@ -28701,7 +28701,7 @@ case 3:i=g.ay(c.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/transportation/"+a+"/participants"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Gq)
+return A.l(A.ec(A.bC("https://eventpresta.fr/transportation/"+a+"/participants"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Gq)
 case 8:n=c
 if(n.b<200||n.b>=400){k=A.bb("Failed to load participants")
 throw A.e(k)}k=n
@@ -28736,7 +28736,7 @@ case 3:h=f.ay(c.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/users-emails/"+a),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],k,k)),$async$Go)
+return A.l(A.ec(A.bC("https://eventpresta.fr/users-emails/"+a),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(h)],k,k)),$async$Go)
 case 8:n=c
 if(n.b<200||n.b>=400){k=A.d8("Error while requesting user emails",n.b)
 throw A.e(k)}j=n
@@ -30624,7 +30624,7 @@ aCa(a){switch(a){case 10:case 11:case 12:case 13:case 133:case 8232:case 8233:re
 default:return!1}},
 a2W(a){var s=0,r=A.w(t.R),q,p,o,n,m
 var $async$a2W=A.x(function(b,c){if(b===1)return A.t(c,r)
-while(true)switch(s){case 0:p=A.bC("http://eventpresta.fr/register")
+while(true)switch(s){case 0:p=A.bC("https://eventpresta.fr/register")
 o=t.N
 n=A.a7(["Content-Type","application/json; charset=UTF-8"],o,o)
 s=3
@@ -30637,7 +30637,7 @@ case 1:return A.u(q,r)}})
 return A.v($async$a2W,r)},
 Aq(a,b){var s=0,r=A.w(t.R),q,p,o,n,m
 var $async$Aq=A.x(function(c,d){if(c===1)return A.t(d,r)
-while(true)switch(s){case 0:p=A.bC("http://eventpresta.fr/login")
+while(true)switch(s){case 0:p=A.bC("https://eventpresta.fr/login")
 o=t.N
 n=A.a7(["Content-Type","application/json; charset=UTF-8"],o,o)
 s=3
@@ -30674,7 +30674,7 @@ case 3:i=g.ay(b.a.h(0,"token"))
 p=5
 k=t.N
 s=8
-return A.l(A.ec(A.bC("http://eventpresta.fr/features/transport"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Od)
+return A.l(A.ec(A.bC("https://eventpresta.fr/features/transport"),A.a7(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.h(i)],k,k)),$async$Od)
 case 8:n=b
 if(n.b<200||n.b>=400){k=A.d8("Error while retrieving transport feature",n.b)
 throw A.e(k)}k=n
