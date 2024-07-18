@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.1 '
+          channel: stable  # Utilise le canal stable pour obtenir la dernière version stable de Flutter
 
       - name: Install Docker Compose
         run: sudo apt-get install -y docker-compose
@@ -53,5 +53,4 @@ jobs:
             docker-compose up -d &&
             cp client/build/app/outputs/flutter-apk/app-release.apk ~/FlashEvent/apk/ &&
             cp -r client/build/web/* ~/FlashEvent/web/
-
           "
