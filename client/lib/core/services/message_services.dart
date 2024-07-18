@@ -15,7 +15,7 @@ class MessageServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$id/messages'),
+        Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/$id/messages'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -48,7 +48,7 @@ class MessageServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/${message.chatRoomId}/messages'),
+      Uri.parse('${ApiEndpoints.baseUrl}/chat-rooms/${message.chatRoomId}/messages'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers

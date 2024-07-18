@@ -14,7 +14,7 @@ class CagnotteServices {
 
     try {
       final response = await http.post(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/cagnottes'),
+        Uri.parse('${ApiEndpoints.baseUrl}/events/$eventId/cagnottes'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -45,7 +45,7 @@ class CagnotteServices {
 
     try {
       final response = await http.post(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/cagnottes/${contribution.cagnotteId}/contribution'),
+        Uri.parse('${ApiEndpoints.baseUrl}/cagnottes/${contribution.cagnotteId}/contribution'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -80,7 +80,7 @@ class CagnotteServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/cagnotte'),
+        Uri.parse('${ApiEndpoints.baseUrl}/events/$eventId/cagnotte'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -107,7 +107,7 @@ class CagnotteServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/cagnottes/$cagnotteId/contributors'),
+        Uri.parse('${ApiEndpoints.baseUrl}/cagnottes/$cagnotteId/contributors'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
