@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
@@ -11,7 +12,7 @@ class EventServices {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8000/events'),
+      final response = await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/events'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -46,7 +47,7 @@ class EventServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/events'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/events'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token', // Include token in headers
@@ -74,7 +75,7 @@ class EventServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/events/$id'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -100,7 +101,7 @@ class EventServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('http://10.0.2.2:8000/events/${event.id}'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/${event.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -128,7 +129,7 @@ class EventServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:8000/events/$id'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -150,7 +151,7 @@ class EventServices {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
       try {
-        final response = await http.get(Uri.parse('http://10.0.2.2:8000/my-events'),
+        final response = await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/my-events'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
@@ -169,7 +170,7 @@ class EventServices {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
       try {
-        final response = await http.get(Uri.parse('http://10.0.2.2:8000/created-events'),
+        final response = await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/created-events'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers

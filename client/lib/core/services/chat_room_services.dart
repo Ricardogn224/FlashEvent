@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_flash_event/core/models/chatRoom.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
@@ -12,7 +13,7 @@ class ChatRoomServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/events/$eventId/chat-rooms'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/chat-rooms'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -44,7 +45,7 @@ class ChatRoomServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/events/${chatRoom.eventId}/chat-rooms'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/events/${chatRoom.eventId}/chat-rooms'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -65,7 +66,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -91,7 +92,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('http://10.0.2.2:8000/chat-rooms/${chatRoom.id}'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/${chatRoom.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -118,7 +119,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -142,7 +143,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/events/$eventId/user-chat-rooms'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/events/$eventId/user-chat-rooms'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -168,7 +169,7 @@ class ChatRoomServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId/unassociated-emails'),
+        Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/unassociated-emails'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -203,7 +204,7 @@ class ChatRoomServices {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/chat-rooms/$chatRoomId/participants'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/chat-rooms/$chatRoomId/participants'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',

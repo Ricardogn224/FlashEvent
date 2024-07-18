@@ -4,13 +4,14 @@ import 'package:flutter_flash_event/core/exceptions/api_exception.dart';
 import 'package:flutter_flash_event/core/models/product.dart';
 import 'package:flutter_flash_event/core/models/user.dart';
 import 'package:flutter_flash_event/core/models/event.dart';
+import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthServices {
   static Future<http.Response> registerUser(User user) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/register'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/register'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -32,7 +33,7 @@ class AuthServices {
 
   static Future<http.Response> loginUser(String email, String password) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/login'),
+      Uri.parse('http://${ApiEndpoints.baseUrl}/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
