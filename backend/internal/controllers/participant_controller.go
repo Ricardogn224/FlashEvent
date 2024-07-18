@@ -22,6 +22,11 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		if user.Role == "AdminEvent" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		var participantAdd models.ParticipantAdd
 		if err := json.NewDecoder(r.Body).Decode(&participantAdd); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -30,7 +35,7 @@ func AddParticipant(db *gorm.DB) http.HandlerFunc {
 
 		// Validate that the user exists
 		var newUser models.User
-		if err := db.Where("email = ?", user.Email).First(&newUser).Error; err != nil {
+		if err := db.Where("email = ?", participantAdd.Email).First(&newUser).Error; err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}

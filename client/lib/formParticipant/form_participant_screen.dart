@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flash_event/eventParty/event_details_screen.dart';
 import 'package:flutter_flash_event/formEventParty/form_item.dart';
 import 'package:flutter_flash_event/formParticipant/bloc/form_participant_bloc.dart';
 import 'package:flutter_flash_event/participant/participant_screen.dart';
@@ -76,10 +77,7 @@ class FormParticipantScreen extends StatelessWidget {
                           onPressed: () {
                             BlocProvider.of<FormParticipantBloc>(context).add(FormSubmitEvent(
                               onSuccess: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => ParticipantScreen(id: eventId)),
-                                );
+                                EventScreen.navigateTo(context, id: eventId);
                               },
                               onError: (errorMessage) {
                                 ScaffoldMessenger.of(context).showSnackBar(

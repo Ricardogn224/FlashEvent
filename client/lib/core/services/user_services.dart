@@ -12,7 +12,7 @@ class UserServices {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
-      final response = await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/users'),
+      final response = await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -41,7 +41,7 @@ class UserServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/my-user'),
+        Uri.parse('${ApiEndpoints.baseUrl}/my-user'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -64,7 +64,7 @@ class UserServices {
 
   static Future<http.Response> registerUserAdmin(User user) async {
     final response = await http.post(
-      Uri.parse('http://${ApiEndpoints.baseUrl}/registerAdmin'),
+      Uri.parse('${ApiEndpoints.baseUrl}/registerAdmin'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -93,7 +93,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/users-email/$email'),
+        Uri.parse('${ApiEndpoints.baseUrl}/users-email/$email'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -119,7 +119,7 @@ class UserServices {
     try {
       // Fetch participants for the given event ID
       final response = await http
-          .get(Uri.parse('http://${ApiEndpoints.baseUrl}/participants-event/$id'),
+          .get(Uri.parse('${ApiEndpoints.baseUrl}/participants-event/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -139,7 +139,7 @@ class UserServices {
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
         final userResponse =
-            await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/users/$userId'),
+            await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users/$userId'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $token', // Include token in headers
@@ -167,7 +167,7 @@ class UserServices {
     try {
       // Fetch participants for the given event ID
       final response = await http
-          .get(Uri.parse('http://${ApiEndpoints.baseUrl}/participants-contribution/$id'),
+          .get(Uri.parse('${ApiEndpoints.baseUrl}/participants-contribution/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -187,7 +187,7 @@ class UserServices {
       for (var participantData in participantsData) {
         final int userId = participantData['user_id'];
         final userResponse =
-        await http.get(Uri.parse('http://${ApiEndpoints.baseUrl}/users/$userId'),
+        await http.get(Uri.parse('${ApiEndpoints.baseUrl}/users/$userId'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'Authorization': 'Bearer $token', // Include token in headers
@@ -215,7 +215,7 @@ class UserServices {
     String? token = prefs.getString('token');
     try {
       final response = await http.get(
-          Uri.parse('http://${ApiEndpoints.baseUrl}/transportation/$id/participants'),
+          Uri.parse('${ApiEndpoints.baseUrl}/transportation/$id/participants'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -241,7 +241,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/users-emails/$id'),
+        Uri.parse('${ApiEndpoints.baseUrl}/users-emails/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -268,7 +268,7 @@ class UserServices {
 
     try {
       final response = await http.get(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/users/$id'),
+        Uri.parse('${ApiEndpoints.baseUrl}/users/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -294,7 +294,7 @@ class UserServices {
 
     try {
       final response = await http.patch(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/users/${user.id}'),
+        Uri.parse('${ApiEndpoints.baseUrl}/users/${user.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
@@ -321,7 +321,7 @@ class UserServices {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://${ApiEndpoints.baseUrl}/users/$id'),
+        Uri.parse('${ApiEndpoints.baseUrl}/users/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token', // Include token in headers
