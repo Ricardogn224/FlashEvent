@@ -41,9 +41,9 @@ func HasRole(user *models.User, roles ...string) bool {
 var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
-	Email string `json:"email"`
-	Role  string `json:"role"` // Ajouter ce champ
-	jwt.StandardClaims
+    Email string `json:"email"`
+    Role  string `json:"role"` // Ajouter ce champ
+    jwt.StandardClaims
 }
 
 var otpStore = make(map[string]string)

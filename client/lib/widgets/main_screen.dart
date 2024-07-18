@@ -50,7 +50,9 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+
   void _onItemTapped(int index) {
+    // Si l'utilisateur essaie d'accéder à la page admin sans le rôle approprié, ne rien faire
     if (index == 2 && widget.userRole != 'AdminPlatform') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Accès refusé: réservé aux administrateurs')),

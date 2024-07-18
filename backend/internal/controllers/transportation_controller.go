@@ -114,7 +114,6 @@ func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-
 		// transportFeatureActive, err := IsTransportFeatureActive(db)
 		// if err != nil {
 		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
