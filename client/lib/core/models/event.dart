@@ -7,6 +7,7 @@ class Event {
   final String dateEnd;
   final bool transportActive;
   final String transportStart;
+  final double cagnotte; // New field
 
   Event({
     required this.id,
@@ -17,6 +18,7 @@ class Event {
     required this.dateEnd,
     required this.transportActive,
     required this.transportStart,
+    required this.cagnotte, // Initialize new field
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class Event {
       dateEnd: json['date_end'] ?? '',
       transportActive: json['transport_active'] ?? false,
       transportStart: json['transport_start'] ?? 'Indefini',
+      cagnotte: (json['cagnotte'] as num).toDouble(), // Ensure it's a double
     );
   }
 
@@ -42,6 +45,7 @@ class Event {
       'date_end': dateEnd,
       'transport_active': transportActive,
       'transport_start': transportStart,
+      'cagnotte': cagnotte, // Add new field
     };
   }
 }

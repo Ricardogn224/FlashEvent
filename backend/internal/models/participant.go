@@ -2,15 +2,16 @@ package models
 
 // Participant représente un participant à un événement
 type Participant struct {
-	ID               uint  `gorm:"primaryKey" json:"id"`
-	UserID           uint  `json:"user_id" gorm:"not null"`
-	User             User  `gorm:"foreignKey:UserID" json:"user"`
-	EventID          uint  `json:"event_id" gorm:"not null"`
-	Event            Event `gorm:"foreignKey:EventID" json:"event"`
-	TransportationID uint  `json:"transportation_id"`
-	Active           bool  `json:"active" gorm:"default:false"`   // New active field
-	Response         bool  `json:"response" gorm:"default:false"` // New active field
-	Present          bool  `json:"present" gorm:"default:false"`
+	ID               uint    `gorm:"primaryKey" json:"id"`
+	UserID           uint    `json:"user_id" gorm:"not null"`
+	User             User    `gorm:"foreignKey:UserID" json:"user"`
+	EventID          uint    `json:"event_id" gorm:"not null"`
+	Event            Event   `gorm:"foreignKey:EventID" json:"event"`
+	TransportationID uint    `json:"transportation_id"`
+	Active           bool    `json:"active" gorm:"default:false"`   // New active field
+	Response         bool    `json:"response" gorm:"default:false"` // New active field
+	Present          bool    `json:"present" gorm:"default:false"`
+	Contribution     float64 `json:"contribution" gorm:"default:0"`
 }
 
 // ParticipantAdd représente les données nécessaires pour ajouter un participant

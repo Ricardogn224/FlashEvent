@@ -82,6 +82,7 @@ class FormEventPartyBloc extends Bloc<FormEventPartyEvent, FormEventPartyState> 
         place: '',
         dateStart: '',
         dateEnd: '',
+        cagnotte: 0,
       );
 
       try {
