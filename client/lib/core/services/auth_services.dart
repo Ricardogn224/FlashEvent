@@ -7,14 +7,16 @@ import 'package:flutter_flash_event/core/models/event.dart';
 import 'package:flutter_flash_event/core/services/api_endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 class AuthServices {
-  static Future<http.Response> registerUser(User user) async {
-    final uri = Uri.https(ApiEndpoints.baseUrl, '/register');
-    final headers = <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Accept': '*/*'
-    };
+  static final Dio _dio = Dio();
+
+
+  static Future<Response<dynamic>> registerUser(User user) async {
+    final uri = '${ApiEndpoints.baseUrl}/register';
+
+
     final body = jsonEncode(<String, String>{
       'firstname': user.firstname,
       'lastname': user.lastname,
@@ -25,7 +27,15 @@ class AuthServices {
 
     log('Registering user at $uri with body: $body');
 
-    final response = await http.post(uri, headers: headers, body: body);
+    final response = await _dio.post(
+      uri,
+      data: body,
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ),
+    );
 
     if (response.statusCode == 201) {
       return response;
@@ -34,12 +44,9 @@ class AuthServices {
     }
   }
 
-  static Future<http.Response> loginUser(String email, String password) async {
-    final uri = Uri.https(ApiEndpoints.baseUrl, '/login');
-    final headers = <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Accept': '*/*'
-    };
+  static Future<Response<dynamic>> loginUser(String email, String password) async {
+    final uri = '${ApiEndpoints.baseUrl}/login';
+
     final body = jsonEncode(<String, String>{
       'email': email,
       'password': password,
@@ -47,19 +54,24 @@ class AuthServices {
 
     log('Logging in user at $uri with body: $body');
 
-    final response = await http.post(uri, headers: headers, body: body);
+    final response = await _dio.post(
+        uri,
+        data: body,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        ),
+    );
 
     log('Received response with status code: ${response.statusCode}');
-    log('Response body: ${response.body}');
+    log('Response body: ${response.data}');
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String token = jsonDecode(response.body)['token'];
-      log('Token received: $token');
-      await prefs.setString('token', token);
+      await prefs.setString('token', response.data['token']);
       return response;
     } else {
-      log('Failed to login, status code: ${response.statusCode}');
       throw Exception('Failed to login');
     }
   }
