@@ -43,7 +43,7 @@ jobs:
 
       - name: Deploy code to server
         run: |
-          rsync -avz --exclude='.git' -e "sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }}:/home/${{ secrets.SSH_USERNAME }}/FlashEvent/
+          rsync -avz --exclude='.git' -e "sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }}:/${{ secrets.SSH_USERNAME }}/FlashEvent/
 
       - name: Connect to server and deploy backend
         run: |
