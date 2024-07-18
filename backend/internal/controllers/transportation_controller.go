@@ -117,6 +117,7 @@ func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 			http.Error(w, "Event not found", http.StatusNotFound)
 			return
 		}
+
 		// Check if the transport feature is active
 		transportFeatureActive, err := IsTransportFeatureActive(db)
 		if err != nil {
@@ -135,6 +136,11 @@ func GetTransportationsByEvent(db *gorm.DB) http.HandlerFunc {
 		if result.Error != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
+		}
+
+		// Return an empty list if no transportations are found
+		if len(transportations) == 0 {
+			transportations = []models.Transportation{}
 		}
 
 		w.WriteHeader(http.StatusOK)

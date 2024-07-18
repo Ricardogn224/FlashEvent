@@ -11,6 +11,8 @@ import 'package:flutter_flash_event/transportation/transportation_screen.dart';
 import 'package:flutter_flash_event/widgets/custom_form_field.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flash_event/core/models/participant.dart';
+import 'package:flutter_flash_event/core/models/itemEvent.dart';
+import 'package:flutter_flash_event/core/models/transportation.dart'; // Importer le modèle Transportation
 
 class EventScreen extends StatefulWidget {
   static const String routeName = '/event';
@@ -31,17 +33,27 @@ class _EventScreenState extends State<EventScreen> {
   bool showParticipants = false;
   bool showParticipantsPresence = false;
   bool showAddParticipantForm = false;
+  bool showItems = false;
+  bool showAddItemForm = false;
+  bool showTransportations = false; // Ajoutez ceci
+  bool showAddTransportationForm = false; // Ajoutez ceci
   late TextEditingController emailController;
+  late TextEditingController itemController;
+  late TextEditingController transportationController; // Ajoutez ceci
 
   @override
   void initState() {
     super.initState();
     emailController = TextEditingController();
+    itemController = TextEditingController();
+    transportationController = TextEditingController(); // Ajoutez ceci
   }
 
   @override
   void dispose() {
     emailController.dispose();
+    itemController.dispose();
+    transportationController.dispose(); // Ajoutez ceci
     super.dispose();
   }
 
@@ -116,14 +128,16 @@ class _EventScreenState extends State<EventScreen> {
                                 const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
-                                        ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateStart))
-                                        : 'Undefined'),
+                                  eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
+                                      ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateStart))
+                                      : 'Undefined',
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
-                                        ? DateFormat.Hm().format(DateTime.parse(eventParty.dateStart))
-                                        : ''),
+                                  eventParty.dateStart != null && eventParty.dateStart.isNotEmpty
+                                      ? DateFormat.Hm().format(DateTime.parse(eventParty.dateStart))
+                                      : '',
+                                ),
                               ],
                             ),
                             const Divider(),
@@ -132,14 +146,16 @@ class _EventScreenState extends State<EventScreen> {
                                 const Icon(Icons.calendar_today, color: Color(0xFF6058E9)),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
-                                        ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateEnd))
-                                        : 'Undefined'),
+                                  eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
+                                      ? DateFormat.yMMMd().format(DateTime.parse(eventParty.dateEnd))
+                                      : 'Undefined',
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
-                                    eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
-                                        ? DateFormat.Hm().format(DateTime.parse(eventParty.dateEnd))
-                                        : ''),
+                                  eventParty.dateEnd != null && eventParty.dateEnd.isNotEmpty
+                                      ? DateFormat.Hm().format(DateTime.parse(eventParty.dateEnd))
+                                      : '',
+                                ),
                               ],
                             ),
                             const Divider(),
@@ -153,22 +169,23 @@ class _EventScreenState extends State<EventScreen> {
                                     });
                                   },
                                   child: Row(
-                                    children: const [
+                                    children: [
                                       Icon(Icons.people, color: Color(0xFF6058E9)),
                                       SizedBox(width: 8),
                                       Text('Participants'),
+                                      Icon(
+                                        showParticipants ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    /*showAddParticipantForm ? Icons.remove :*/ Icons.add,
+                                    Icons.add,
                                     color: Color(0xFF6058E9),
                                   ),
                                   onPressed: () {
-                                    /*setState(() {
-                                      showAddParticipantForm = !showAddParticipantForm;
-                                    });*/
                                     FormParticipantScreen.navigateTo(context, id: widget.id);
                                   },
                                 ),
@@ -180,95 +197,18 @@ class _EventScreenState extends State<EventScreen> {
                                 children: [
                                   const Divider(),
                                   if (state.participants != null && state.participants!.isNotEmpty)
-                                    ...state.participants!
-                                        .map((participant) => Text('Participant: ${participant.firstname} ${participant.lastname}'))
-                                        .toList()
+                                    ...state.participants!.map((participant) {
+                                      return ListTile(
+                                        leading: Icon(Icons.person),
+                                        title: Text('${participant.firstname} ${participant.lastname}'),
+                                      );
+                                    }).toList()
                                   else
                                     const Text('Aucun participant à afficher'),
                                 ],
                               ),
-                            if (showAddParticipantForm)
-                              Container(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Form(
-                                  key: state.formKey,
-                                  child: Column(
-                                    children: [
-                                      Autocomplete<String>(
-                                        optionsBuilder: (TextEditingValue textEditingValue) {
-                                          if (textEditingValue.text.isEmpty) {
-                                            return const Iterable<String>.empty();
-                                          }
-                                          BlocProvider.of<EventPartyBloc>(context)
-                                              .add(FetchEmailSuggestions(query: textEditingValue.text, eventId: state.userParticipant!.eventId));
-                                          return state.emailSuggestions.where((String option) {
-                                            return option.contains(textEditingValue.text.toLowerCase());
-                                          });
-                                        },
-                                        onSelected: (String selection) {
-                                          BlocProvider.of<EventPartyBloc>(context)
-                                              .add(EmailChanged(email: BlocFormItem(value: selection)));
-                                        },
-                                        fieldViewBuilder: (
-                                            BuildContext context,
-                                            TextEditingController textEditingController,
-                                            FocusNode focusNode,
-                                            VoidCallback onFieldSubmitted,
-                                            ) {
-                                          return CustomFormField(
-                                            controller: emailController,
-                                            focusNode: focusNode,
-                                            hintText: 'Email',
-                                            onChange: (val) {
-                                              BlocProvider.of<EventPartyBloc>(context)
-                                                  .add(EmailChanged(email: BlocFormItem(value: val!)));
-                                            },
-                                            validator: (val) {
-                                              return state.email.error;
-                                            },
-                                          );
-
-                                        },
-                                      ),
-                                      const SizedBox(height: 30),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              context.read<EventPartyBloc>().add(
-                                                FormSubmitEvent(
-                                                  participant: state.userParticipant!,
-                                                  onSuccess: () {
-                                                    Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EventScreen(id: state.userParticipant!.eventId)),
-                                                    );
-                                                  },
-                                                  onError: (errorMessage) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text(errorMessage)),
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: const Text('AJOUTER'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            child: const Text('RÉINITIALISER'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
                             SwitchListTile(
-                              title: Text("Ma présence"),
+                              title: const Text("Ma présence"),
                               value: state.userParticipant?.present ?? false,
                               onChanged: (bool value) {
                                 if (state.userParticipant != null) {
@@ -292,10 +232,14 @@ class _EventScreenState extends State<EventScreen> {
                                     });
                                   },
                                   child: Row(
-                                    children: const [
+                                    children: [
                                       Icon(Icons.people, color: Color(0xFF6058E9)),
                                       SizedBox(width: 8),
-                                      Text('Participants avec présence confirmé'),
+                                      Text('Participants avec présence confirmée'),
+                                      Icon(
+                                        showParticipantsPresence ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -307,11 +251,196 @@ class _EventScreenState extends State<EventScreen> {
                                 children: [
                                   const Divider(),
                                   if (state.participantsPresence != null && state.participantsPresence!.isNotEmpty)
-                                    ...state.participantsPresence!
-                                        .map((participantPresence) => Text('Participant: ${participantPresence.firstname} ${participantPresence.lastname}'))
-                                        .toList()
+                                    ...state.participantsPresence!.map((participantPresence) {
+                                      return ListTile(
+                                        leading: Icon(Icons.person),
+                                        title: Text('${participantPresence.firstname} ${participantPresence.lastname}'),
+                                      );
+                                    }).toList()
                                   else
                                     const Text('Aucun participant à afficher'),
+                                ],
+                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      showItems = !showItems;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.list, color: Color(0xFF6058E9)),
+                                      SizedBox(width: 8),
+                                      Text('Choses à ramener'),
+                                      Icon(
+                                        showItems ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                        color: Color(0xFF6058E9),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    showAddItemForm ? Icons.remove : Icons.add,
+                                    color: Color(0xFF6058E9),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      showAddItemForm = !showAddItemForm;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            if (showItems)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Divider(),
+                                  if (state.itemEvents != null && state.itemEvents!.isNotEmpty)
+                                    ...state.itemEvents!.map((itemEvent) {
+                                      return ListTile(
+                                        leading: Icon(Icons.person),
+                                        title: Text(itemEvent.name),
+                                        subtitle: Text('${itemEvent.firstname} ${itemEvent.lastname}'),
+                                      );
+                                    }).toList()
+                                  else
+                                    const Text('Aucun item à afficher'),
+                                ],
+                              ),
+                            if (showAddItemForm)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: itemController,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Nom de l\'item',
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.check, color: Colors.green),
+                                      onPressed: () {
+                                        if (itemController.text.isNotEmpty) {
+                                          final newItem = ItemEvent(
+                                            id: 0,
+                                            name: itemController.text,
+                                            userId: state.userParticipant?.userId ?? 0,
+                                            eventId: widget.id,
+                                            firstname: 'John',
+                                            lastname: 'Doe',
+                                          );
+
+                                          context.read<EventPartyBloc>().add(AddItem(itemEvent: newItem));
+                                          setState(() {
+                                            itemController.clear();
+                                            showAddItemForm = false;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (eventParty.transportActive) // Vérifiez si le transport est actif
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            showTransportations = !showTransportations;
+                                          });
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.directions_bus, color: Color(0xFF6058E9)),
+                                            SizedBox(width: 8),
+                                            Text('Transportations'),
+                                            Icon(
+                                              showTransportations ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                              color: Color(0xFF6058E9),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          showAddTransportationForm ? Icons.remove : Icons.add,
+                                          color: Color(0xFF6058E9),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            showAddTransportationForm = !showAddTransportationForm;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  if (showTransportations)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Divider(),
+                                        if (state.transportations != null && state.transportations!.isNotEmpty)
+                                          ...state.transportations!.map((transportation) {
+                                            return ListTile(
+                                              leading: Icon(Icons.directions_car),
+                                              title: Text(transportation.vehicle),
+                                              subtitle: Text('Seat number: ${transportation.seatNumber}'),
+                                            );
+                                          }).toList()
+                                        else
+                                          const Text('Aucun transportation à afficher'),
+                                      ],
+                                    ),
+                                  if (showAddTransportationForm)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextFormField(
+                                              controller: transportationController,
+                                              decoration: const InputDecoration(
+                                                hintText: 'Nom du véhicule',
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.check, color: Colors.green),
+                                            onPressed: () {
+                                              if (transportationController.text.isNotEmpty) {
+                                                final newTransportation = Transportation(
+                                                  id: 0,
+                                                  vehicle: transportationController.text,
+                                                  seatNumber: 0, // Vous pouvez ajouter une logique pour obtenir le numéro de siège
+                                                  eventId: widget.id,
+                                                  userId: state.userParticipant?.userId ?? 0,
+                                                  email: 'john.doe@example.com', // Utilisez des valeurs par défaut
+                                                );
+
+                                                context.read<EventPartyBloc>().add(AddTransportation(transportation: newTransportation));
+                                                setState(() {
+                                                  transportationController.clear();
+                                                  showAddTransportationForm = false;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                 ],
                               ),
                           ],

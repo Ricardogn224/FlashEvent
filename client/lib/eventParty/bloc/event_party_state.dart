@@ -12,6 +12,8 @@ class EventPartyState {
   final BlocFormItem email;
   final GlobalKey<FormState>? formKey;
   final String? errorMessage;
+  final List<ItemEvent>? itemEvents;
+  final List<Transportation>? transportations; // Ajoutez ceci
 
   EventPartyState({
     this.status = EventPartyStatus.initial,
@@ -23,6 +25,8 @@ class EventPartyState {
     this.email = const BlocFormItem(error: 'Enter email'),
     this.formKey,
     this.errorMessage,
+    this.itemEvents,
+    this.transportations, // Ajoutez ceci
   });
 
   EventPartyState copyWith({
@@ -35,6 +39,8 @@ class EventPartyState {
     BlocFormItem? email,
     GlobalKey<FormState>? formKey,
     String? errorMessage,
+    List<ItemEvent>? itemEvents,
+    List<Transportation>? transportations, // Ajoutez ceci
   }) {
     return EventPartyState(
       status: status ?? this.status,
@@ -46,6 +52,8 @@ class EventPartyState {
       email: email ?? this.email,
       formKey: formKey,
       errorMessage: errorMessage ?? this.errorMessage,
+      itemEvents: itemEvents ?? this.itemEvents,
+      transportations: transportations ?? this.transportations, // Ajoutez ceci
     );
   }
 }
