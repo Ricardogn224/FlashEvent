@@ -43,6 +43,9 @@ func main() {
 	// Création du routeur
 	router := mux.NewRouter()
 
+	// Ajout du middleware CORS
+	router.Use(corsMiddleware)
+
 	// Enregistrement des routes publiques
 	routes.RegisterPublicRoutes(router, api, db)
 
@@ -58,4 +61,22 @@ func main() {
 
 	// Démarrage du serveur HTTP
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+// corsMiddleware ajoute les en-têtes CORS aux réponses HTTP
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Si la méthode est OPTIONS, on retourne 200 sans aller plus loin
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
