@@ -22,8 +22,16 @@ class TransportationScreen extends StatelessWidget {
       create: (context) => TransportationBloc()..add(TransportationDataLoaded(id: id)),
       child: BlocBuilder<TransportationBloc, TransportationState>(
         builder: (context, state) {
-          final transportations = state.transportations;
-          final participants = state.participants;
+          if (state.status == TransportationStatus.loading) {
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          final transportations = state.transportations ?? [];
+          final participants = state.participants ?? [];
           final currentUser = state.currentUser;
           final eventParty = state.eventParty;
 
@@ -35,22 +43,24 @@ class TransportationScreen extends StatelessWidget {
               backgroundColor: Colors.white,
               body: Column(
                 children: [
-                  if (eventParty != null) // Check if eventParty is not null
+                  if (eventParty != null)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Lieu de départ : ' + (eventParty.transportStart.isNotEmpty
-                                ? eventParty.transportStart
-                                : 'Indéfini'),
+                            'Lieu de départ : ' +
+                                (eventParty.transportStart.isNotEmpty
+                                    ? eventParty.transportStart
+                                    : 'Indéfini'),
                             style: TextStyle(fontSize: 16),
                           ),
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              TransportStartEditScreen.navigateTo(context, event: eventParty);
+                              TransportStartEditScreen.navigateTo(
+                                  context, event: eventParty);
                             },
                           ),
                         ],
@@ -62,12 +72,15 @@ class TransportationScreen extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  if (state.status == TransportationStatus.success && transportations != null)
+                  if (state.status == TransportationStatus.success)
                     Expanded(
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final transportation = transportations[index];
-                          final transportParticipants = participants?.where((p) => p.transportationId == transportation.id).toList() ?? [];
+                          final transportParticipants = participants
+                              .where((p) =>
+                          p.transportationId == transportation.id)
+                              .toList();
                           return TransportationListItem(
                             transportation: transportation,
                             participants: transportParticipants,
@@ -79,23 +92,26 @@ class TransportationScreen extends StatelessWidget {
                     ),
                   FloatingActionButton(
                     onPressed: () async {
-                      final newParticipant = await Navigator.of(context).push<Map<String, String>>(
+                      final newParticipant = await Navigator.of(context)
+                          .push<Map<String, String>>(
                         MaterialPageRoute(
-                          builder: (context) => FormTransportationScreen.navigateTo(context, id: id),
+                          builder: (context) => FormTransportationScreen
+                              .navigateTo(context, id: id),
                         ),
                       );
 
+                      if (newParticipant != null) {
                         // Handle the new participant data if needed
-                      },
-                      child: Icon(Icons.add),
-                    ),
-                  ],
-                ),
+                      }
+                    },
+                    child: Icon(Icons.add),
+                  ),
+                ],
               ),
+            ),
           );
         },
       ),
     );
   }
 }
-
