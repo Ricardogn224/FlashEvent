@@ -26,16 +26,14 @@ func AddTransportationToEvent(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// transportFeatureActive, err := IsTransportFeatureActive(db)
-		// if err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// if !event.TransportActive || !transportFeatureActive {
-		// 	http.Error(w, "Transportation not available", http.StatusForbidden)
-		// 	return
-		// }
+		// Check for the "transport" feature
+		var feature models.Feature
+		if err := db.Where("name = ?", "transport").First(&feature).Error; err == nil {
+			if feature.Active {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+		}
 
 		var request models.Transportation
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

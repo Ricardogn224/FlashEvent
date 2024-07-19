@@ -84,6 +84,18 @@ func UpdateFeatureByID(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Check if the user has the 'AdminPlatform' role
+		if user.Role != "AdminPlatform" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		var feature models.Feature
 		if err := db.First(&feature, id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {

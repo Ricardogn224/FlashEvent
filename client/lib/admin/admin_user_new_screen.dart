@@ -69,6 +69,19 @@ class AdminUserNewScreen extends StatelessWidget {
                         },
                       ),
                       CustomFormField(
+                        hintText: 'Email',
+                        onChange: (val) {
+                          BlocProvider.of<AdminFormUserBloc>(context).add(
+                            EmailChanged(
+                              email: BlocFormItem(value: val!),
+                            ),
+                          );
+                        },
+                        validator: (val) {
+                          return state.email.error;
+                        },
+                      ),
+                      CustomFormField(
                         hintText: 'Username',
                         onChange: (val) {
                           BlocProvider.of<AdminFormUserBloc>(context).add(

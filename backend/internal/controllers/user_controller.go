@@ -41,9 +41,9 @@ func HasRole(user *models.User, roles ...string) bool {
 var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
-    Email string `json:"email"`
-    Role  string `json:"role"` // Ajouter ce champ
-    jwt.StandardClaims
+	Email string `json:"email"`
+	Role  string `json:"role"` // Ajouter ce champ
+	jwt.StandardClaims
 }
 
 var otpStore = make(map[string]string)
@@ -316,7 +316,6 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-
 func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -345,6 +344,19 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 // GetAllUsers returns all users
 func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Check if the user has the 'AdminPlatform' role
+		if user.Role != "AdminPlatform" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		var users []models.User
 		result := db.Find(&users)
 		if result.Error != nil {
@@ -462,6 +474,18 @@ func UpdateUserByID(db *gorm.DB) http.HandlerFunc {
 // DeleteUserByID deletes a user by their ID
 func DeleteUserByID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetUserFromToken(r, db)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Check if the user has the 'AdminPlatform' role
+		if user.Role != "AdminPlatform" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		vars := mux.Vars(r)
 		id, err := strconv.Atoi(vars["userId"])
 		if err != nil {
