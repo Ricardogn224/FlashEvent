@@ -52,4 +52,4 @@ jobs:
             cp client/build/app/outputs/flutter-apk/app-release.apk ~/FlashEvent/apk/ &&
             cp -r client/build/web/* ~/FlashEvent/web/" &&
             docker-compose build --no-cache &&
-            docker-compose up -d &&
+            docker-compose up -d 
