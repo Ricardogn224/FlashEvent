@@ -44,13 +44,11 @@ class EventPartyBloc extends Bloc<EventPartyEvent, EventPartyState> {
           transportations = await TransportationServices.getTransportationsByEvent(id: event.id);
         }
 
-        // Check for the transport feature
-        Feature transportFeature;
-        try {
-          transportFeature = await FeatureServices.findTransportFeature();
-        } catch (e) {
-          transportFeature = Feature(id: 0, name: '', active: false);
-        }
+        final features = await FeatureServices.getFeatures();
+        final transportFeature = features.firstWhere(
+              (feature) => feature.name == 'transport',
+          orElse: () => Feature(id: 0, name: '', active: false),
+        );
 
         emit(state.copyWith(
           status: EventPartyStatus.success,

@@ -22,11 +22,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final response = await AuthServices.loginUser(event.email, event.password);
       if (response.statusCode == 200) {
         // Extract token from response body
-        Map<String, dynamic> data = jsonDecode(response.body);
-        String token = data['token'];
 
         // Decode the token
-        Map<String, dynamic>? decodedToken = Jwt.parseJwt(token);
+        Map<String, dynamic>? decodedToken = Jwt.parseJwt(response.data['token']);
 
         // Access information from the decoded token
         String email = decodedToken['email'];
@@ -34,7 +32,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         // Store token in session
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
+        await prefs.setString('token', response.data['token']);
         await prefs.setString('email', email);
         
         await prefs.setString('role', userRole);
@@ -47,7 +45,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         //await FirebaseApi().initNotifications();
       } else {
-        emit(LoginFailure(error: 'Login failed: ${response.body}'));
+        emit(LoginFailure(error: 'Login failed: ${response.data}'));
       }
     } catch (e) {
       emit(LoginFailure(error: 'Error: $e'));

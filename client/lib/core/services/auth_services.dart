@@ -55,13 +55,13 @@ class AuthServices {
     log('Logging in user at $uri with body: $body');
 
     final response = await _dio.post(
-        uri,
-        data: body,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-        ),
+      uri,
+      data: body,
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ),
     );
 
     log('Received response with status code: ${response.statusCode}');

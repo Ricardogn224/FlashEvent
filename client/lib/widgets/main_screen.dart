@@ -116,7 +116,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           HomeScreen(),
           InvitationScreen(),
-          if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(userRole: widget.userRole),
+          if (widget.userRole == 'AdminPlatform') AdminHomeDesktop(),
           NotificationsScreen(),
           Container(), // Placeholder for the logout option
         ],

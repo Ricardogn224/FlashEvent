@@ -422,20 +422,21 @@ class _EventScreenState extends State<EventScreen> {
                                 ),
                               ),
                             const Divider(),
-                            GestureDetector(
-                              onTap: () {
-                                TransportationScreen.navigateTo(
-                                    context, id: widget.id);
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.directions_car,
-                                      color: Color(0xFF6058E9)),
-                                  SizedBox(width: 8),
-                                  Text('Le transport'),
-                                ],
+                            if ((state.feature?.name == 'transport' && state.feature?.active == true) || state.feature?.name == '')
+                              GestureDetector(
+                                onTap: () {
+                                  TransportationScreen.navigateTo(
+                                      context, id: widget.id);
+                                },
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.directions_car,
+                                        color: Color(0xFF6058E9)),
+                                    SizedBox(width: 8),
+                                    Text('Le transport'),
+                                  ],
+                                ),
                               ),
-                            ),
                             const Divider(),
                             GestureDetector(
                               onTap: () {
