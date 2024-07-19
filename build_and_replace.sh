@@ -16,7 +16,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Building Flutter web..."
-flutter build web
+flutter build web --web-renderer html
 cp -r client/build/web/* web/
 
 # Copier et remplacer les fichiers existants

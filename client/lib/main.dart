@@ -8,9 +8,17 @@ import 'package:flutter_flash_event/firebase_options.dart';
 import 'package:flutter_flash_event/screens/splash_screen.dart';
 import 'package:flutter_flash_event/routes.dart';
 import 'package:flutter_flash_event/widgets/main_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Clear the preferences at the start of the app
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('token');
+  await prefs.remove('email');
+  await prefs.remove('userId');
+  await prefs.remove('role');
 
   if (defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS) {
