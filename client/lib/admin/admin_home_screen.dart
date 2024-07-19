@@ -10,23 +10,14 @@ import '../widgets/main_screen.dart';
 class AdminHomeDesktop extends StatelessWidget {
   static const String routeName = '/admin';
 
-  final String userRole;
+  const AdminHomeDesktop();
 
-  AdminHomeDesktop({required this.userRole});
-
-  static navigateTo(BuildContext context, String userRole) {
-    Navigator.of(context).pushNamed(routeName, arguments: userRole);
+  static navigateTo(BuildContext context) {
+    Navigator.of(context).pushNamed(routeName);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (userRole != 'AdminPlatform') {
-      return Scaffold(
-        body: Center(
-          child: Text('Accès refusé: réservé aux administrateurs'),
-        ),
-      );
-    }
 
     return MaterialApp(
       title: 'Interface admin',
@@ -84,7 +75,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.routeName: (context) => LoginScreen(),
         AdminHomeDesktop.routeName: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as String;
-          return AdminHomeDesktop(userRole: args);
+          return AdminHomeDesktop();
         },
         // Add other routes as necessary
       },
