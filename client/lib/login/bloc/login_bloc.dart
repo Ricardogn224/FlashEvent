@@ -38,6 +38,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         String userRole = decodedToken['role'] ??
             ''; // Assuming the role is stored in the token
 
+        if (email == null || userRole == null) {
+          throw Exception('Invalid token: missing email or role');
+        }
+
         // Store token in session
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
