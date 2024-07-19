@@ -35,7 +35,7 @@ class AdminUserNewScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              body: Padding(
+              body: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Form(
                   key: state.formKey,
@@ -96,6 +96,7 @@ class AdminUserNewScreen extends StatelessWidget {
                       ),
                       CustomFormField(
                         hintText: 'Password',
+                        obscureText: true, // Définir comme champ de mot de passe
                         onChange: (val) {
                           BlocProvider.of<AdminFormUserBloc>(context).add(
                             PasswordChanged(

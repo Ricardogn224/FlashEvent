@@ -9,6 +9,7 @@ class CustomFormField extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? initialValue;
+  final bool obscureText; // Ajout du paramètre obscureText
 
   const CustomFormField({
     Key? key,
@@ -19,6 +20,7 @@ class CustomFormField extends StatelessWidget {
     this.controller,
     this.focusNode,
     this.initialValue,
+    this.obscureText = false, // Initialisation par défaut à false
   }) : super(key: key);
 
   @override
@@ -31,6 +33,7 @@ class CustomFormField extends StatelessWidget {
         validator: validator,
         controller: controller,
         focusNode: focusNode,
+        obscureText: obscureText, // Utilisation de obscureText
         decoration: InputDecoration(hintText: hintText),
         onChanged: (value) {
           if (onChange != null) {

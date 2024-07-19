@@ -48,7 +48,7 @@ class AdminFormUserState extends Equatable {
   }
 
   @override
-  List<Object> get props => [firstname, lastname, email, username, isAdmin, role];
+  List<Object> get props => [firstname, lastname, email, username, isAdmin, role, password];
 }
 
 enum FormStatus { none, inProgress, valid, error }

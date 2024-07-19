@@ -122,7 +122,6 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
       state.copyWith(
         password: BlocFormItem(
           value: event.password.value,
-          error: event.password.value.isValidName ? null : 'Enter a valid name',
         ),
         formKey: formKey,
       ),
@@ -180,10 +179,11 @@ class AdminFormUserBloc extends Bloc<AdminFormUserEvent, AdminFormUserState> {
   }
 
   Future<void> _onFormNewSubmitted(FormNewSubmitEvent event, Emitter<AdminFormUserState> emit) async {
+    print(state.password.value);
     if (state.formKey!.currentState!.validate()) {
 
       String roleContent = '';
-      if (state.role.value == false){
+      if (state.password.value == false){
         roleContent = 'user';
       } else {
         roleContent = 'AdminPlatform';
