@@ -54,9 +54,32 @@ class AuthServices {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String token = jsonDecode(response.body)['token'];
-      log('Token received: $token');
-      await prefs.setString('token', token);
+
+      // Vérification et journalisation du contenu de la réponse JSON
+      Map<String, dynamic> responseJson;
+      try {
+        responseJson = jsonDecode(response.body);
+      } catch (e) {
+        log('Error decoding JSON: $e');
+        throw Exception('Failed to decode JSON');
+      }
+
+      // Vérification de la présence du token
+      if (responseJson.containsKey('token') &&
+          responseJson['token'] is String) {
+        String token = responseJson['token'];
+        log('Token received: $token');
+
+        // Stocker le token
+        await prefs.setString('token', token);
+
+        // Récupérer et loguer le token pour vérification
+        String storedToken = prefs.getString('token') ?? 'null';
+        log('Stored token: $storedToken');
+      } else {
+        log('Token is missing or is not a string');
+        throw Exception('Failed to retrieve token');
+      }
       return response;
     } else {
       log('Failed to login, status code: ${response.statusCode}');

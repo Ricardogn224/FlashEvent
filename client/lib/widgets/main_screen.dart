@@ -6,6 +6,7 @@ import 'package:flutter_flash_event/admin/admin_home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flash_event/login/login_screen.dart';
 import 'dart:async';
+import 'dart:developer';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/main';
@@ -32,15 +33,22 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _checkTokenValidity() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    log('Token checked: $token');
 
     // Check if the current route is the login screen
     if (ModalRoute.of(context)?.settings.name == LoginScreen.routeName) {
+      log('Current route is login screen, canceling timer');
       _timer?.cancel(); // Cancel the timer if on login screen
       return;
     }
 
-    if (token == null) {
-      Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+    if (token == null || token.isEmpty) {
+      log('Token is null or empty, navigating to login screen');
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+      }
+    } else {
+      log('Token is valid');
     }
   }
 
@@ -99,7 +107,9 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-    Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+    }
   }
 
   @override
@@ -153,4 +163,3 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-

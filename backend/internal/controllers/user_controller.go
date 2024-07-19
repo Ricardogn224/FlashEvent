@@ -42,7 +42,7 @@ var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
-	Role  string `json:"role"` // Ajouter ce champ
+	Role  string `json:"role"` // Ajout du champ Role
 	jwt.StandardClaims
 }
 
@@ -56,9 +56,71 @@ func setCORSHeaders(w http.ResponseWriter) {
 }
 
 // RegisterUser gère l'enregistrement d'un nouvel utilisateur
-func RegisterUser(db *gorm.DB) http.HandlerFunc {
+func LoginUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("RegisterUser called")
+		log.Println("LoginUser called")
+		setCORSHeaders(w)
+
+		// Initialiser les tables nécessaires si elles n'existent pas
+		log.Println("Migrating database tables")
+		database.MigrateAll(db)
+
+		var credentials models.User
+		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+			log.Printf("Error decoding request body: %v\n", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		log.Printf("Credentials received: %v\n", credentials)
+
+		var user models.User
+		log.Printf("Looking up user with email: %s\n", credentials.Email)
+		result := db.Where("email = ?", credentials.Email).First(&user)
+		if result.Error != nil {
+			log.Printf("User not found or error occurred: %v\n", result.Error)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		log.Printf("User found: %v\n", user)
+
+		if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)) != nil {
+			log.Println("Password does not match")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		log.Println("Password match")
+
+		log.Printf("User role: %s\n", user.Role) // Log the user role
+
+		expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
+		claims := &Claims{
+			Email: user.Email,
+			Role:  user.Role,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString(jwtKey)
+		if err != nil {
+			log.Printf("Error signing token: %v\n", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		log.Println("Token generated successfully")
+		log.Printf("Generated token claims: %+v\n", claims) // Log the token claims
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+	}
+}
+
+// RegisterUserAdmin gère l'enregistrement d'un nouvel utilisateur admin
+func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("RegisterUserAdmin called")
 		setCORSHeaders(w)
 
 		// Initialiser les tables nécessaires si elles n'existent pas
@@ -70,55 +132,7 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Valider les champs requis
-		if user.Email == "" || user.Firstname == "" || user.Lastname == "" || user.Password == "" {
-			http.Error(w, "Email, firstname, lastname and password are required fields", http.StatusBadRequest)
-			return
-		}
-
-		// Vérifier si l'email existe déjà
-		var existingUser models.User
-		if err := db.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
-			http.Error(w, "Email already exists", http.StatusConflict)
-			return
-		}
-
-		// Attribuer le rôle "user" par défaut
-		user.Role = "user"
-
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error hashing password: %v", err), http.StatusInternalServerError)
-			return
-		}
-		user.Password = string(hashedPassword)
-
-		result := db.Create(&user)
-		if result.Error != nil {
-			http.Error(w, fmt.Sprintf("Error creating user: %v", result.Error), http.StatusInternalServerError)
-			return
-		}
-
-		sendWelcomeEmail(user.Email)
-
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(user)
-	}
-}
-
-// RegisterUser gère l'enregistrement d'un nouvel utilisateur
-func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Initialiser les tables nécessaires si elles n'existent pas
-		database.MigrateAll(db)
-
-		var user models.User
-		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			http.Error(w, fmt.Sprintf("Invalid request payload: %v", err), http.StatusBadRequest)
-			return
-		}
-
-		// Verify user roles and permissions
+		// Vérifier les rôles et permissions de l'utilisateur authentifié
 		authUser, err := GetUserFromToken(r, db)
 		if err != nil {
 			log.Printf("Unauthorized: %v", err)
@@ -296,7 +310,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 		claims := &Claims{
 			Email: user.Email,
-			Role:  user.Role,
+			Role:  user.Role, // Assurez-vous que le rôle est inclus dans les revendications
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},
@@ -344,7 +358,6 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 // GetAllUsers returns all users
 func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		user, err := GetUserFromToken(r, db)
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -372,7 +385,6 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 // GetUserByID returns a user by their ID
 func MyUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		// Vérifier les rôles de l'utilisateur
 		user, err := GetUserFromToken(r, db)
 		if err != nil {
