@@ -42,7 +42,7 @@ var jwtKey = []byte("your_secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
-	Role  string `json:"role"` // Ajouter ce champ
+	Role  string `json:"role"` // Ajout du champ Role
 	jwt.StandardClaims
 }
 
@@ -106,9 +106,12 @@ func RegisterUser(db *gorm.DB) http.HandlerFunc {
 	}
 }
 
-// RegisterUser gère l'enregistrement d'un nouvel utilisateur
+// RegisterUserAdmin gère l'enregistrement d'un nouvel utilisateur admin
 func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("RegisterUserAdmin called")
+		setCORSHeaders(w)
+
 		// Initialiser les tables nécessaires si elles n'existent pas
 		database.MigrateAll(db)
 
@@ -118,7 +121,7 @@ func RegisterUserAdmin(db *gorm.DB) http.HandlerFunc {
 			return
 		}
 
-		// Verify user roles and permissions
+		// Vérifier les rôles et permissions de l'utilisateur authentifié
 		authUser, err := GetUserFromToken(r, db)
 		if err != nil {
 			log.Printf("Unauthorized: %v", err)
@@ -296,7 +299,7 @@ func LoginUser(db *gorm.DB) http.HandlerFunc {
 		expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
 		claims := &Claims{
 			Email: user.Email,
-			Role:  user.Role,
+			Role:  user.Role, // Assurez-vous que le rôle est inclus dans les revendications
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},
@@ -344,7 +347,6 @@ func GetUserFromToken(r *http.Request, db *gorm.DB) (*models.User, error) {
 // GetAllUsers returns all users
 func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		user, err := GetUserFromToken(r, db)
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -372,7 +374,6 @@ func GetAllUsers(db *gorm.DB) http.HandlerFunc {
 // GetUserByID returns a user by their ID
 func MyUser(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		// Vérifier les rôles de l'utilisateur
 		user, err := GetUserFromToken(r, db)
 		if err != nil {

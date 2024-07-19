@@ -28,8 +28,8 @@ class UserServices {
 
       final data = json.decode(response.body);
       return (data as List<dynamic>?)?.map((e) {
-        return User.fromJson(e);
-      }).toList() ??
+            return User.fromJson(e);
+          }).toList() ??
           [];
     } catch (error) {
       log('Error occurred while retrieving users.', error: error);
@@ -40,6 +40,8 @@ class UserServices {
   static Future<User> getCurrentUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
+    // Get the current user
+    log('Token before geting user: $token');
     try {
       final response = await http.get(
         Uri.https(ApiEndpoints.baseUrl, '/my-user'),
@@ -59,7 +61,8 @@ class UserServices {
       return User.fromJson(data);
     } catch (error) {
       log('Error occurred while retrieving current user.', error: error);
-      throw ApiException(message: 'Unknown error while retrieving current user');
+      throw ApiException(
+          message: 'Unknown error while retrieving current user');
     }
   }
 
@@ -163,7 +166,8 @@ class UserServices {
     }
   }
 
-  static Future<List<User>> getUsersParticipantsContribution({required int id}) async {
+  static Future<List<User>> getUsersParticipantsContribution(
+      {required int id}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     try {
