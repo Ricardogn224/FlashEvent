@@ -49,7 +49,7 @@ jobs:
         run: |
           sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} "
             cd ~/FlashEvent/ &&
+            cp client/build/app/outputs/flutter-apk/app-release.apk ~/FlashEvent/apk/ &&
+            cp -r client/build/web/* ~/FlashEvent/web/" &&
             docker-compose build --no-cache &&
             docker-compose up -d &&
-            cp client/build/app/outputs/flutter-apk/app-release.apk ~/FlashEvent/apk/ &&
-            cp -r client/build/web/* ~/FlashEvent/web/"
