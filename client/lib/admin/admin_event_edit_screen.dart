@@ -147,7 +147,7 @@ class AdminEventEditScreen extends StatelessWidget {
                               title: Text(participant!.firstname),
                               subtitle: Text('Email: ${participant.email}'),
                               trailing: TextButton(
-                                child: const Text('Remove'),
+                                child: const Text('Retirer'),
                                 onPressed: () => context
                                     .read<AdminFormBloc>()
                                     .add(RemoveParticipant(

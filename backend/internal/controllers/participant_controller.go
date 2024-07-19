@@ -4,10 +4,10 @@ import (
 	"backend/internal/database"
 	"backend/internal/models"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
-	"errors"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -348,9 +348,17 @@ func GetParticipantByEventId(db *gorm.DB) http.HandlerFunc {
 func GetParticipantsByEventID(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
-		eventID := params["eventId"]
+		eventIDStr := params["eventId"]
 
-		// Fetch all participants with the given event ID
+		// Convert eventID to uint
+		eventIDInt, err := strconv.Atoi(eventIDStr)
+		if err != nil {
+			http.Error(w, "Invalid event ID", http.StatusBadRequest)
+			return
+		}
+		eventID := uint(eventIDInt)
+
+		// Fetch all participants with the given event ID and where active and response are true
 		var participants []models.Participant
 		if err := db.Where("event_id = ? AND active = ? AND response = ?", eventID, true, true).Find(&participants).Error; err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
